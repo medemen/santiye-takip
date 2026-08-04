@@ -1,0 +1,1039 @@
+{
+  "aciklama": "Tüm Adalar Tip-Daire-Kat Listesi",
+  "proje": "Şahinbey Belediyesi Güneyşehir Toplu Konutları Yapım İşi",
+  "adalar": [
+    {
+      "ada": "ADA-1",
+      "blok_sayisi": 13,
+      "toplam_daire": 311,
+      "toplam_kat": 98,
+      "bloklar": [
+        {
+          "blok_no": 1,
+          "tip": "TİP-4B",
+          "daire_sayisi": 23,
+          "yapi_konfigurasyonu": "3B+Z+4",
+          "kat_sayisi": 8
+        },
+        {
+          "blok_no": 2,
+          "tip": "TİP-4A",
+          "daire_sayisi": 24,
+          "yapi_konfigurasyonu": "3B+Z+4",
+          "kat_sayisi": 8
+        },
+        {
+          "blok_no": 3,
+          "tip": "TİP-4A",
+          "daire_sayisi": 24,
+          "yapi_konfigurasyonu": "3B+Z+4",
+          "kat_sayisi": 8
+        },
+        {
+          "blok_no": 4,
+          "tip": "TİP-4A",
+          "daire_sayisi": 24,
+          "yapi_konfigurasyonu": "3B+Z+4",
+          "kat_sayisi": 8
+        },
+        {
+          "blok_no": 5,
+          "tip": "TİP-4A",
+          "daire_sayisi": 24,
+          "yapi_konfigurasyonu": "3B+Z+4",
+          "kat_sayisi": 8
+        },
+        {
+          "blok_no": 6,
+          "tip": "TİP-4A",
+          "daire_sayisi": 24,
+          "yapi_konfigurasyonu": "3B+Z+4",
+          "kat_sayisi": 8
+        },
+        {
+          "blok_no": 7,
+          "tip": "TİP-4A",
+          "daire_sayisi": 24,
+          "yapi_konfigurasyonu": "3B+Z+4",
+          "kat_sayisi": 8
+        },
+        {
+          "blok_no": 8,
+          "tip": "TİP-1",
+          "daire_sayisi": 24,
+          "yapi_konfigurasyonu": "B+Z+5",
+          "kat_sayisi": 7
+        },
+        {
+          "blok_no": 9,
+          "tip": "TİP-1",
+          "daire_sayisi": 24,
+          "yapi_konfigurasyonu": "B+Z+5",
+          "kat_sayisi": 7
+        },
+        {
+          "blok_no": 10,
+          "tip": "TİP-1",
+          "daire_sayisi": 24,
+          "yapi_konfigurasyonu": "B+Z+5",
+          "kat_sayisi": 7
+        },
+        {
+          "blok_no": 11,
+          "tip": "TİP-1",
+          "daire_sayisi": 24,
+          "yapi_konfigurasyonu": "B+Z+5",
+          "kat_sayisi": 7
+        },
+        {
+          "blok_no": 12,
+          "tip": "TİP-1",
+          "daire_sayisi": 24,
+          "yapi_konfigurasyonu": "B+Z+5",
+          "kat_sayisi": 7
+        },
+        {
+          "blok_no": 13,
+          "tip": "TİP-1",
+          "daire_sayisi": 24,
+          "yapi_konfigurasyonu": "B+Z+5",
+          "kat_sayisi": 7
+        }
+      ]
+    },
+    {
+      "ada": "ADA-2",
+      "blok_sayisi": 18,
+      "toplam_daire": 453,
+      "toplam_kat": 143,
+      "bloklar": [
+        {
+          "blok_no": 1,
+          "tip": "TİP-3",
+          "daire_sayisi": 26,
+          "yapi_konfigurasyonu": "2B+Z+5",
+          "kat_sayisi": 8
+        },
+        {
+          "blok_no": 2,
+          "tip": "TİP-3",
+          "daire_sayisi": 26,
+          "yapi_konfigurasyonu": "2B+Z+5",
+          "kat_sayisi": 8
+        },
+        {
+          "blok_no": 3,
+          "tip": "TİP-3",
+          "daire_sayisi": 26,
+          "yapi_konfigurasyonu": "2B+Z+5",
+          "kat_sayisi": 8
+        },
+        {
+          "blok_no": 4,
+          "tip": "TİP-3",
+          "daire_sayisi": 26,
+          "yapi_konfigurasyonu": "2B+Z+5",
+          "kat_sayisi": 8
+        },
+        {
+          "blok_no": 5,
+          "tip": "TİP-3",
+          "daire_sayisi": 26,
+          "yapi_konfigurasyonu": "2B+Z+5",
+          "kat_sayisi": 8
+        },
+        {
+          "blok_no": 6,
+          "tip": "TİP-4B",
+          "daire_sayisi": 23,
+          "yapi_konfigurasyonu": "3B+Z+4",
+          "kat_sayisi": 8
+        },
+        {
+          "blok_no": 7,
+          "tip": "TİP-4A",
+          "daire_sayisi": 24,
+          "yapi_konfigurasyonu": "3B+Z+4",
+          "kat_sayisi": 8
+        },
+        {
+          "blok_no": 8,
+          "tip": "TİP-1",
+          "daire_sayisi": 24,
+          "yapi_konfigurasyonu": "B+Z+5",
+          "kat_sayisi": 7
+        },
+        {
+          "blok_no": 9,
+          "tip": "TİP-3",
+          "daire_sayisi": 26,
+          "yapi_konfigurasyonu": "2B+Z+5",
+          "kat_sayisi": 8
+        },
+        {
+          "blok_no": 10,
+          "tip": "TİP-3",
+          "daire_sayisi": 26,
+          "yapi_konfigurasyonu": "2B+Z+5",
+          "kat_sayisi": 8
+        },
+        {
+          "blok_no": 11,
+          "tip": "TİP-3",
+          "daire_sayisi": 26,
+          "yapi_konfigurasyonu": "2B+Z+5",
+          "kat_sayisi": 8
+        },
+        {
+          "blok_no": 12,
+          "tip": "TİP-4A",
+          "daire_sayisi": 24,
+          "yapi_konfigurasyonu": "3B+Z+4",
+          "kat_sayisi": 8
+        },
+        {
+          "blok_no": 13,
+          "tip": "TİP-4A",
+          "daire_sayisi": 24,
+          "yapi_konfigurasyonu": "3B+Z+4",
+          "kat_sayisi": 8
+        },
+        {
+          "blok_no": 14,
+          "tip": "TİP-4A",
+          "daire_sayisi": 24,
+          "yapi_konfigurasyonu": "3B+Z+4",
+          "kat_sayisi": 8
+        },
+        {
+          "blok_no": 15,
+          "tip": "TİP-4A",
+          "daire_sayisi": 24,
+          "yapi_konfigurasyonu": "3B+Z+4",
+          "kat_sayisi": 8
+        },
+        {
+          "blok_no": 16,
+          "tip": "TİP-3",
+          "daire_sayisi": 26,
+          "yapi_konfigurasyonu": "2B+Z+5",
+          "kat_sayisi": 8
+        },
+        {
+          "blok_no": 17,
+          "tip": "TİP-3",
+          "daire_sayisi": 26,
+          "yapi_konfigurasyonu": "2B+Z+5",
+          "kat_sayisi": 8
+        },
+        {
+          "blok_no": 18,
+          "tip": "TİP-3",
+          "daire_sayisi": 26,
+          "yapi_konfigurasyonu": "2B+Z+5",
+          "kat_sayisi": 8
+        }
+      ]
+    },
+    {
+      "ada": "ADA-3",
+      "blok_sayisi": 20,
+      "toplam_daire": 498,
+      "toplam_kat": 158,
+      "bloklar": [
+        {
+          "blok_no": 1,
+          "tip": "TİP-4A",
+          "daire_sayisi": 24,
+          "yapi_konfigurasyonu": "3B+Z+4",
+          "kat_sayisi": 8
+        },
+        {
+          "blok_no": 2,
+          "tip": "TİP-4A",
+          "daire_sayisi": 24,
+          "yapi_konfigurasyonu": "3B+Z+4",
+          "kat_sayisi": 8
+        },
+        {
+          "blok_no": 3,
+          "tip": "TİP-4A",
+          "daire_sayisi": 24,
+          "yapi_konfigurasyonu": "3B+Z+4",
+          "kat_sayisi": 8
+        },
+        {
+          "blok_no": 4,
+          "tip": "TİP-4A",
+          "daire_sayisi": 24,
+          "yapi_konfigurasyonu": "3B+Z+4",
+          "kat_sayisi": 8
+        },
+        {
+          "blok_no": 5,
+          "tip": "TİP-4A",
+          "daire_sayisi": 24,
+          "yapi_konfigurasyonu": "3B+Z+4",
+          "kat_sayisi": 8
+        },
+        {
+          "blok_no": 6,
+          "tip": "TİP-4A",
+          "daire_sayisi": 24,
+          "yapi_konfigurasyonu": "3B+Z+4",
+          "kat_sayisi": 8
+        },
+        {
+          "blok_no": 7,
+          "tip": "TİP-4A",
+          "daire_sayisi": 24,
+          "yapi_konfigurasyonu": "3B+Z+4",
+          "kat_sayisi": 8
+        },
+        {
+          "blok_no": 8,
+          "tip": "TİP-3",
+          "daire_sayisi": 26,
+          "yapi_konfigurasyonu": "2B+Z+5",
+          "kat_sayisi": 8
+        },
+        {
+          "blok_no": 9,
+          "tip": "TİP-3",
+          "daire_sayisi": 26,
+          "yapi_konfigurasyonu": "2B+Z+5",
+          "kat_sayisi": 8
+        },
+        {
+          "blok_no": 10,
+          "tip": "TİP-3",
+          "daire_sayisi": 26,
+          "yapi_konfigurasyonu": "2B+Z+5",
+          "kat_sayisi": 8
+        },
+        {
+          "blok_no": 11,
+          "tip": "TİP-3",
+          "daire_sayisi": 26,
+          "yapi_konfigurasyonu": "2B+Z+5",
+          "kat_sayisi": 8
+        },
+        {
+          "blok_no": 12,
+          "tip": "TİP-2",
+          "daire_sayisi": 22,
+          "yapi_konfigurasyonu": "2B+Z+4",
+          "kat_sayisi": 7
+        },
+        {
+          "blok_no": 13,
+          "tip": "TİP-2",
+          "daire_sayisi": 22,
+          "yapi_konfigurasyonu": "2B+Z+4",
+          "kat_sayisi": 7
+        },
+        {
+          "blok_no": 14,
+          "tip": "TİP-3",
+          "daire_sayisi": 26,
+          "yapi_konfigurasyonu": "2B+Z+5",
+          "kat_sayisi": 8
+        },
+        {
+          "blok_no": 15,
+          "tip": "TİP-3",
+          "daire_sayisi": 26,
+          "yapi_konfigurasyonu": "2B+Z+5",
+          "kat_sayisi": 8
+        },
+        {
+          "blok_no": 16,
+          "tip": "TİP-3",
+          "daire_sayisi": 26,
+          "yapi_konfigurasyonu": "2B+Z+5",
+          "kat_sayisi": 8
+        },
+        {
+          "blok_no": 17,
+          "tip": "TİP-3",
+          "daire_sayisi": 26,
+          "yapi_konfigurasyonu": "2B+Z+5",
+          "kat_sayisi": 8
+        },
+        {
+          "blok_no": 18,
+          "tip": "TİP-3",
+          "daire_sayisi": 26,
+          "yapi_konfigurasyonu": "2B+Z+5",
+          "kat_sayisi": 8
+        },
+        {
+          "blok_no": 19,
+          "tip": "TİP-3",
+          "daire_sayisi": 26,
+          "yapi_konfigurasyonu": "2B+Z+5",
+          "kat_sayisi": 8
+        },
+        {
+          "blok_no": 20,
+          "tip": "TİP-3",
+          "daire_sayisi": 26,
+          "yapi_konfigurasyonu": "2B+Z+5",
+          "kat_sayisi": 8
+        }
+      ]
+    },
+    {
+      "ada": "ADA-4",
+      "blok_sayisi": 31,
+      "toplam_daire": 748,
+      "toplam_kat": 250,
+      "bloklar": [
+        {
+          "blok_no": 1,
+          "tip": "TİP-4A",
+          "daire_sayisi": 24,
+          "yapi_konfigurasyonu": "3B+Z+4",
+          "kat_sayisi": 8
+        },
+        {
+          "blok_no": 2,
+          "tip": "TİP-4A",
+          "daire_sayisi": 24,
+          "yapi_konfigurasyonu": "3B+Z+4",
+          "kat_sayisi": 8
+        },
+        {
+          "blok_no": 3,
+          "tip": "TİP-4A",
+          "daire_sayisi": 24,
+          "yapi_konfigurasyonu": "3B+Z+4",
+          "kat_sayisi": 8
+        },
+        {
+          "blok_no": 4,
+          "tip": "TİP-4A",
+          "daire_sayisi": 24,
+          "yapi_konfigurasyonu": "3B+Z+4",
+          "kat_sayisi": 8
+        },
+        {
+          "blok_no": 5,
+          "tip": "TİP-4A",
+          "daire_sayisi": 24,
+          "yapi_konfigurasyonu": "3B+Z+4",
+          "kat_sayisi": 8
+        },
+        {
+          "blok_no": 6,
+          "tip": "TİP-4A",
+          "daire_sayisi": 24,
+          "yapi_konfigurasyonu": "3B+Z+4",
+          "kat_sayisi": 8
+        },
+        {
+          "blok_no": 7,
+          "tip": "TİP-4A",
+          "daire_sayisi": 24,
+          "yapi_konfigurasyonu": "3B+Z+4",
+          "kat_sayisi": 8
+        },
+        {
+          "blok_no": 8,
+          "tip": "TİP-4A",
+          "daire_sayisi": 24,
+          "yapi_konfigurasyonu": "3B+Z+4",
+          "kat_sayisi": 8
+        },
+        {
+          "blok_no": 9,
+          "tip": "TİP-4A",
+          "daire_sayisi": 24,
+          "yapi_konfigurasyonu": "3B+Z+4",
+          "kat_sayisi": 8
+        },
+        {
+          "blok_no": 10,
+          "tip": "TİP-4A",
+          "daire_sayisi": 24,
+          "yapi_konfigurasyonu": "3B+Z+4",
+          "kat_sayisi": 8
+        },
+        {
+          "blok_no": 11,
+          "tip": "TİP-2",
+          "daire_sayisi": 22,
+          "yapi_konfigurasyonu": "2B+Z+4",
+          "kat_sayisi": 7
+        },
+        {
+          "blok_no": 12,
+          "tip": "TİP-2",
+          "daire_sayisi": 22,
+          "yapi_konfigurasyonu": "2B+Z+4",
+          "kat_sayisi": 7
+        },
+        {
+          "blok_no": 13,
+          "tip": "TİP-2",
+          "daire_sayisi": 22,
+          "yapi_konfigurasyonu": "2B+Z+4",
+          "kat_sayisi": 7
+        },
+        {
+          "blok_no": 14,
+          "tip": "TİP-4A",
+          "daire_sayisi": 24,
+          "yapi_konfigurasyonu": "3B+Z+4",
+          "kat_sayisi": 8
+        },
+        {
+          "blok_no": 15,
+          "tip": "TİP-4A",
+          "daire_sayisi": 24,
+          "yapi_konfigurasyonu": "3B+Z+4",
+          "kat_sayisi": 8
+        },
+        {
+          "blok_no": 16,
+          "tip": "TİP-4A",
+          "daire_sayisi": 24,
+          "yapi_konfigurasyonu": "3B+Z+4",
+          "kat_sayisi": 8
+        },
+        {
+          "blok_no": 17,
+          "tip": "TİP-4A",
+          "daire_sayisi": 24,
+          "yapi_konfigurasyonu": "3B+Z+4",
+          "kat_sayisi": 8
+        },
+        {
+          "blok_no": 18,
+          "tip": "TİP-4A",
+          "daire_sayisi": 24,
+          "yapi_konfigurasyonu": "3B+Z+4",
+          "kat_sayisi": 8
+        },
+        {
+          "blok_no": 19,
+          "tip": "TİP-4A",
+          "daire_sayisi": 24,
+          "yapi_konfigurasyonu": "3B+Z+4",
+          "kat_sayisi": 8
+        },
+        {
+          "blok_no": 20,
+          "tip": "TİP-4A",
+          "daire_sayisi": 24,
+          "yapi_konfigurasyonu": "3B+Z+4",
+          "kat_sayisi": 8
+        },
+        {
+          "blok_no": 21,
+          "tip": "TİP-4A",
+          "daire_sayisi": 24,
+          "yapi_konfigurasyonu": "3B+Z+4",
+          "kat_sayisi": 8
+        },
+        {
+          "blok_no": 22,
+          "tip": "TİP-4A",
+          "daire_sayisi": 24,
+          "yapi_konfigurasyonu": "3B+Z+4",
+          "kat_sayisi": 8
+        },
+        {
+          "blok_no": 23,
+          "tip": "TİP-4A",
+          "daire_sayisi": 24,
+          "yapi_konfigurasyonu": "3B+Z+4",
+          "kat_sayisi": 8
+        },
+        {
+          "blok_no": 24,
+          "tip": "TİP-5",
+          "daire_sayisi": 26,
+          "yapi_konfigurasyonu": "4B+Z+4",
+          "kat_sayisi": 9
+        },
+        {
+          "blok_no": 25,
+          "tip": "TİP-5",
+          "daire_sayisi": 26,
+          "yapi_konfigurasyonu": "4B+Z+4",
+          "kat_sayisi": 9
+        },
+        {
+          "blok_no": 26,
+          "tip": "TİP-5",
+          "daire_sayisi": 26,
+          "yapi_konfigurasyonu": "4B+Z+4",
+          "kat_sayisi": 9
+        },
+        {
+          "blok_no": 27,
+          "tip": "TİP-5",
+          "daire_sayisi": 26,
+          "yapi_konfigurasyonu": "4B+Z+4",
+          "kat_sayisi": 9
+        },
+        {
+          "blok_no": 28,
+          "tip": "TİP-4A",
+          "daire_sayisi": 24,
+          "yapi_konfigurasyonu": "3B+Z+4",
+          "kat_sayisi": 8
+        },
+        {
+          "blok_no": 29,
+          "tip": "TİP-4A",
+          "daire_sayisi": 24,
+          "yapi_konfigurasyonu": "3B+Z+4",
+          "kat_sayisi": 8
+        },
+        {
+          "blok_no": 30,
+          "tip": "TİP-4A",
+          "daire_sayisi": 24,
+          "yapi_konfigurasyonu": "3B+Z+4",
+          "kat_sayisi": 8
+        },
+        {
+          "blok_no": 31,
+          "tip": "TİP-5",
+          "daire_sayisi": 26,
+          "yapi_konfigurasyonu": "4B+Z+4",
+          "kat_sayisi": 9
+        }
+      ]
+    },
+    {
+      "ada": "ADA-5",
+      "blok_sayisi": 33,
+      "toplam_daire": 858,
+      "toplam_kat": 264,
+      "bloklar": [
+        {
+          "blok_no": 1,
+          "tip": "TİP-3",
+          "daire_sayisi": 26,
+          "yapi_konfigurasyonu": "2B+Z+5",
+          "kat_sayisi": 8
+        },
+        {
+          "blok_no": 2,
+          "tip": "TİP-3",
+          "daire_sayisi": 26,
+          "yapi_konfigurasyonu": "2B+Z+5",
+          "kat_sayisi": 8
+        },
+        {
+          "blok_no": 3,
+          "tip": "TİP-3",
+          "daire_sayisi": 26,
+          "yapi_konfigurasyonu": "2B+Z+5",
+          "kat_sayisi": 8
+        },
+        {
+          "blok_no": 4,
+          "tip": "TİP-3",
+          "daire_sayisi": 26,
+          "yapi_konfigurasyonu": "2B+Z+5",
+          "kat_sayisi": 8
+        },
+        {
+          "blok_no": 5,
+          "tip": "TİP-3",
+          "daire_sayisi": 26,
+          "yapi_konfigurasyonu": "2B+Z+5",
+          "kat_sayisi": 8
+        },
+        {
+          "blok_no": 6,
+          "tip": "TİP-3",
+          "daire_sayisi": 26,
+          "yapi_konfigurasyonu": "2B+Z+5",
+          "kat_sayisi": 8
+        },
+        {
+          "blok_no": 7,
+          "tip": "TİP-3",
+          "daire_sayisi": 26,
+          "yapi_konfigurasyonu": "2B+Z+5",
+          "kat_sayisi": 8
+        },
+        {
+          "blok_no": 8,
+          "tip": "TİP-3",
+          "daire_sayisi": 26,
+          "yapi_konfigurasyonu": "2B+Z+5",
+          "kat_sayisi": 8
+        },
+        {
+          "blok_no": 9,
+          "tip": "TİP-3",
+          "daire_sayisi": 26,
+          "yapi_konfigurasyonu": "2B+Z+5",
+          "kat_sayisi": 8
+        },
+        {
+          "blok_no": 10,
+          "tip": "TİP-3",
+          "daire_sayisi": 26,
+          "yapi_konfigurasyonu": "2B+Z+5",
+          "kat_sayisi": 8
+        },
+        {
+          "blok_no": 11,
+          "tip": "TİP-3",
+          "daire_sayisi": 26,
+          "yapi_konfigurasyonu": "2B+Z+5",
+          "kat_sayisi": 8
+        },
+        {
+          "blok_no": 12,
+          "tip": "TİP-3",
+          "daire_sayisi": 26,
+          "yapi_konfigurasyonu": "2B+Z+5",
+          "kat_sayisi": 8
+        },
+        {
+          "blok_no": 13,
+          "tip": "TİP-3",
+          "daire_sayisi": 26,
+          "yapi_konfigurasyonu": "2B+Z+5",
+          "kat_sayisi": 8
+        },
+        {
+          "blok_no": 14,
+          "tip": "TİP-3",
+          "daire_sayisi": 26,
+          "yapi_konfigurasyonu": "2B+Z+5",
+          "kat_sayisi": 8
+        },
+        {
+          "blok_no": 15,
+          "tip": "TİP-3",
+          "daire_sayisi": 26,
+          "yapi_konfigurasyonu": "2B+Z+5",
+          "kat_sayisi": 8
+        },
+        {
+          "blok_no": 16,
+          "tip": "TİP-3",
+          "daire_sayisi": 26,
+          "yapi_konfigurasyonu": "2B+Z+5",
+          "kat_sayisi": 8
+        },
+        {
+          "blok_no": 17,
+          "tip": "TİP-3",
+          "daire_sayisi": 26,
+          "yapi_konfigurasyonu": "2B+Z+5",
+          "kat_sayisi": 8
+        },
+        {
+          "blok_no": 18,
+          "tip": "TİP-3",
+          "daire_sayisi": 26,
+          "yapi_konfigurasyonu": "2B+Z+5",
+          "kat_sayisi": 8
+        },
+        {
+          "blok_no": 19,
+          "tip": "TİP-3",
+          "daire_sayisi": 26,
+          "yapi_konfigurasyonu": "2B+Z+5",
+          "kat_sayisi": 8
+        },
+        {
+          "blok_no": 20,
+          "tip": "TİP-3",
+          "daire_sayisi": 26,
+          "yapi_konfigurasyonu": "2B+Z+5",
+          "kat_sayisi": 8
+        },
+        {
+          "blok_no": 21,
+          "tip": "TİP-3",
+          "daire_sayisi": 26,
+          "yapi_konfigurasyonu": "2B+Z+5",
+          "kat_sayisi": 8
+        },
+        {
+          "blok_no": 22,
+          "tip": "TİP-3",
+          "daire_sayisi": 26,
+          "yapi_konfigurasyonu": "2B+Z+5",
+          "kat_sayisi": 8
+        },
+        {
+          "blok_no": 23,
+          "tip": "TİP-3",
+          "daire_sayisi": 26,
+          "yapi_konfigurasyonu": "2B+Z+5",
+          "kat_sayisi": 8
+        },
+        {
+          "blok_no": 24,
+          "tip": "TİP-3",
+          "daire_sayisi": 26,
+          "yapi_konfigurasyonu": "2B+Z+5",
+          "kat_sayisi": 8
+        },
+        {
+          "blok_no": 25,
+          "tip": "TİP-3",
+          "daire_sayisi": 26,
+          "yapi_konfigurasyonu": "2B+Z+5",
+          "kat_sayisi": 8
+        },
+        {
+          "blok_no": 26,
+          "tip": "TİP-3",
+          "daire_sayisi": 26,
+          "yapi_konfigurasyonu": "2B+Z+5",
+          "kat_sayisi": 8
+        },
+        {
+          "blok_no": 27,
+          "tip": "TİP-3",
+          "daire_sayisi": 26,
+          "yapi_konfigurasyonu": "2B+Z+5",
+          "kat_sayisi": 8
+        },
+        {
+          "blok_no": 28,
+          "tip": "TİP-3",
+          "daire_sayisi": 26,
+          "yapi_konfigurasyonu": "2B+Z+5",
+          "kat_sayisi": 8
+        },
+        {
+          "blok_no": 29,
+          "tip": "TİP-3",
+          "daire_sayisi": 26,
+          "yapi_konfigurasyonu": "2B+Z+5",
+          "kat_sayisi": 8
+        },
+        {
+          "blok_no": 30,
+          "tip": "TİP-3",
+          "daire_sayisi": 26,
+          "yapi_konfigurasyonu": "2B+Z+5",
+          "kat_sayisi": 8
+        },
+        {
+          "blok_no": 31,
+          "tip": "TİP-3",
+          "daire_sayisi": 26,
+          "yapi_konfigurasyonu": "2B+Z+5",
+          "kat_sayisi": 8
+        },
+        {
+          "blok_no": 32,
+          "tip": "TİP-3",
+          "daire_sayisi": 26,
+          "yapi_konfigurasyonu": "2B+Z+5",
+          "kat_sayisi": 8
+        },
+        {
+          "blok_no": 33,
+          "tip": "TİP-3",
+          "daire_sayisi": 26,
+          "yapi_konfigurasyonu": "2B+Z+5",
+          "kat_sayisi": 8
+        }
+      ]
+    },
+    {
+      "ada": "ADA-6",
+      "blok_sayisi": 21,
+      "toplam_daire": 546,
+      "toplam_kat": 168,
+      "bloklar": [
+        {
+          "blok_no": 1,
+          "tip": "TİP-3",
+          "daire_sayisi": 26,
+          "yapi_konfigurasyonu": "2B+Z+5",
+          "kat_sayisi": 8
+        },
+        {
+          "blok_no": 2,
+          "tip": "TİP-3",
+          "daire_sayisi": 26,
+          "yapi_konfigurasyonu": "2B+Z+5",
+          "kat_sayisi": 8
+        },
+        {
+          "blok_no": 3,
+          "tip": "TİP-3",
+          "daire_sayisi": 26,
+          "yapi_konfigurasyonu": "2B+Z+5",
+          "kat_sayisi": 8
+        },
+        {
+          "blok_no": 4,
+          "tip": "TİP-3",
+          "daire_sayisi": 26,
+          "yapi_konfigurasyonu": "2B+Z+5",
+          "kat_sayisi": 8
+        },
+        {
+          "blok_no": 5,
+          "tip": "TİP-3",
+          "daire_sayisi": 26,
+          "yapi_konfigurasyonu": "2B+Z+5",
+          "kat_sayisi": 8
+        },
+        {
+          "blok_no": 6,
+          "tip": "TİP-3",
+          "daire_sayisi": 26,
+          "yapi_konfigurasyonu": "2B+Z+5",
+          "kat_sayisi": 8
+        },
+        {
+          "blok_no": 7,
+          "tip": "TİP-3",
+          "daire_sayisi": 26,
+          "yapi_konfigurasyonu": "2B+Z+5",
+          "kat_sayisi": 8
+        },
+        {
+          "blok_no": 8,
+          "tip": "TİP-3",
+          "daire_sayisi": 26,
+          "yapi_konfigurasyonu": "2B+Z+5",
+          "kat_sayisi": 8
+        },
+        {
+          "blok_no": 9,
+          "tip": "TİP-3",
+          "daire_sayisi": 26,
+          "yapi_konfigurasyonu": "2B+Z+5",
+          "kat_sayisi": 8
+        },
+        {
+          "blok_no": 10,
+          "tip": "TİP-3",
+          "daire_sayisi": 26,
+          "yapi_konfigurasyonu": "2B+Z+5",
+          "kat_sayisi": 8
+        },
+        {
+          "blok_no": 11,
+          "tip": "TİP-3",
+          "daire_sayisi": 26,
+          "yapi_konfigurasyonu": "2B+Z+5",
+          "kat_sayisi": 8
+        },
+        {
+          "blok_no": 12,
+          "tip": "TİP-3",
+          "daire_sayisi": 26,
+          "yapi_konfigurasyonu": "2B+Z+5",
+          "kat_sayisi": 8
+        },
+        {
+          "blok_no": 13,
+          "tip": "TİP-3",
+          "daire_sayisi": 26,
+          "yapi_konfigurasyonu": "2B+Z+5",
+          "kat_sayisi": 8
+        },
+        {
+          "blok_no": 14,
+          "tip": "TİP-3",
+          "daire_sayisi": 26,
+          "yapi_konfigurasyonu": "2B+Z+5",
+          "kat_sayisi": 8
+        },
+        {
+          "blok_no": 15,
+          "tip": "TİP-3",
+          "daire_sayisi": 26,
+          "yapi_konfigurasyonu": "2B+Z+5",
+          "kat_sayisi": 8
+        },
+        {
+          "blok_no": 16,
+          "tip": "TİP-3",
+          "daire_sayisi": 26,
+          "yapi_konfigurasyonu": "2B+Z+5",
+          "kat_sayisi": 8
+        },
+        {
+          "blok_no": 17,
+          "tip": "TİP-3",
+          "daire_sayisi": 26,
+          "yapi_konfigurasyonu": "2B+Z+5",
+          "kat_sayisi": 8
+        },
+        {
+          "blok_no": 18,
+          "tip": "TİP-3",
+          "daire_sayisi": 26,
+          "yapi_konfigurasyonu": "2B+Z+5",
+          "kat_sayisi": 8
+        },
+        {
+          "blok_no": 19,
+          "tip": "TİP-3",
+          "daire_sayisi": 26,
+          "yapi_konfigurasyonu": "2B+Z+5",
+          "kat_sayisi": 8
+        },
+        {
+          "blok_no": 20,
+          "tip": "TİP-3",
+          "daire_sayisi": 26,
+          "yapi_konfigurasyonu": "2B+Z+5",
+          "kat_sayisi": 8
+        },
+        {
+          "blok_no": 21,
+          "tip": "TİP-3",
+          "daire_sayisi": 26,
+          "yapi_konfigurasyonu": "2B+Z+5",
+          "kat_sayisi": 8
+        }
+      ]
+    }
+  ],
+  "pdf_referans_toplamlari": {
+    "ADA-1": {
+      "blok": 13,
+      "daire": 311,
+      "kat": 98
+    },
+    "ADA-2": {
+      "blok": 18,
+      "daire": 453,
+      "kat": 143
+    },
+    "ADA-3": {
+      "blok": 20,
+      "daire": 498,
+      "kat": 158
+    },
+    "ADA-4": {
+      "blok": 31,
+      "daire": 748,
+      "kat": 250
+    },
+    "ADA-5": {
+      "blok": 33,
+      "daire": 858,
+      "kat": 264
+    },
+    "ADA-6": {
+      "blok": 21,
+      "daire": 546,
+      "kat": 168
+    }
+  },
+  "not": "Blok bazindaki veriler PDF'den otomatik cikarilmistir. Toplamlar PDF referans degerleri ile karsilastirildiginda farkliliklar olabilir. Gerekli duzeltmeleri yapabilirsiniz."
+}

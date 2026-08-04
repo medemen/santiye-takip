@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Güneyşehir Takip</string>
+    <string name="title_activity_main">Güneyşehir Takip</string>
+    <string name="package_name">com.santiyetakip.app</string>
+    <string name="custom_url_scheme">com.santiyetakip.app</string>
+</resources>

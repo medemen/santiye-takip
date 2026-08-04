@@ -1,0 +1,187 @@
+{
+  "aciklama": "Güneyşehir Şantiyesi Saha ve Personel Listesi",
+  "proje": "Şahinbey Belediyesi Güneyşehir Toplu Konutları Yapım İşi",
+  "tarih": "26.07.2028",
+  "santiye_sefleri": [
+    {
+      "ad_soyad": "Mehmet Orhan Edemen",
+      "adalar": ["ADA-1", "ADA-2"]
+    },
+    {
+      "ad_soyad": "Şafak Bektaş Atmalı",
+      "adalar": ["ADA-3", "ADA-4"]
+    },
+    {
+      "ad_soyad": "Cihan Erdoğan",
+      "adalar": ["ADA-5", "ADA-6"]
+    }
+  ],
+  "personel": [
+    {
+      "ad_soyad": "Alp Dora Alaşehirli",
+      "rol": "Saha Mühendisi",
+      "atanan_ada": null
+    },
+    {
+      "ad_soyad": "Fatma Tuğçe Armut",
+      "rol": "Saha Mühendisi",
+      "atanan_ada": null
+    },
+    {
+      "ad_soyad": "Mehmet Kılıç",
+      "rol": "Saha Mühendisi",
+      "atanan_ada": null
+    },
+    {
+      "ad_soyad": "Kamuran Erez",
+      "rol": "Saha Mühendisi",
+      "atanan_ada": null
+    },
+    {
+      "ad_soyad": "Ömer Buğra Özlü",
+      "rol": "Saha Mühendisi",
+      "atanan_ada": null
+    },
+    {
+      "ad_soyad": "Sadık Umut Mutlu",
+      "rol": "Saha Mühendisi",
+      "atanan_ada": null
+    },
+    {
+      "ad_soyad": "Ahmet Belgin",
+      "rol": "Saha Mühendisi",
+      "atanan_ada": null
+    },
+    {
+      "ad_soyad": "Abdullah Kılıç",
+      "rol": "Formen",
+      "atanan_ada": null
+    },
+    {
+      "ad_soyad": "Duran Arıcı",
+      "rol": "Saha Mühendisi",
+      "atanan_ada": null
+    },
+    {
+      "ad_soyad": "Nurselin Ekinci",
+      "rol": "Saha Mimarı",
+      "atanan_ada": null
+    },
+    {
+      "ad_soyad": "Fethi Yıldırım",
+      "rol": "Saha Mühendisi",
+      "atanan_ada": null
+    },
+    {
+      "ad_soyad": "Turgay Turgut",
+      "rol": "Saha Mühendisi",
+      "atanan_ada": null
+    },
+    {
+      "ad_soyad": "Erkan Karabaş",
+      "rol": "Saha Mühendisi",
+      "atanan_ada": null
+    },
+    {
+      "ad_soyad": "Sinem Özkan",
+      "rol": "Saha Mühendisi",
+      "atanan_ada": null
+    },
+    {
+      "ad_soyad": "Volkan Baran",
+      "rol": "Saha Mühendisi",
+      "atanan_ada": null
+    },
+    {
+      "ad_soyad": "Kerem Çolakoğlu",
+      "rol": "Saha Mühendisi",
+      "atanan_ada": null
+    },
+    {
+      "ad_soyad": "Alperen Koç",
+      "rol": "Saha Mühendisi",
+      "atanan_ada": null
+    },
+    {
+      "ad_soyad": "Burak Uğurlu",
+      "rol": "Formen",
+      "atanan_ada": null
+    },
+    {
+      "ad_soyad": "Ahmet Öz",
+      "rol": "Formen",
+      "atanan_ada": null
+    },
+    {
+      "ad_soyad": "Nevzat Yıldırım",
+      "rol": "Saha Mühendisi",
+      "atanan_ada": null
+    },
+    {
+      "ad_soyad": "Tuba Saatçi",
+      "rol": "Saha Mimarı",
+      "atanan_ada": null
+    },
+    {
+      "ad_soyad": "Ahmet Çelik",
+      "rol": "Saha Mühendisi",
+      "atanan_ada": null
+    },
+    {
+      "ad_soyad": "Recep Er",
+      "rol": "Saha Mühendisi",
+      "atanan_ada": null
+    },
+    {
+      "ad_soyad": "Kayhan Tarhan",
+      "rol": "Saha Mühendisi",
+      "atanan_ada": null
+    },
+    {
+      "ad_soyad": "Ahmet Aslan",
+      "rol": "Saha Mühendisi",
+      "atanan_ada": null
+    },
+    {
+      "ad_soyad": "Rıza Polat",
+      "rol": "Saha Teknikeri",
+      "atanan_ada": null
+    },
+    {
+      "ad_soyad": "Ahmet Sakar",
+      "rol": "Saha Mühendisi",
+      "atanan_ada": null
+    },
+    {
+      "ad_soyad": "Malik Tayşan",
+      "rol": "Saha Mühendisi",
+      "atanan_ada": null
+    },
+    {
+      "ad_soyad": "Murat Zavran",
+      "rol": "Saha Mühendisi",
+      "atanan_ada": null
+    },
+    {
+      "ad_soyad": "Muhammed Furkan Gezer",
+      "rol": "Formen",
+      "atanan_ada": null
+    },
+    {
+      "ad_soyad": "Hamit Yıldızlı",
+      "rol": "Formen",
+      "atanan_ada": null
+    },
+    {
+      "ad_soyad": "Erkan Zevkirlioğlu",
+      "rol": "Formen",
+      "atanan_ada": null
+    },
+    {
+      "ad_soyad": "Proje Müdürü",
+      "rol": "Proje Müdürü",
+      "atanan_ada": null,
+      "proje_muduru": true
+    }
+  ]
+}
