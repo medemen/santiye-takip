@@ -23,6 +23,7 @@ const Personnel = lazy(() => import('./pages/Personnel'));
 const Profile = lazy(() => import('./pages/Profile'));
 const Statistics = lazy(() => import('./pages/Statistics'));
 const Settings = lazy(() => import('./pages/Settings'));
+const NewSantiyeWizard = lazy(() => import('./pages/NewSantiyeWizard'));
 const Login = lazy(() => import('./pages/Login'));
 
 function PageLoader() {
@@ -122,6 +123,7 @@ export default function App() {
                         <Route path="/profil" element={<Profile />} />
                         <Route path="/istatistik" element={<Statistics />} />
                         <Route path="/ayarlar" element={<AdminRoute><Settings /></AdminRoute>} />
+                        <Route path="/yeni-santiye" element={<AdminRoute><NewSantiyeWizard /></AdminRoute>} />
                       </Routes>
                     </Layout>
                   </ProtectedRoute>

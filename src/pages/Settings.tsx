@@ -5,8 +5,12 @@ import { useSiteConfig } from '../hooks/useSiteConfig';
 import { setSiteConfig, resetSiteConfig, persistConfigToDb } from '../config/site';
 import { CONFIG_VERSION } from '../config/defaultConfig';
 import { getAllKalemler } from '../config/helpers';
+import { configValidate, durumTespitUret } from '../config/editor';
+import type { AdaBlok, ImalatGrubu } from '../config/types';
 import { toastGoster } from '../stores/toastStore';
 import { card, pageTitle, btnGhost } from '../utils/styles';
+import AdaBlokEditor from '../components/config/AdaBlokEditor';
+import KalemGrupEditor from '../components/config/KalemGrupEditor';
 
 export default function Settings() {
   const navigate = useNavigate();
@@ -21,7 +25,14 @@ export default function Settings() {
   const [webBasename, setWebBasename] = useState(config.marka.webBasename);
   const [emailDomain, setEmailDomain] = useState(config.marka.emailDomain);
   const [sahaRolleri, setSahaRolleri] = useState(config.roller.sahaPersoneliRolleri.join(', '));
+  const [adalar, setAdalar] = useState<AdaBlok[]>(() =>
+    JSON.parse(JSON.stringify(config.yapi.adalar))
+  );
+  const [gruplar, setGruplar] = useState<ImalatGrubu[]>(() =>
+    JSON.parse(JSON.stringify(config.isKalemleri.gruplar))
+  );
   const [kaydediliyor, setKaydediliyor] = useState(false);
+  const [dogrulama, setDogrulama] = useState<string[]>([]);
 
   if (!user?.admin) {
     return (
@@ -32,35 +43,51 @@ export default function Settings() {
   }
 
   const handleKaydet = async () => {
+    const yeniYapi = { adalar };
+    const taslak = {
+      ...config,
+      genel: {
+        ...config.genel,
+        santiyeAdi: santiyeAdi.trim(),
+        projeAdi: projeAdi.trim(),
+        musteri: musteri.trim(),
+        baslangicTarihi: baslangicTarihi || undefined,
+      },
+      marka: {
+        ...config.marka,
+        appName: appName.trim(),
+        webBasename: webBasename.trim() || '/',
+        emailDomain: emailDomain.trim(),
+      },
+      roller: {
+        ...config.roller,
+        sahaPersoneliRolleri: sahaRolleri
+          .split(',')
+          .map((r) => r.trim())
+          .filter(Boolean),
+      },
+      yapi: yeniYapi,
+      isKalemleri: {
+        ...config.isKalemleri,
+        gruplar,
+      },
+      durumTespit: durumTespitUret({ ...config, yapi: yeniYapi }),
+    };
+
+    const sorunlar = configValidate(taslak);
+    if (sorunlar.length > 0) {
+      setDogrulama(sorunlar);
+      toastGoster('Ayarlar kaydedilemedi — doğrulama hatalarını düzeltin', 'error');
+      return;
+    }
+    setDogrulama([]);
+
     setKaydediliyor(true);
     try {
-      const yeni = {
-        ...config,
-        genel: {
-          ...config.genel,
-          santiyeAdi: santiyeAdi.trim(),
-          projeAdi: projeAdi.trim(),
-          musteri: musteri.trim(),
-          baslangicTarihi: baslangicTarihi || undefined,
-        },
-        marka: {
-          ...config.marka,
-          appName: appName.trim(),
-          webBasename: webBasename.trim() || '/',
-          emailDomain: emailDomain.trim(),
-        },
-        roller: {
-          ...config.roller,
-          sahaPersoneliRolleri: sahaRolleri
-            .split(',')
-            .map((r) => r.trim())
-            .filter(Boolean),
-        },
-      };
-      setSiteConfig(yeni, { persistLocal: true });
+      setSiteConfig(taslak, { persistLocal: true });
       toastGoster('Ayarlar cihazınıza kaydedildi', 'success');
       try {
-        await persistConfigToDb(yeni);
+        await persistConfigToDb(taslak);
         toastGoster('Ayarlar sunucuya yayınlandı', 'success');
       } catch (err) {
         const mesaj = err instanceof Error ? err.message : 'Bilinmeyen hata';
@@ -101,9 +128,27 @@ export default function Settings() {
     <div>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
         <h1 style={pageTitle}>Şantiye Ayarları</h1>
-        <button onClick={() => navigate('/')} style={btnGhost}>
-          ← Dashboard
-        </button>
+        <div style={{ display: 'flex', gap: 8 }}>
+          <button
+            onClick={() => navigate('/yeni-santiye')}
+            style={{
+              padding: '8px 14px',
+              backgroundColor: '#1f2937',
+              border: 'none',
+              borderRadius: 10,
+              fontSize: 12,
+              fontWeight: 600,
+              color: '#fff',
+              cursor: 'pointer',
+            }}
+            title="Yeni bir şantiye yapısı kur (ada/blok/iş kalemi tanımla)"
+          >
+            + Yeni Şantiye
+          </button>
+          <button onClick={() => navigate('/')} style={btnGhost}>
+            ← Dashboard
+          </button>
+        </div>
       </div>
 
       <div style={{ ...card, padding: 14, marginBottom: 16, fontSize: 12, color: '#6b7280' }}>
@@ -168,6 +213,48 @@ export default function Settings() {
           <input style={inputStyle} value={sahaRolleri} onChange={(e) => setSahaRolleri(e.target.value)} />
         </div>
       </div>
+
+      <div style={{ ...card, marginBottom: 16 }}>
+        <h3 style={{ fontSize: 14, fontWeight: 600, color: '#374151', margin: 0, marginBottom: 12 }}>
+          Adalar & Bloklar
+        </h3>
+        <p style={{ fontSize: 11, color: '#9ca3af', margin: 0, marginBottom: 10 }}>
+          Blok düzenlemeleri sonrası daire/kat toplamları otomatik hesaplanır. Kaydedince durum
+          tespit referans toplamları da yeniden üretilir.
+        </p>
+        <AdaBlokEditor adalar={adalar} onChange={setAdalar} />
+      </div>
+
+      <div style={{ ...card, marginBottom: 16 }}>
+        <h3 style={{ fontSize: 14, fontWeight: 600, color: '#374151', margin: 0, marginBottom: 12 }}>
+          İş Kalemleri
+        </h3>
+        <p style={{ fontSize: 11, color: '#9ca3af', margin: 0, marginBottom: 10 }}>
+          Gruplar ve kalemler buradan düzenlenebilir; her satıra bir kalem yazın.
+        </p>
+        <KalemGrupEditor gruplar={gruplar} onChange={setGruplar} />
+      </div>
+
+      {dogrulama.length > 0 && (
+        <div
+          style={{
+            backgroundColor: '#fef2f2',
+            borderRadius: 10,
+            padding: '10px 14px',
+            marginBottom: 16,
+            border: '1px solid #fecaca',
+          }}
+        >
+          <div style={{ fontSize: 12, fontWeight: 600, color: '#ef4444', marginBottom: 4 }}>
+            Doğrulama hataları:
+          </div>
+          {dogrulama.map((d, i) => (
+            <div key={i} style={{ fontSize: 12, color: '#b91c1c' }}>
+              • {d}
+            </div>
+          ))}
+        </div>
+      )}
 
       <div style={{ display: 'flex', gap: 10 }}>
         <button
