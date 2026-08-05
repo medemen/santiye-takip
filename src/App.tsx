@@ -8,6 +8,7 @@ import { isLoggedIn, isAdmin, supabaseAuthInit, subscribeAuthChanges } from './s
 import { supabaseRaporlariYukle, aboneOlRaporGuncellemeleri, realtimeRaporAboneliktenCik } from './stores/reportStore';
 import { supabaseAtamalariYukle, aboneOlAtamaGuncellemeleri, realtimeAtamaAboneliktenCik } from './stores/atamaStore';
 import { supabaseKullanicilariYukle } from './stores/kullanicilarStore';
+import { supabaseHedefleriYukle, aboneOlHedefGuncellemeleri, realtimeHedefAboneliktenCik } from './stores/hedefStore';
 import { getSiteConfig, subscribeSiteConfig } from './config/site';
 import { isSupabaseReady } from './lib/supabase';
 
@@ -67,15 +68,22 @@ export default function App() {
   useEffect(() => {
     if (!isLoggedIn() || !isSupabaseReady()) return;
 
-    Promise.all([supabaseRaporlariYukle(), supabaseAtamalariYukle(), supabaseKullanicilariYukle()]);
+    Promise.all([
+      supabaseRaporlariYukle(),
+      supabaseAtamalariYukle(),
+      supabaseKullanicilariYukle(),
+      supabaseHedefleriYukle(),
+    ]);
 
     aboneOlRaporGuncellemeleri();
     aboneOlAtamaGuncellemeleri();
+    aboneOlHedefGuncellemeleri();
 
     const handleVisibility = () => {
       if (document.visibilityState === 'visible') {
         supabaseRaporlariYukle();
         supabaseAtamalariYukle();
+        supabaseHedefleriYukle();
       }
     };
     document.addEventListener('visibilitychange', handleVisibility);
@@ -83,6 +91,7 @@ export default function App() {
     return () => {
       realtimeRaporAboneliktenCik();
       realtimeAtamaAboneliktenCik();
+      realtimeHedefAboneliktenCik();
       document.removeEventListener('visibilitychange', handleVisibility);
     };
   }, [authTick]);

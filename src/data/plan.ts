@@ -12,20 +12,22 @@ export function getIlerlemeDurumu(
   rapor: Rapor | null,
   hedefTarih?: string
 ): { label: string; renk: string } {
-  if (!rapor) return { label: 'Rapor Yok', renk: '#9ca3af' };
-  if (rapor.durum === 'tamamlandi') return { label: 'Tamamlandı', renk: '#22c55e' };
-  if (rapor.durum === 'gecikme') return { label: 'Gecikme', renk: '#ef4444' };
+  if (rapor?.durum === 'tamamlandi') return { label: 'Tamamlandı', renk: '#22c55e' };
+  if (rapor?.durum === 'gecikme') return { label: 'Gecikme', renk: '#ef4444' };
   if (hedefTarih) {
     const bugun = new Date();
+    bugun.setHours(0, 0, 0, 0);
     const hedef = new Date(hedefTarih);
-    if (hedef < bugun) return { label: 'Süresi Geçti', renk: '#f59e0b' };
-    const kalanGun = Math.ceil((hedef.getTime() - bugun.getTime()) / (1000 * 60 * 60 * 24));
-    if (kalanGun <= 7) return { label: `⚠ ${kalanGun} gün kaldı`, renk: '#f59e0b' };
-    return { label: `${kalanGun} gün kaldı`, renk: '#3b82f6' };
+    hedef.setHours(0, 0, 0, 0);
+    const farkGun = Math.round((hedef.getTime() - bugun.getTime()) / (1000 * 60 * 60 * 24));
+    if (farkGun < 0) return { label: `Süresi Geçti (${-farkGun} gün)`, renk: '#ef4444' };
+    if (farkGun === 0) return { label: 'Bugün', renk: '#f59e0b' };
+    if (farkGun <= 7) return { label: `⚠ ${farkGun} gün kaldı`, renk: '#f59e0b' };
+    return { label: `${farkGun} gün kaldı`, renk: '#3b82f6' };
   }
-  if (rapor.durum === 'devam_ediyor') return { label: 'Devam Ediyor', renk: '#3b82f6' };
-  if (rapor.durum === 'planlandi') return { label: 'Planlandı', renk: '#f59e0b' };
-  return { label: 'Bilinmiyor', renk: '#9ca3af' };
+  if (rapor?.durum === 'devam_ediyor') return { label: 'Devam Ediyor', renk: '#3b82f6' };
+  if (rapor?.durum === 'planlandi') return { label: 'Planlandı', renk: '#f59e0b' };
+  return { label: 'Rapor Yok', renk: '#9ca3af' };
 }
 
 export function getAdaProgramOzeti(

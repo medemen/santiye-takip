@@ -85,3 +85,11 @@ export interface BlokProgress {
   is_kalemleri: Record<string, Rapor | null>;
   genel_ilerleme: number;
 }
+
+export interface IsKalemiHedefi {
+  id: number;
+  ada: string;
+  blok_no: number;
+  is_kalemi: string;
+  hedef_tarih: string; // yyyy-mm-dd
+}

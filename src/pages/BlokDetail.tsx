@@ -1,13 +1,25 @@
 import { useParams, useNavigate } from 'react-router-dom';
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useSyncExternalStore } from 'react';
 import { useSiteConfig } from '../hooks/useSiteConfig';
 import { getBlok, getAllKalemler, getGrupByKalem } from '../config/helpers';
 import { getBlokProgress, getBlokRaporlari, getBlokGenelIlerleme } from '../stores/reportStore';
 import { getSantiyeSefi } from '../stores/kullanicilarStore';
+import {
+  getHedefler,
+  setHedef,
+  subscribeHedefChanges,
+  hedefDuzetmeYetkisiVarMi,
+} from '../stores/hedefStore';
+import { getIlerlemeDurumu } from '../data/plan';
 import type { IsDurumu } from '../types';
 import ProgressBar from '../components/ProgressBar';
 import StatusBadge from '../components/StatusBadge';
 import ReportCard from '../components/ReportCard';
+
+function formatTarih(iso: string): string {
+  const [y, m, d] = iso.split('-');
+  return `${d}.${m}.${y}`;
+}
 
 export default function BlokDetail() {
   const { ada, blokNo } = useParams<{ ada: string; blokNo: string }>();
@@ -25,6 +37,11 @@ export default function BlokDetail() {
     (a, b) => new Date(b.olusturma_tarihi).getTime() - new Date(a.olusturma_tarihi).getTime()
   );
   const blokOzelRaporVar = raporlar.length > 0;
+
+  const hedefler = useSyncExternalStore(subscribeHedefChanges, getHedefler);
+  const hedefDuzenleyebilir = hedefDuzetmeYetkisiVarMi();
+  const [duzenlenenKalem, setDuzenlenenKalem] = useState<string | null>(null);
+  const [duzenlenenTarih, setDuzenlenenTarih] = useState('');
 
   const progressArray = isKalemleri.map((ik) => {
     const r = progress[ik];
@@ -189,54 +206,158 @@ export default function BlokDetail() {
                 </button>
                 {acik && (
                   <div style={{ padding: 8, display: 'flex', flexDirection: 'column', gap: 6 }}>
-                    {grupKalemleri.map(({ isKalemi, rapor }) => (
-                      <div
-                        key={isKalemi}
-                        style={{
-                          display: 'flex',
-                          alignItems: 'center',
-                          gap: 10,
-                          padding: '8px 10px',
-                          borderRadius: 10,
-                          backgroundColor: rapor?.durum === 'gecikme' ? '#fef2f2' : '#f9fafb',
-                        }}
-                      >
-                        <div style={{ width: 120, fontSize: 12, fontWeight: 500, color: '#374151', flexShrink: 0 }}>
-                          {isKalemi}
-                        </div>
-                        <div style={{ flex: 1 }}>
-                          <ProgressBar
-                            value={rapor?.durum === 'tamamlandi' ? 100 : rapor?.ilerleme_yuzde ?? 0}
-                            height={6}
-                            color={rapor?.durum === 'gecikme' ? '#ef4444' : undefined}
-                          />
-                        </div>
-                        <div style={{ width: 100, textAlign: 'right', flexShrink: 0 }}>
-                          {rapor ? (
-                            <div style={{ display: 'flex', gap: 4, alignItems: 'center', justifyContent: 'flex-end' }}>
-                              {rapor.blok_no === 0 && blokNum !== 0 && (
-                                <span
-                                  style={{
-                                    fontSize: 9,
-                                    backgroundColor: '#fef3c7',
-                                    color: '#92400e',
-                                    padding: '1px 6px',
-                                    borderRadius: 8,
-                                    whiteSpace: 'nowrap',
+                    {grupKalemleri.map(({ isKalemi, rapor }) => {
+                      const hedef = hedefler.find(
+                        (h) => h.ada === ada && h.blok_no === blokNum && h.is_kalemi === isKalemi
+                      );
+                      const ilerlemeDurumu = getIlerlemeDurumu(rapor, hedef?.hedef_tarih);
+                      const duzenleniyor = duzenlenenKalem === isKalemi;
+                      return (
+                        <div
+                          key={isKalemi}
+                          style={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: 10,
+                            padding: '8px 10px',
+                            borderRadius: 10,
+                            backgroundColor: rapor?.durum === 'gecikme' ? '#fef2f2' : '#f9fafb',
+                          }}
+                        >
+                          <div style={{ width: 120, fontSize: 12, fontWeight: 500, color: '#374151', flexShrink: 0 }}>
+                            {isKalemi}
+                          </div>
+                          <div style={{ flex: 1 }}>
+                            <ProgressBar
+                              value={rapor?.durum === 'tamamlandi' ? 100 : rapor?.ilerleme_yuzde ?? 0}
+                              height={6}
+                              color={rapor?.durum === 'gecikme' ? '#ef4444' : undefined}
+                            />
+                            <div style={{ marginTop: 4, minHeight: 22, display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
+                              {duzenleniyor ? (
+                                <>
+                                  <input
+                                    type="date"
+                                    value={duzenlenenTarih}
+                                    onChange={(e) => setDuzenlenenTarih(e.target.value)}
+                                    style={{
+                                      fontSize: 11,
+                                      padding: '3px 6px',
+                                      borderRadius: 8,
+                                      border: '1px solid #e5e7eb',
+                                      backgroundColor: '#fff',
+                                      color: '#1f2937',
+                                    }}
+                                  />
+                                  <button
+                                    onClick={() => {
+                                      setHedef(ada!, blokNum, isKalemi, duzenlenenTarih || null);
+                                      setDuzenlenenKalem(null);
+                                    }}
+                                    style={{
+                                      fontSize: 11,
+                                      padding: '3px 10px',
+                                      borderRadius: 8,
+                                      border: 'none',
+                                      backgroundColor: '#f59e0b',
+                                      color: '#fff',
+                                      fontWeight: 600,
+                                      cursor: 'pointer',
+                                    }}
+                                  >
+                                    Kaydet
+                                  </button>
+                                  <button
+                                    onClick={() => setDuzenlenenKalem(null)}
+                                    style={{
+                                      fontSize: 11,
+                                      padding: '3px 8px',
+                                      borderRadius: 8,
+                                      border: '1px solid #e5e7eb',
+                                      backgroundColor: '#fff',
+                                      color: '#6b7280',
+                                      cursor: 'pointer',
+                                    }}
+                                  >
+                                    Vazgeç
+                                  </button>
+                                </>
+                              ) : hedef ? (
+                                <>
+                                  <span style={{ fontSize: 11, fontWeight: 600, color: ilerlemeDurumu.renk }}>
+                                    🎯 {ilerlemeDurumu.label}
+                                  </span>
+                                  <span style={{ fontSize: 11, color: '#9ca3af' }}>
+                                    Hedef: {formatTarih(hedef.hedef_tarih)}
+                                  </span>
+                                  {hedefDuzenleyebilir && (
+                                    <button
+                                      onClick={() => {
+                                        setDuzenlenenTarih(hedef.hedef_tarih);
+                                        setDuzenlenenKalem(isKalemi);
+                                      }}
+                                      style={{
+                                        fontSize: 11,
+                                        padding: '2px 8px',
+                                        borderRadius: 8,
+                                        border: '1px solid #e5e7eb',
+                                        backgroundColor: '#fff',
+                                        color: '#6b7280',
+                                        cursor: 'pointer',
+                                      }}
+                                    >
+                                      ✎
+                                    </button>
+                                  )}
+                                </>
+                              ) : hedefDuzenleyebilir ? (
+                                <button
+                                  onClick={() => {
+                                    setDuzenlenenTarih('');
+                                    setDuzenlenenKalem(isKalemi);
                                   }}
-                                  title="Bu kalem için blok özel raporu yok; ada geneli rapor geçerli"
+                                  style={{
+                                    fontSize: 11,
+                                    padding: '3px 10px',
+                                    borderRadius: 8,
+                                    border: '1px dashed #d1d5db',
+                                    backgroundColor: '#fff',
+                                    color: '#9ca3af',
+                                    cursor: 'pointer',
+                                  }}
                                 >
-                                  Ada Geneli
-                                </span>
-                              )}
-                              <StatusBadge durum={rapor.durum as IsDurumu} size="sm" />
+                                  🎯 Hedef Belirle
+                                </button>
+                              ) : null}
                             </div>
-                          ) : (
-                            <span style={{ fontSize: 11, color: '#9ca3af' }}>—</span>
-                          )}
+                          </div>
+                          <div style={{ width: 100, textAlign: 'right', flexShrink: 0 }}>
+                            {rapor ? (
+                              <div style={{ display: 'flex', gap: 4, alignItems: 'center', justifyContent: 'flex-end' }}>
+                                {rapor.blok_no === 0 && blokNum !== 0 && (
+                                  <span
+                                    style={{
+                                      fontSize: 9,
+                                      backgroundColor: '#fef3c7',
+                                      color: '#92400e',
+                                      padding: '1px 6px',
+                                      borderRadius: 8,
+                                      whiteSpace: 'nowrap',
+                                    }}
+                                    title="Bu kalem için blok özel raporu yok; ada geneli rapor geçerli"
+                                  >
+                                    Ada Geneli
+                                  </span>
+                                )}
+                                <StatusBadge durum={rapor.durum as IsDurumu} size="sm" />
+                              </div>
+                            ) : (
+                              <span style={{ fontSize: 11, color: '#9ca3af' }}>—</span>
+                            )}
+                          </div>
                         </div>
-                      </div>
-                    ))}
+                      );
+                    })}
                   </div>
                 )}
               </div>
