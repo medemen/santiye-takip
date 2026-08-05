@@ -1,13 +1,12 @@
 import { useParams, useNavigate } from 'react-router-dom';
-import { useState, useEffect, useRef, useSyncExternalStore } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useSiteConfig } from '../hooks/useSiteConfig';
+import { useHedefler } from '../hooks/useHedefler';
 import { getBlok, getAllKalemler, getGrupByKalem } from '../config/helpers';
 import { getBlokProgress, getBlokRaporlari, getBlokGenelIlerleme } from '../stores/reportStore';
 import { getSantiyeSefi } from '../stores/kullanicilarStore';
 import {
-  getHedefler,
   setHedef,
-  subscribeHedefChanges,
   hedefDuzetmeYetkisiVarMi,
 } from '../stores/hedefStore';
 import { getIlerlemeDurumu } from '../data/plan';
@@ -38,7 +37,7 @@ export default function BlokDetail() {
   );
   const blokOzelRaporVar = raporlar.length > 0;
 
-  const hedefler = useSyncExternalStore(subscribeHedefChanges, getHedefler);
+  const hedefler = useHedefler();
   const hedefDuzenleyebilir = hedefDuzetmeYetkisiVarMi();
   const [duzenlenenKalem, setDuzenlenenKalem] = useState<string | null>(null);
   const [duzenlenenTarih, setDuzenlenenTarih] = useState('');

@@ -9,13 +9,19 @@ const STORAGE_KEY = `${getSiteConfig().marka.localStoragePrefix}_hedefler`;
 
 type Listener = () => void;
 const _hedefListeners = new Set<Listener>();
+let _version = 0;
 
 export function subscribeHedefChanges(listener: Listener): () => void {
   _hedefListeners.add(listener);
   return () => { _hedefListeners.delete(listener); };
 }
 
+export function getHedefVersion(): number {
+  return _version;
+}
+
 function notifyHedefListeners(): void {
+  _version++;
   _hedefListeners.forEach(fn => fn());
 }
 

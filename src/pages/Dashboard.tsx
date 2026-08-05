@@ -1,5 +1,7 @@
 import { useNavigate } from 'react-router-dom';
-import { getIstatistikler, getAdaGenelIlerleme, getRaporlar } from '../stores/reportStore';
+import { getIstatistikler, getAdaGenelIlerleme, getRaporlar, getSonRapor } from '../stores/reportStore';
+import { useHedefler } from '../hooks/useHedefler';
+import { getHedefOzeti } from '../data/plan';
 import { useSiteConfig } from '../hooks/useSiteConfig';
 import { getAdaList, getAllKalemler } from '../config/helpers';
 import { DURUM_RENKLERI } from '../config/defaultConfig';
@@ -19,6 +21,9 @@ export default function Dashboard() {
     .slice(0, 5);
   const tumRaporlar = getRaporlar();
   const gecikenIsler = tumRaporlar.filter((r) => r.durum === 'gecikme');
+
+  const hedefler = useHedefler();
+  const hedefOzeti = getHedefOzeti(hedefler, (a, b, ik) => getSonRapor(a, b, ik));
 
   const donutData = [
     { name: 'Tamamlandı', value: stats.tamamlananIsler, color: DURUM_RENKLERI.tamamlandi },
@@ -116,6 +121,52 @@ export default function Dashboard() {
               </div>
             ))}
           </div>
+        </div>
+      )}
+
+      {hedefOzeti.toplam > 0 && (
+        <div style={{ ...card, marginBottom: 16 }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 }}>
+            <h3 style={{ fontSize: 14, fontWeight: 600, color: '#4b5563', margin: 0 }}>
+              🎯 Hedef Takvimi
+            </h3>
+            <span style={{ fontSize: 12, color: '#9ca3af' }}>{hedefOzeti.toplam} hedef</span>
+          </div>
+          <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginBottom: 10 }}>
+            <span style={{ fontSize: 12, backgroundColor: '#f3f4f6', color: '#4b5563', padding: '3px 10px', borderRadius: 12 }}>
+              ✅ {hedefOzeti.tamamlanan} tamam
+            </span>
+            <span style={{ fontSize: 12, backgroundColor: hedefOzeti.suresiGecen > 0 ? '#fef2f2' : '#f3f4f6', color: hedefOzeti.suresiGecen > 0 ? '#ef4444' : '#4b5563', padding: '3px 10px', borderRadius: 12, fontWeight: hedefOzeti.suresiGecen > 0 ? 700 : 400 }}>
+              ⛔ {hedefOzeti.suresiGecen} süresi geçti
+            </span>
+            <span style={{ fontSize: 12, backgroundColor: hedefOzeti.bugun > 0 ? '#fef3c7' : '#f3f4f6', color: hedefOzeti.bugun > 0 ? '#92400e' : '#4b5563', padding: '3px 10px', borderRadius: 12, fontWeight: hedefOzeti.bugun > 0 ? 700 : 400 }}>
+              📅 {hedefOzeti.bugun} bugün
+            </span>
+            <span style={{ fontSize: 12, backgroundColor: hedefOzeti.yediGun > 0 ? '#fef3c7' : '#f3f4f6', color: hedefOzeti.yediGun > 0 ? '#92400e' : '#4b5563', padding: '3px 10px', borderRadius: 12, fontWeight: hedefOzeti.yediGun > 0 ? 700 : 400 }}>
+              ⏳ {hedefOzeti.yediGun} ≤7 gün
+            </span>
+          </div>
+          {hedefOzeti.acil.length > 0 ? (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+              {hedefOzeti.acil.slice(0, 6).map((h) => (
+                <div
+                  key={`${h.ada}-${h.blok_no}-${h.is_kalemi}`}
+                  onClick={() => navigate(h.blok_no === 0 ? `/ada/${h.ada}` : `/ada/${h.ada}/blok/${h.blok_no}`)}
+                  style={{
+                    display: 'flex', justifyContent: 'space-between',
+                    padding: '6px 10px', backgroundColor: '#f9fafb',
+                    borderRadius: 8, cursor: 'pointer', fontSize: 12,
+                  }}
+                >
+                  <span style={{ fontWeight: 500 }}>{h.ada} - {h.blok_no === 0 ? 'Ada Geneli' : `Blok ${h.blok_no}`}</span>
+                  <span style={{ color: '#374151' }}>{h.is_kalemi}</span>
+                  <span style={{ color: h.durum.renk, fontWeight: 600 }}>{h.durum.label}</span>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <p style={{ fontSize: 12, color: '#9ca3af', margin: 0 }}>Tüm hedefler yolunda, acil iş yok. 🎉</p>
+          )}
         </div>
       )}
 

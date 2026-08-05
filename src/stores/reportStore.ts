@@ -188,6 +188,16 @@ export function getPersonelRaporlari(adSoyad: string): Rapor[] {
   return getRaporlar().filter((r) => r.raporlayan === adSoyad);
 }
 
+export function getSonRapor(ada: string, blokNo: number, isKalemi: string): Rapor | null {
+  return getRaporlar()
+    .filter((r) => r.ada === ada && r.blok_no === blokNo && r.is_kalemi === isKalemi)
+    .sort(
+      (a, b) =>
+        new Date(b.olusturma_tarihi).getTime() -
+        new Date(a.olusturma_tarihi).getTime()
+    )[0] ?? null;
+}
+
 function sonRaporBul(raporlar: Rapor[], ik: string): Rapor | null {
   const son = raporlar
     .filter((r) => r.is_kalemi === ik)

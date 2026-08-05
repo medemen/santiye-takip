@@ -3,15 +3,23 @@ import { useState } from 'react';
 import BlokCard from '../components/BlokCard';
 import ProgressBar from '../components/ProgressBar';
 import { useSiteConfig } from '../hooks/useSiteConfig';
+import { useHedefler } from '../hooks/useHedefler';
 import { getAda, getBloklar, getAllKalemler } from '../config/helpers';
 import { getSantiyeSefi, getBlokSorumlulari } from '../stores/kullanicilarStore';
-import { getAdaGenelIlerleme } from '../stores/reportStore';
+import { getAdaGenelIlerleme, getSonRapor } from '../stores/reportStore';
+import { getHedefOzeti } from '../data/plan';
 
 export default function AdaDetail() {
   const { ada } = useParams<{ ada: string }>();
   const navigate = useNavigate();
   const config = useSiteConfig();
   const [filterTip, setFilterTip] = useState('');
+
+  const hedefler = useHedefler();
+  const hedefOzeti = getHedefOzeti(
+    hedefler.filter((h) => h.ada === ada),
+    (a, b, ik) => getSonRapor(a, b, ik)
+  );
 
   const adaData = getAda(config, ada!);
 
@@ -116,6 +124,57 @@ export default function AdaDetail() {
           ))}
         </div>
       </div>
+
+      {hedefOzeti.toplam > 0 && (
+        <div
+          style={{
+            backgroundColor: '#fff',
+            borderRadius: 12,
+            padding: 14,
+            marginBottom: 16,
+            border: '1px solid #f0f0f0',
+          }}
+        >
+          <h3 style={{ fontSize: 13, fontWeight: 600, color: '#4b5563', margin: 0, marginBottom: 8 }}>
+            🎯 Hedef Özeti ({hedefOzeti.toplam})
+          </h3>
+          <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginBottom: 8 }}>
+            <span style={{ fontSize: 12, backgroundColor: '#f3f4f6', color: '#4b5563', padding: '3px 10px', borderRadius: 12 }}>
+              ✅ {hedefOzeti.tamamlanan} tamam
+            </span>
+            <span style={{ fontSize: 12, backgroundColor: hedefOzeti.suresiGecen > 0 ? '#fef2f2' : '#f3f4f6', color: hedefOzeti.suresiGecen > 0 ? '#ef4444' : '#4b5563', padding: '3px 10px', borderRadius: 12, fontWeight: hedefOzeti.suresiGecen > 0 ? 700 : 400 }}>
+              ⛔ {hedefOzeti.suresiGecen} süresi geçti
+            </span>
+            <span style={{ fontSize: 12, backgroundColor: hedefOzeti.bugun > 0 ? '#fef3c7' : '#f3f4f6', color: hedefOzeti.bugun > 0 ? '#92400e' : '#4b5563', padding: '3px 10px', borderRadius: 12, fontWeight: hedefOzeti.bugun > 0 ? 700 : 400 }}>
+              📅 {hedefOzeti.bugun} bugün
+            </span>
+            <span style={{ fontSize: 12, backgroundColor: hedefOzeti.yediGun > 0 ? '#fef3c7' : '#f3f4f6', color: hedefOzeti.yediGun > 0 ? '#92400e' : '#4b5563', padding: '3px 10px', borderRadius: 12, fontWeight: hedefOzeti.yediGun > 0 ? 700 : 400 }}>
+              ⏳ {hedefOzeti.yediGun} ≤7 gün
+            </span>
+          </div>
+          {hedefOzeti.acil.length > 0 && (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+              {hedefOzeti.acil.slice(0, 5).map((h) => (
+                <div
+                  key={`${h.blok_no}-${h.is_kalemi}`}
+                  onClick={() => navigate(h.blok_no === 0 ? `/ada/${h.ada}` : `/ada/${h.ada}/blok/${h.blok_no}`)}
+                  style={{
+                    display: 'flex', justifyContent: 'space-between',
+                    padding: '6px 10px', backgroundColor: '#f9fafb',
+                    borderRadius: 8, cursor: 'pointer', fontSize: 12,
+                  }}
+                >
+                  <span style={{ fontWeight: 500 }}>
+                    {h.blok_no === 0 ? 'Ada Geneli' : `Blok ${h.blok_no}`}
+                  </span>
+                  <span style={{ color: '#374151' }}>{h.is_kalemi}</span>
+                  <span style={{ color: h.durum.renk, fontWeight: 600 }}>{h.durum.label}</span>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
 
       <div style={{ marginBottom: 16 }}>
         <div style={{ display: 'flex', gap: 8, overflowX: 'auto', paddingBottom: 4 }}>
