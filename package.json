@@ -10,6 +10,7 @@
     "preview": "vite preview",
     "seed:users": "node scripts/seed-users.mjs",
     "seed:config": "node scripts/seed-config.mjs",
+    "seed:migration": "node scripts/seed-migration.mjs",
     "bootstrap:admin": "node scripts/bootstrap-admin.mjs",
     "new:santiye": "node scripts/new-santiye.mjs",
     "build:config": "node scripts/build-config.mjs && node scripts/validate-config.mjs",
