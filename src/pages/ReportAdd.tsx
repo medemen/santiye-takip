@@ -1,19 +1,20 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { blokData } from '../data/blokData';
-import { IS_KALEMLERI, IMALAT_GRUPLARI, DURUM_LABELLARI } from '../data/isKalemleri';
-import { SABLONLAR, getSablonKalemleri } from '../data/sablonlar';
-import { saveRapor, updateRapor, getRaporById } from '../store/reportStore';
-import { getCurrentUser } from '../store/authStore';
-import { getKullaniciAdaAtamasi, getKullaniciBloklari } from '../store/atamaStore';
+import { useSiteConfig } from '../hooks/useSiteConfig';
+import { getAda, getAdaList, getAllKalemler, getSablonKalemleri } from '../config/helpers';
+import { DURUM_LABELLARI } from '../config/defaultConfig';
+import { saveRapor, updateRapor, getRaporById } from '../stores/reportStore';
+import { getCurrentUser } from '../stores/authStore';
+import { getKullaniciAdaAtamasi, getKullaniciBloklari } from '../stores/atamaStore';
 import type { IsDurumu } from '../types';
 import { todayISO } from '../utils/helpers';
-import { toastGoster } from '../store/toastStore';
+import { toastGoster } from '../stores/toastStore';
 
 type Step = 'ada' | 'blok' | 'is_kalemi' | 'detay';
 
 export default function ReportAdd() {
   const navigate = useNavigate();
+  const config = useSiteConfig();
   const [searchParams] = useSearchParams();
   const preAda = searchParams.get('ada') || '';
   const preBlok = searchParams.get('blok') || '';
@@ -34,9 +35,9 @@ export default function ReportAdd() {
   }
 
   const gosterilecekAdalar = user?.admin
-    ? blokData.adalar.filter((a) => yetkiliAdalar.includes(a.ada))
+    ? getAdaList(config).filter((a) => yetkiliAdalar.includes(a.ada))
     : atananAda
-      ? blokData.adalar.filter((a) => a.ada === atananAda)
+      ? getAdaList(config).filter((a) => a.ada === atananAda)
       : [];
 
   const [step, setStep] = useState<Step>(
@@ -67,7 +68,7 @@ export default function ReportAdd() {
     }
   }, [editId]);
 
-  const adaData = ada ? blokData.adalar.find((a) => a.ada === ada) : null;
+  const adaData = ada ? getAda(config, ada) : null;
 
   const getBlokFiltre = () => {
     if (!ada) return [];
@@ -355,14 +356,14 @@ export default function ReportAdd() {
               {ada} - {blokNo === 0 ? 'Ada Geneli' : `Blok ${blokNo}`} — İş Kalemi
             </h3>
 
-            {!editMode && SABLONLAR.length > 0 && (
+            {!editMode && config.isKalemleri.sablonlar.length > 0 && (
               <div style={{ marginBottom: 12 }}>
                 <label style={{ display: 'block', fontSize: 12, fontWeight: 500, color: '#6b7280', marginBottom: 4 }}>
                   Hızlı Şablon
                 </label>
                 <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
-                  {SABLONLAR.map((s) => {
-                    const kalemler = getSablonKalemleri(s);
+                  {config.isKalemleri.sablonlar.map((s) => {
+                    const kalemler = getSablonKalemleri(config, s);
                     return (
                       <button
                         key={s.id}
@@ -416,14 +417,14 @@ export default function ReportAdd() {
             {kalemArama ? (
               <div style={{ marginBottom: 16 }}>
                 {kalemButonlari(
-                  IS_KALEMLERI.filter((ik) =>
+                  getAllKalemler(config).filter((ik) =>
                     ik.toLowerCase().includes(kalemArama.toLowerCase())
                   )
                 )}
               </div>
             ) : (
               <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginBottom: 16 }}>
-                {IMALAT_GRUPLARI.map((g) => {
+                {config.isKalemleri.gruplar.map((g) => {
                   const acik = acikGruplar.has(g.id);
                   return (
                     <div

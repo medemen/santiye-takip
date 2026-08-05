@@ -2,8 +2,9 @@ import { memo, useMemo } from 'react';
 import type { Blok, IsDurumu } from '../types';
 import ProgressBar from './ProgressBar';
 import StatusBadge from './StatusBadge';
-import { getBlokProgress, getBlokRaporlari } from '../store/reportStore';
-import { IS_KALEMLERI } from '../data/isKalemleri';
+import { getBlokProgress, getBlokRaporlari } from '../stores/reportStore';
+import { getAllKalemler } from '../config/helpers';
+import { useSiteConfig } from '../hooks/useSiteConfig';
 
 interface Props {
   ada: string;
@@ -12,15 +13,16 @@ interface Props {
 }
 
 const BlokCard = memo(function BlokCard({ ada, blok, onClick }: Props) {
+  const config = useSiteConfig();
+  const isKalemleri = getAllKalemler(config);
   const blokOzelRaporlar = useMemo(
     () => getBlokRaporlari(ada, blok.blok_no),
     [ada, blok.blok_no]
   );
   const progress = useMemo(
-    () => getBlokProgress(ada, blok.blok_no, IS_KALEMLERI),
-    [ada, blok.blok_no]
+    () => getBlokProgress(ada, blok.blok_no, isKalemleri),
+    [ada, blok.blok_no, isKalemleri]
   );
-  const isKalemleri = IS_KALEMLERI;
 
   const { tamamlanan, geciken, sonDurum } = useMemo(() => {
     let t = 0, g = 0;

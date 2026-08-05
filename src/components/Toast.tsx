@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { toastSubscribe, toastKaldir } from '../store/toastStore';
+import { toastSubscribe, toastKaldir } from '../stores/toastStore';
 
 const BG_RENKLERI: Record<string, string> = {
   success: '#22c55e',

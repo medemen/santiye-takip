@@ -1,9 +1,10 @@
--- Seed data: Adalar
-insert into public.adalar (ada, blok_sayisi, toplam_daire, toplam_kat) values
-  ('ADA-1', 24, 624, 192),
-  ('ADA-2', 24, 588, 192),
-  ('ADA-3', 22, 546, 174),
-  ('ADA-4', 22, 546, 174),
-  ('ADA-5', 22, 546, 174),
-  ('ADA-6', 22, 564, 175)
-on conflict (ada) do nothing;
+-- Santiye Takip V2 - Seed
+-- V2'de yapi bilgisi DB tablosundan degil, `santiye.config.json` + `santiye_config` tablosundan gelir.
+-- Bu nedenle adalar/bloklar insert'i kaldirildi.
+--
+-- Veri seed islemleri (npm run ...):
+--   seed:config  -> data/santiye.config.json'i `santiye_config` tablosuna yazar (service role)
+--   seed:users   -> auth.users + `kullanicilar` tablosunu data/personel.json'dan olusturur
+--
+-- Auth trigger (`handle_new_user`) yeni auth kullanicilarini otomatik olarak
+-- `kullanicilar` tablosuna tasir; seed scriptleri idempotent'tir.

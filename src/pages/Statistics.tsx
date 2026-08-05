@@ -1,15 +1,19 @@
 import { useNavigate } from 'react-router-dom';
-import { getIstatistikler, getAdaRaporlari, getAdaGenelIlerleme, getPersonelRaporlari } from '../store/reportStore';
-import { blokData } from '../data/blokData';
-import { personelData } from '../data/personelData';
-import { IS_KALEMLERI, DURUM_RENKLERI } from '../data/isKalemleri';
+import { getIstatistikler, getAdaRaporlari, getAdaGenelIlerleme, getPersonelRaporlari } from '../stores/reportStore';
+import { getAllPersonel } from '../stores/kullanicilarStore';
+import { useSiteConfig } from '../hooks/useSiteConfig';
+import { getAdaList, getAllKalemler } from '../config/helpers';
+import { DURUM_RENKLERI } from '../config/defaultConfig';
 import DonutChart from '../components/DonutChart';
 import BarChart from '../components/BarChart';
 import { card, btnGhost, pageTitle } from '../utils/styles';
 
 export default function Statistics() {
   const navigate = useNavigate();
+  const config = useSiteConfig();
   const stats = getIstatistikler();
+  const isKalemleri = getAllKalemler(config);
+  const adalar = getAdaList(config);
 
   const donutData = [
     { name: 'Tamamlandı', value: stats.tamamlananIsler, color: DURUM_RENKLERI.tamamlandi },
@@ -18,13 +22,13 @@ export default function Statistics() {
     { name: 'Gecikme', value: stats.gecikenIsler, color: DURUM_RENKLERI.gecikme },
   ];
 
-  const adaProgress = blokData.adalar.map((a) => ({
+  const adaProgress = adalar.map((a) => ({
     name: a.ada,
-    value: getAdaGenelIlerleme(a.ada, a.bloklar, IS_KALEMLERI),
+    value: getAdaGenelIlerleme(a.ada, a.bloklar, isKalemleri),
     color: '#f59e0b',
   }));
 
-  const adaDetay = blokData.adalar.map((a) => {
+  const adaDetay = adalar.map((a) => {
     const raporlar = getAdaRaporlari(a.ada);
     return {
       ada: a.ada,
@@ -33,11 +37,11 @@ export default function Statistics() {
       devam: raporlar.filter((r) => r.durum === 'devam_ediyor').length,
       gecikme: raporlar.filter((r) => r.durum === 'gecikme').length,
       plan: raporlar.filter((r) => r.durum === 'planlandi').length,
-      ilerleme: getAdaGenelIlerleme(a.ada, a.bloklar, IS_KALEMLERI),
+      ilerleme: getAdaGenelIlerleme(a.ada, a.bloklar, isKalemleri),
     };
   });
 
-  const personelRaporSiralamasi = personelData.personel
+  const personelRaporSiralamasi = getAllPersonel()
     .map((p) => ({
       ad_soyad: p.ad_soyad,
       raporSayisi: getPersonelRaporlari(p.ad_soyad).length,
@@ -46,12 +50,12 @@ export default function Statistics() {
     .slice(0, 10);
 
   const genelIlerleme =
-    blokData.adalar.length > 0
+    adalar.length > 0
       ? Math.round(
-          blokData.adalar.reduce(
-            (s, a) => s + getAdaGenelIlerleme(a.ada, a.bloklar, IS_KALEMLERI),
+          adalar.reduce(
+            (s, a) => s + getAdaGenelIlerleme(a.ada, a.bloklar, isKalemleri),
             0
-          ) / blokData.adalar.length
+          ) / adalar.length
         )
       : 0;
 

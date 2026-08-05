@@ -1,10 +1,11 @@
 import type { Rapor } from '../types';
 import { getSupabase, isSupabaseReady } from '../lib/supabase';
+import { getSiteConfig } from '../config/site';
 import type { RealtimeChannel } from '@supabase/supabase-js';
 import { toastGoster } from './toastStore';
 import { getCurrentUser } from './authStore';
 
-const STORAGE_KEY = 'santiye_raporlari_v2';
+const STORAGE_KEY = `${getSiteConfig().marka.localStoragePrefix}_raporlar`;
 
 type Listener = () => void;
 const _raporListeners = new Set<Listener>();

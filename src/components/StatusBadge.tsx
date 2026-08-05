@@ -1,6 +1,6 @@
 import { memo } from 'react';
 import type { IsDurumu } from '../types';
-import { DURUM_RENKLERI, DURUM_LABELLARI } from '../data/isKalemleri';
+import { DURUM_RENKLERI, DURUM_LABELLARI } from '../config/defaultConfig';
 
 interface Props {
   durum: IsDurumu;

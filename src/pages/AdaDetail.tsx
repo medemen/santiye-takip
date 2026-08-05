@@ -1,31 +1,33 @@
 import { useParams, useNavigate } from 'react-router-dom';
 import { useState } from 'react';
-import { blokData } from '../data/blokData';
 import BlokCard from '../components/BlokCard';
-import { getSantiyeSefi, getBlokSorumlulari } from '../data/personelData';
-import { getAdaGenelIlerleme } from '../store/reportStore';
-import { IS_KALEMLERI } from '../data/isKalemleri';
 import ProgressBar from '../components/ProgressBar';
+import { useSiteConfig } from '../hooks/useSiteConfig';
+import { getAda, getBloklar, getAllKalemler } from '../config/helpers';
+import { getSantiyeSefi, getBlokSorumlulari } from '../stores/kullanicilarStore';
+import { getAdaGenelIlerleme } from '../stores/reportStore';
 
 export default function AdaDetail() {
   const { ada } = useParams<{ ada: string }>();
   const navigate = useNavigate();
+  const config = useSiteConfig();
   const [filterTip, setFilterTip] = useState('');
 
-  const adaData = blokData.adalar.find((a) => a.ada === ada);
+  const adaData = getAda(config, ada!);
 
   if (!adaData) {
     return <div style={{ padding: 40, textAlign: 'center', color: '#9ca3af' }}>Ada bulunamadı</div>;
   }
 
-  const ilerleme = getAdaGenelIlerleme(ada!, adaData.bloklar, IS_KALEMLERI);
+  const bloklar = getBloklar(config, ada!);
+  const ilerleme = getAdaGenelIlerleme(ada!, bloklar, getAllKalemler(config));
   const santiyeSefi = getSantiyeSefi(ada!);
   const sorumlular = getBlokSorumlulari(ada!);
 
-  const tipler = [...new Set(adaData.bloklar.map((b) => b.tip))];
+  const tipler = [...new Set(bloklar.map((b) => b.tip))];
   const filteredBloklar = filterTip
-    ? adaData.bloklar.filter((b) => b.tip === filterTip)
-    : adaData.bloklar;
+    ? bloklar.filter((b) => b.tip === filterTip)
+    : bloklar;
 
   return (
     <div>
@@ -49,7 +51,7 @@ export default function AdaDetail() {
         {ada}
       </h1>
       <p style={{ fontSize: 13, color: '#6b7280', margin: 0, marginBottom: 12 }}>
-        Şantiye Şefi: {santiyeSefi} | {adaData.blok_sayisi} Blok, {adaData.toplam_daire} Daire, {adaData.toplam_kat} Kat
+        Şantiye Şefi: {santiyeSefi} | {bloklar.length} Blok, {adaData.toplam_daire} Daire, {adaData.toplam_kat} Kat
       </p>
 
       <div
@@ -131,7 +133,7 @@ export default function AdaDetail() {
               whiteSpace: 'nowrap',
             }}
           >
-            Tümü ({adaData.bloklar.length})
+            Tümü ({bloklar.length})
           </button>
           {tipler.map((t) => (
             <button
@@ -149,7 +151,7 @@ export default function AdaDetail() {
                 whiteSpace: 'nowrap',
               }}
             >
-              {t} ({adaData.bloklar.filter((b) => b.tip === t).length})
+              {t} ({bloklar.filter((b) => b.tip === t).length})
             </button>
           ))}
         </div>

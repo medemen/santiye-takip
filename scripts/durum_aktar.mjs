@@ -17,9 +17,10 @@ const sb = createClient(supabaseUrl, serviceRoleKey, {
 });
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
-const durum = JSON.parse(
-  readFileSync(join(__dirname, '..', 'data', 'durum_tespit.json'), 'utf8')
+const config = JSON.parse(
+  readFileSync(join(__dirname, '..', 'data', 'santiye.config.json'), 'utf8')
 );
+const durum = config.durumTespit;
 
 const adalar = durum.adalar;
 const tarih = new Date().toISOString().slice(0, 10);

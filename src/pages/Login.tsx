@@ -1,44 +1,28 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { personelData } from '../data/personelData';
-import { girisYap } from '../store/authStore';
-import { toastGoster } from '../store/toastStore';
+import { getKullanicilar } from '../stores/kullanicilarStore';
+import { girisYap } from '../stores/authStore';
+import { toastGoster } from '../stores/toastStore';
+import { useSiteConfig } from '../hooks/useSiteConfig';
 
 export default function Login() {
   const navigate = useNavigate();
+  const config = useSiteConfig();
   const [selected, setSelected] = useState('');
   const [yukleniyor, setYukleniyor] = useState(false);
 
-  const tumKullanicilar = [
-    ...personelData.santiye_sefleri.map((s) => ({
-      ad_soyad: s.ad_soyad,
-      rol: 'Şantiye Şefi',
-    })),
-    ...personelData.personel.map((p) => ({
-      ad_soyad: p.ad_soyad,
-      rol: p.rol,
-    })),
-  ];
+  const tumKullanicilar = getKullanicilar().map((k) => ({
+    ad_soyad: k.ad_soyad,
+    rol: k.rol,
+  }));
 
-  const yoneticiler = [
-    ...personelData.santiye_sefleri.map((s) => ({
-      ad_soyad: s.ad_soyad,
-      rol: 'Şantiye Şefi',
-    })),
-    ...personelData.personel
-      .filter((p) => p.proje_muduru)
-      .map((p) => ({
-        ad_soyad: p.ad_soyad,
-        rol: p.rol,
-      })),
-  ];
+  const yoneticiler = getKullanicilar()
+    .filter((k) => k.admin || k.proje_muduru)
+    .map((k) => ({ ad_soyad: k.ad_soyad, rol: k.rol }));
 
-  const standartKullanicilar = personelData.personel
-    .filter((p) => !p.proje_muduru)
-    .map((p) => ({
-      ad_soyad: p.ad_soyad,
-      rol: p.rol,
-    }));
+  const standartKullanicilar = getKullanicilar()
+    .filter((k) => !k.admin && !k.proje_muduru)
+    .map((k) => ({ ad_soyad: k.ad_soyad, rol: k.rol }));
 
   const handleGiris = async () => {
     if (!selected || yukleniyor) return;
@@ -68,7 +52,7 @@ export default function Login() {
       <div style={{ textAlign: 'center', marginBottom: 32 }}>
         <div style={{ fontSize: 48, marginBottom: 8 }}>🏗️</div>
         <h1 style={{ fontSize: 22, fontWeight: 700, color: '#1f2937', margin: 0 }}>
-          Güneyşehir Şantiyesi
+          {config.genel.santiyeAdi}
         </h1>
         <p style={{ fontSize: 13, color: '#6b7280', marginTop: 4 }}>
           Rapor Takip Sistemi

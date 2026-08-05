@@ -1,5 +1,5 @@
 import type { Rapor } from '../types';
-import { DURUM_LABELLARI } from '../data/isKalemleri';
+import { DURUM_LABELLARI } from '../config/defaultConfig';
 
 export async function raporPdfExport(rapor: Rapor, element: HTMLElement): Promise<void> {
   const [{ default: html2canvas }, { jsPDF }] = await Promise.all([

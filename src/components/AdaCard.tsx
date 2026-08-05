@@ -1,8 +1,9 @@
 import { memo } from 'react';
 import type { Blok } from '../types';
-import { getSantiyeSefi } from '../data/personelData';
-import { getAdaGenelIlerleme } from '../store/reportStore';
-import { IS_KALEMLERI } from '../data/isKalemleri';
+import { getSantiyeSefi } from '../stores/kullanicilarStore';
+import { getAdaGenelIlerleme } from '../stores/reportStore';
+import { getAllKalemler } from '../config/helpers';
+import { useSiteConfig } from '../hooks/useSiteConfig';
 import ProgressBar from './ProgressBar';
 
 interface Props {
@@ -15,8 +16,9 @@ interface Props {
 }
 
 const AdaCard = memo(function AdaCard({ ada, blokSayisi, toplamDaire, toplamKat, bloklar, onClick }: Props) {
+  const config = useSiteConfig();
   const santiyeSefi = getSantiyeSefi(ada);
-  const ilerleme = getAdaGenelIlerleme(ada, bloklar, IS_KALEMLERI);
+  const ilerleme = getAdaGenelIlerleme(ada, bloklar, getAllKalemler(config));
 
   return (
     <div

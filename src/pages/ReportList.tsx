@@ -1,15 +1,17 @@
 import { useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { getRaporlar, getPersonelRaporlari, deleteRapor } from '../store/reportStore';
-import { getCurrentUser, isSahaPersoneli } from '../store/authStore';
-import { blokData } from '../data/blokData';
+import { getRaporlar, getPersonelRaporlari, deleteRapor } from '../stores/reportStore';
+import { getCurrentUser, isSahaPersoneli } from '../stores/authStore';
+import { useSiteConfig } from '../hooks/useSiteConfig';
+import { getAdaList } from '../config/helpers';
 import ReportCard from '../components/ReportCard';
-import { DURUM_LABELLARI } from '../data/isKalemleri';
-import { toastGoster } from '../store/toastStore';
+import { DURUM_LABELLARI } from '../config/defaultConfig';
+import { toastGoster } from '../stores/toastStore';
 import { raporlarXlsxExport } from '../utils/exportXlsx';
 
 export default function ReportList() {
   const navigate = useNavigate();
+  const config = useSiteConfig();
   const [searchParams] = useSearchParams();
   const preAda = searchParams.get('ada') || '';
   const preBlok = searchParams.get('blok') || '';
@@ -58,7 +60,7 @@ export default function ReportList() {
     return true;
   });
 
-  const adaList = blokData.adalar;
+  const adaList = getAdaList(config);
 
   const handleDelete = (id: string) => {
     if (window.confirm('Bu raporu silmek istediğinize emin misiniz?')) {

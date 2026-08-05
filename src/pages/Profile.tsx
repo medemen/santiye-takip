@@ -1,8 +1,8 @@
 import { useNavigate } from 'react-router-dom';
-import { getCurrentUser, cikisYap } from '../store/authStore';
-import { getKullaniciAdaAtamasi, getKullaniciBloklari } from '../store/atamaStore';
-import { getPersonelRaporlari } from '../store/reportStore';
-import { personelData } from '../data/personelData';
+import { getCurrentUser, cikisYap } from '../stores/authStore';
+import { getKullaniciAdaAtamasi, getKullaniciBloklari } from '../stores/atamaStore';
+import { getPersonelRaporlari } from '../stores/reportStore';
+import { getAllPersonel, isSantiyeSefi, getSefAdalar } from '../stores/kullanicilarStore';
 
 export default function Profile() {
   const navigate = useNavigate();
@@ -10,8 +10,8 @@ export default function Profile() {
   if (!user) return null;
 
   const atananAda = getKullaniciAdaAtamasi(user.ad_soyad);
-  const kisi = personelData.personel.find((p) => p.ad_soyad === user.ad_soyad);
-  const sef = personelData.santiye_sefleri.find((s) => s.ad_soyad === user.ad_soyad);
+  const kisi = getAllPersonel().find((p) => p.ad_soyad === user.ad_soyad);
+  const sefAdalar = isSantiyeSefi(user.ad_soyad) ? getSefAdalar(user.ad_soyad) : [];
   const raporSayisi = getPersonelRaporlari(user.ad_soyad).length;
 
   const handleLogout = () => {
@@ -62,10 +62,10 @@ export default function Profile() {
             <span style={{ color: '#6b7280' }}>Rol</span>
             <span style={{ color: '#1f2937', fontWeight: 500 }}>{user.rol}</span>
           </div>
-          {sef && (
+          {sefAdalar.length > 0 && (
             <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 13 }}>
               <span style={{ color: '#6b7280' }}>Yetkili Adalar</span>
-              <span style={{ color: '#1f2937', fontWeight: 500 }}>{sef.adalar.join(', ')}</span>
+              <span style={{ color: '#1f2937', fontWeight: 500 }}>{sefAdalar.join(', ')}</span>
             </div>
           )}
           {atananAda && (

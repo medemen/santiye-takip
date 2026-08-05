@@ -1,7 +1,8 @@
 import { useNavigate } from 'react-router-dom';
-import { getIstatistikler, getAdaGenelIlerleme, getRaporlar } from '../store/reportStore';
-import { blokData } from '../data/blokData';
-import { IS_KALEMLERI, DURUM_RENKLERI } from '../data/isKalemleri';
+import { getIstatistikler, getAdaGenelIlerleme, getRaporlar } from '../stores/reportStore';
+import { useSiteConfig } from '../hooks/useSiteConfig';
+import { getAdaList, getAllKalemler } from '../config/helpers';
+import { DURUM_RENKLERI } from '../config/defaultConfig';
 import DonutChart from '../components/DonutChart';
 import BarChart from '../components/BarChart';
 import ReportCard from '../components/ReportCard';
@@ -10,6 +11,7 @@ import { card, btnGhost } from '../utils/styles';
 
 export default function Dashboard() {
   const navigate = useNavigate();
+  const config = useSiteConfig();
   const stats = getIstatistikler();
   const sonRaporlar = getRaporlar()
     .filter((r) => r.raporlayan !== 'DURUM TESPİT')
@@ -25,17 +27,20 @@ export default function Dashboard() {
     { name: 'Gecikme', value: stats.gecikenIsler, color: DURUM_RENKLERI.gecikme },
   ];
 
-  const adaProgress = blokData.adalar.map((a) => ({
+  const isKalemleri = getAllKalemler(config);
+  const adalar = getAdaList(config);
+
+  const adaProgress = adalar.map((a) => ({
     name: a.ada,
-    value: getAdaGenelIlerleme(a.ada, a.bloklar, IS_KALEMLERI),
+    value: getAdaGenelIlerleme(a.ada, a.bloklar, isKalemleri),
     color: '#f59e0b',
   }));
 
   const genelIlerleme =
-    blokData.adalar.length > 0
+    adalar.length > 0
       ? Math.round(
-          blokData.adalar.reduce((s, a) => s + getAdaGenelIlerleme(a.ada, a.bloklar, IS_KALEMLERI), 0) /
-            blokData.adalar.length
+          adalar.reduce((s, a) => s + getAdaGenelIlerleme(a.ada, a.bloklar, isKalemleri), 0) /
+            adalar.length
         )
       : 0;
 
@@ -43,10 +48,10 @@ export default function Dashboard() {
     <div>
       <div style={{ marginBottom: 20 }}>
         <h1 style={{ fontSize: 22, fontWeight: 700, color: '#1f2937', margin: 0, marginBottom: 4 }}>
-          Güneyşehir Şantiyesi
+          {config.genel.santiyeAdi}
         </h1>
         <p style={{ fontSize: 13, color: '#6b7280', margin: 0 }}>
-          Şahinbey Belediyesi Toplu Konutları
+          {config.genel.projeAdi}
         </p>
       </div>
 

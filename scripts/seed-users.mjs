@@ -26,6 +26,11 @@ const personel = JSON.parse(
   readFileSync(join(__dirname, '..', 'data', 'personel.json'), 'utf8')
 );
 
+const config = JSON.parse(
+  readFileSync(join(__dirname, '..', 'data', 'santiye.config.json'), 'utf8')
+);
+const EMAIL_DOMAIN = config.marka?.emailDomain ?? 'santiye.com';
+
 const TURKCE_MAP = {
   ç: 'c', ğ: 'g', ı: 'i', ö: 'o', ş: 's', ü: 'u',
   Ç: 'c', Ğ: 'g', İ: 'i', Ö: 'o', Ş: 's', Ü: 'u',
@@ -43,7 +48,7 @@ function slug(ad_soyad) {
 }
 
 function email(ad_soyad) {
-  return `${slug(ad_soyad)}@santiye.com`;
+  return `${slug(ad_soyad)}@${EMAIL_DOMAIN}`;
 }
 
 function adalarListesi() {

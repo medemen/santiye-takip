@@ -1,9 +1,9 @@
 import { useParams, useNavigate } from 'react-router-dom';
 import { useState, useEffect, useRef } from 'react';
-import { blokData } from '../data/blokData';
-import { IS_KALEMLERI, IMALAT_GRUPLARI, getGrupByKalem } from '../data/isKalemleri';
-import { getBlokProgress, getBlokRaporlari, getBlokGenelIlerleme } from '../store/reportStore';
-import { getSantiyeSefi } from '../data/personelData';
+import { useSiteConfig } from '../hooks/useSiteConfig';
+import { getBlok, getAllKalemler, getGrupByKalem } from '../config/helpers';
+import { getBlokProgress, getBlokRaporlari, getBlokGenelIlerleme } from '../stores/reportStore';
+import { getSantiyeSefi } from '../stores/kullanicilarStore';
 import type { IsDurumu } from '../types';
 import ProgressBar from '../components/ProgressBar';
 import StatusBadge from '../components/StatusBadge';
@@ -12,22 +12,23 @@ import ReportCard from '../components/ReportCard';
 export default function BlokDetail() {
   const { ada, blokNo } = useParams<{ ada: string; blokNo: string }>();
   const navigate = useNavigate();
+  const config = useSiteConfig();
   const blokNum = parseInt(blokNo || '0');
 
-  const adaData = blokData.adalar.find((a) => a.ada === ada);
-  const blok = adaData?.bloklar.find((b) => b.blok_no === blokNum);
+  const blok = getBlok(config, ada!, blokNum);
+  const isKalemleri = getAllKalemler(config);
 
-  const progress = getBlokProgress(ada!, blokNum, IS_KALEMLERI);
-  const genelIlerleme = getBlokGenelIlerleme(ada!, blokNum, IS_KALEMLERI);
+  const progress = getBlokProgress(ada!, blokNum, isKalemleri);
+  const genelIlerleme = getBlokGenelIlerleme(ada!, blokNum, isKalemleri);
   const santiyeSefi = getSantiyeSefi(ada!);
   const raporlar = getBlokRaporlari(ada!, blokNum).sort(
     (a, b) => new Date(b.olusturma_tarihi).getTime() - new Date(a.olusturma_tarihi).getTime()
   );
   const blokOzelRaporVar = raporlar.length > 0;
 
-  const progressArray = (IS_KALEMLERI).map((ik) => {
+  const progressArray = isKalemleri.map((ik) => {
     const r = progress[ik];
-    return { isKalemi: ik, rapor: r, grup: getGrupByKalem(ik) };
+    return { isKalemi: ik, rapor: r, grup: getGrupByKalem(config, ik) };
   });
 
   const [acikGruplar, setAcikGruplar] = useState<Set<string>>(new Set());
@@ -37,11 +38,11 @@ export default function BlokDetail() {
     if (!ilkRender.current || !ada) return;
     ilkRender.current = false;
     const ilk = new Set<string>();
-    for (const g of IMALAT_GRUPLARI) {
+    for (const g of config.isKalemleri.gruplar) {
       if (g.kalemler.some((k) => progress[k])) ilk.add(g.id);
     }
     setAcikGruplar(ilk);
-  }, [progress, ada]);
+  }, [progress, ada, config.isKalemleri.gruplar]);
 
   const toggleGrup = (grupId: string) => {
     setAcikGruplar((prev) => {
@@ -56,7 +57,7 @@ export default function BlokDetail() {
   const geciken = progressArray.filter((p) => p.rapor?.durum === 'gecikme').length;
   const devamEden = progressArray.filter((p) => p.rapor?.durum === 'devam_ediyor').length;
 
-  if (!adaData || !blok) {
+  if (!blok) {
     return <div style={{ padding: 40, textAlign: 'center', color: '#9ca3af' }}>Blok bulunamadı</div>;
   }
 
@@ -153,7 +154,7 @@ export default function BlokDetail() {
           İş Kalemleri Durumu
         </h3>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-          {IMALAT_GRUPLARI.map((g) => {
+          {config.isKalemleri.gruplar.map((g) => {
             const acik = acikGruplar.has(g.id);
             const grupKalemleri = progressArray.filter((p) => p.grup?.id === g.id);
             const grupTamam = grupKalemleri.filter((p) => p.rapor?.durum === 'tamamlandi').length;

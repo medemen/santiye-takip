@@ -1,16 +1,18 @@
 import { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { blokData } from '../data/blokData';
-import { IS_KALEMLERI, IMALAT_GRUPLARI, DURUM_LABELLARI, DURUM_RENKLERI } from '../data/isKalemleri';
-import { saveRapor, getRaporlar, getBlokProgress } from '../store/reportStore';
-import { getCurrentUser } from '../store/authStore';
-import { getKullaniciAdaAtamasi } from '../store/atamaStore';
+import { useSiteConfig } from '../hooks/useSiteConfig';
+import { getAda, getAdaList, getAllKalemler } from '../config/helpers';
+import { DURUM_LABELLARI, DURUM_RENKLERI } from '../config/defaultConfig';
+import { saveRapor, getRaporlar, getBlokProgress } from '../stores/reportStore';
+import { getCurrentUser } from '../stores/authStore';
+import { getKullaniciAdaAtamasi } from '../stores/atamaStore';
 import type { IsDurumu } from '../types';
 import { todayISO } from '../utils/helpers';
-import { toastGoster } from '../store/toastStore';
+import { toastGoster } from '../stores/toastStore';
 
 export default function BulkReport() {
   const navigate = useNavigate();
+  const config = useSiteConfig();
   const user = getCurrentUser();
   const kullaniciAdi = user?.ad_soyad ?? '';
 
@@ -23,9 +25,9 @@ export default function BulkReport() {
   }
 
   const gosterilecekAdalar = user?.admin
-    ? blokData.adalar.filter((a) => yetkiliAdalar.includes(a.ada))
+    ? getAdaList(config).filter((a) => yetkiliAdalar.includes(a.ada))
     : atananAda
-      ? blokData.adalar.filter((a) => a.ada === atananAda)
+      ? getAdaList(config).filter((a) => a.ada === atananAda)
       : [];
 
   const [ada, setAda] = useState('');
@@ -39,7 +41,7 @@ export default function BulkReport() {
   const [kalemArama, setKalemArama] = useState('');
   const [acikGruplar, setAcikGruplar] = useState<Set<string>>(new Set());
 
-  const adaData = ada ? blokData.adalar.find((a) => a.ada === ada) : null;
+  const adaData = ada ? getAda(config, ada) : null;
 
   const blokDurumMap = useMemo(() => {
     if (!ada || !isKalemi) return {} as Record<number, { durum: IsDurumu; ilerleme_yuzde: number; adaGenel: boolean }>;
@@ -175,14 +177,14 @@ export default function BulkReport() {
           {kalemArama ? (
             <div style={{ marginBottom: 4 }}>
               {kalemButonlari(
-                IS_KALEMLERI.filter((ik) =>
+                getAllKalemler(config).filter((ik) =>
                   ik.toLowerCase().includes(kalemArama.toLowerCase())
                 )
               )}
             </div>
           ) : (
             <div style={{ display: 'flex', flexDirection: 'column', gap: 6, marginBottom: 4 }}>
-              {IMALAT_GRUPLARI.map((g) => {
+              {config.isKalemleri.gruplar.map((g) => {
                 const acik = acikGruplar.has(g.id);
                 return (
                   <div key={g.id} style={{ border: '1px solid #e5e7eb', borderRadius: 8, overflow: 'hidden' }}>

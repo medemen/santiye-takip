@@ -1,9 +1,14 @@
 import type { Oturum } from '../types';
-import { isSantiyeSefi, isProjeMuduru, getSefAdalar } from '../data/personelData';
-import { blokData } from '../data/blokData';
 import { getSupabase, isSupabaseReady } from '../lib/supabase';
+import { getSiteConfig } from '../config/site';
+import {
+  isSantiyeSefi,
+  isProjeMuduru,
+  getSefAdalar,
+  getKullanicilar,
+} from './kullanicilarStore';
 
-const STORAGE_KEY = 'santiye_oturum';
+const STORAGE_KEY = `${getSiteConfig().marka.localStoragePrefix}_oturum`;
 
 const TURKCE_MAP: Record<string, string> = {
   ç: 'c', ğ: 'g', ı: 'i', ö: 'o', ş: 's', ü: 'u',
@@ -12,6 +17,7 @@ const TURKCE_MAP: Record<string, string> = {
 };
 
 export function epostaOlustur(ad_soyad: string): string {
+  const domain = getSiteConfig().marka.emailDomain || 'santiye.com';
   const slug = ad_soyad
     .toLowerCase()
     .split('')
@@ -19,7 +25,7 @@ export function epostaOlustur(ad_soyad: string): string {
     .join('')
     .replace(/[^a-z0-9.]+/g, '.')
     .replace(/^\.+|\.+$/g, '');
-  return `${slug}@santiye.com`;
+  return `${slug}@${domain}`;
 }
 
 const varsayilanSifre = (): string => import.meta.env.VITE_DEFAULT_PASSWORD || 'Santiye2026';
@@ -40,7 +46,7 @@ function statikOturum(ad_soyad: string, rol: string): Oturum {
   const pm = isProjeMuduru(ad_soyad);
   const admin = isSantiyeSefi(ad_soyad) || pm;
   const yetkiliAdalar = pm
-    ? blokData.adalar.map((a) => a.ada)
+    ? getKullanicilar().flatMap((k) => k.yetkili_adalar)
     : (admin ? getSefAdalar(ad_soyad) : []);
   return {
     user_id: null,
@@ -48,7 +54,7 @@ function statikOturum(ad_soyad: string, rol: string): Oturum {
     rol,
     admin,
     proje_muduru: pm,
-    yetkili_adalar: yetkiliAdalar,
+    yetkili_adalar: [...new Set(yetkiliAdalar)],
     giris_tarihi: new Date().toISOString(),
   };
 }
@@ -125,7 +131,7 @@ export function isProjeMuduruSession(): boolean {
 }
 
 export function isSahaPersoneli(rol: string): boolean {
-  return rol === 'Saha Mühendisi' || rol === 'Saha Mimarı';
+  return getSiteConfig().roller.sahaPersoneliRolleri.includes(rol);
 }
 
 export async function supabaseAuthInit(): Promise<void> {

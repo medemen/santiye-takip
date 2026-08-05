@@ -1,5 +1,5 @@
 import type { Rapor } from '../types';
-import { DURUM_LABELLARI } from '../data/isKalemleri';
+import { DURUM_LABELLARI } from '../config/defaultConfig';
 
 export async function raporlarXlsxExport(raporlar: Rapor[], dosyaAdi = 'raporlar.xlsx'): Promise<void> {
   const XLSX = await import('xlsx');

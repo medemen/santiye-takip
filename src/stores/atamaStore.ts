@@ -1,11 +1,13 @@
 import type { KullaniciAtamalari, BlokAtamasi } from '../types';
 import { getSupabase, isSupabaseReady } from '../lib/supabase';
+import { getSiteConfig } from '../config/site';
 import type { RealtimeChannel } from '@supabase/supabase-js';
 import { toastGoster } from './toastStore';
 import { getCurrentUser } from './authStore';
 
-const BLOK_KEY = 'santiye_atanabilir_bloklar';
-const ADA_KEY = 'santiye_kullanici_ada_atamalari';
+const PREFIX = getSiteConfig().marka.localStoragePrefix;
+const BLOK_KEY = `${PREFIX}_blok_atamalari`;
+const ADA_KEY = `${PREFIX}_ada_atamalari`;
 
 type Listener = () => void;
 const _atamaListeners = new Set<Listener>();

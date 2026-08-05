@@ -1,22 +1,22 @@
 import { useState } from 'react';
-import { personelData } from '../data/personelData';
-import { blokData } from '../data/blokData';
-import { getPersonelRaporlari } from '../store/reportStore';
-import { getKullaniciBlokAtamasi, setKullaniciBlokAtamasi, getKullaniciAdaAtamasi, setKullaniciAdaAtamasi } from '../store/atamaStore';
-import { getCurrentUser } from '../store/authStore';
+import { useSiteConfig } from '../hooks/useSiteConfig';
+import { getAdaList } from '../config/helpers';
+import { getAllPersonel, getKullanicilar } from '../stores/kullanicilarStore';
+import { getPersonelRaporlari } from '../stores/reportStore';
+import { getKullaniciBlokAtamasi, setKullaniciBlokAtamasi, getKullaniciAdaAtamasi, setKullaniciAdaAtamasi } from '../stores/atamaStore';
+import { getCurrentUser } from '../stores/authStore';
 import type { BlokAtamasi } from '../types';
 import ReportCard from '../components/ReportCard';
-import { toastGoster } from '../store/toastStore';
+import { toastGoster } from '../stores/toastStore';
 
 function exportCSV() {
-  const { personel } = personelData;
-  const rows = [['Ad Soyad', 'Rol', 'Varsayılan Ada', 'Atanan Ada', 'Atanan Bloklar']];
-  for (const p of personel) {
+  const rows = [['Ad Soyad', 'Rol', 'Atanan Ada', 'Atanan Bloklar']];
+  for (const p of getAllPersonel()) {
     const lsAda = getKullaniciAdaAtamasi(p.ad_soyad);
     const atananAda = lsAda !== null ? lsAda : (p.atanan_ada || '');
     const blokAtama = getKullaniciBlokAtamasi(p.ad_soyad);
     const blokStr = atananAda && blokAtama[atananAda] ? blokAtama[atananAda].sort((a, b) => a - b).join('; ') : '';
-    rows.push([p.ad_soyad, p.rol, p.atanan_ada || '', atananAda, blokStr]);
+    rows.push([p.ad_soyad, p.rol, atananAda, blokStr]);
   }
   const csv = rows.map((r) => r.map((c) => `"${c}"`).join(',')).join('\r\n');
   const blob = new Blob(['\ufeff' + csv], { type: 'text/csv;charset=utf-8;' });
@@ -30,6 +30,7 @@ function exportCSV() {
 }
 
 export default function Personnel() {
+  const config = useSiteConfig();
   const [selectedPerson, setSelectedPerson] = useState<string | null>(null);
   const [editPerson, setEditPerson] = useState<string | null>(null);
   const [editAda, setEditAda] = useState<string>('');
@@ -41,6 +42,8 @@ export default function Personnel() {
   const user = getCurrentUser();
   const isAdmin = user?.admin ?? false;
   const yetkiliAdalar = user?.yetkili_adalar ?? [];
+
+  const adalar = getAdaList(config);
 
   const raporlar = selectedPerson ? getPersonelRaporlari(selectedPerson) : [];
 
@@ -58,29 +61,32 @@ export default function Personnel() {
     'Formen': '#92400e',
   };
 
+  const personelList = getAllPersonel();
+  const sefler = getKullanicilar().filter((k) => k.admin);
+
   const getEffectiveAda = (ad_soyad: string): string | null => {
     const lsAtama = getKullaniciAdaAtamasi(ad_soyad);
     if (lsAtama !== null) return lsAtama;
-    const person = personelData.personel.find((p) => p.ad_soyad === ad_soyad);
+    const person = personelList.find((p) => p.ad_soyad === ad_soyad);
     return person?.atanan_ada ?? null;
   };
 
-  const getAdaLabileli = (): { ada: string; personel: typeof personelData.personel }[] => {
-    const atanmis = personelData.personel.filter((p) => getEffectiveAda(p.ad_soyad));
-    const gruplu: Record<string, typeof personelData.personel> = {};
+  const getAdaLabileli = (): { ada: string; personel: typeof personelList }[] => {
+    const atanmis = personelList.filter((p) => getEffectiveAda(p.ad_soyad));
+    const gruplu: Record<string, typeof personelList> = {};
     for (const p of atanmis) {
       const a = getEffectiveAda(p.ad_soyad)!;
       if (!gruplu[a]) gruplu[a] = [];
       gruplu[a].push(p);
     }
-    return blokData.adalar.map((b) => ({
+    return adalar.map((b) => ({
       ada: b.ada,
       personel: gruplu[b.ada] || [],
     }));
   };
 
   const getAtanmamisPersonel = () => {
-    return personelData.personel.filter((p) => !getEffectiveAda(p.ad_soyad));
+    return personelList.filter((p) => !getEffectiveAda(p.ad_soyad));
   };
 
   const openEdit = (ad_soyad: string) => {
@@ -172,7 +178,7 @@ export default function Personnel() {
   }
 
   if (editPerson) {
-    const person = personelData.personel.find((p) => p.ad_soyad === editPerson);
+    const person = personelList.find((p) => p.ad_soyad === editPerson);
     return (
       <div>
         <div
@@ -263,7 +269,7 @@ export default function Personnel() {
             }}
           >
             <option value="">Atanmamış</option>
-            {(yetkiliAdalar.length > 0 ? yetkiliAdalar : blokData.adalar.map((a) => a.ada)).map((ada) => (
+            {(yetkiliAdalar.length > 0 ? yetkiliAdalar : adalar.map((a) => a.ada)).map((ada) => (
               <option key={ada} value={ada}>{ada}</option>
             ))}
           </select>
@@ -277,7 +283,7 @@ export default function Personnel() {
               </h3>
               <button
                 onClick={() => {
-                  const adaBlok = blokData.adalar.find((a) => a.ada === editAda);
+                  const adaBlok = adalar.find((a) => a.ada === editAda);
                   if (adaBlok) toggleAda(editAda, adaBlok.bloklar);
                 }}
                 style={{
@@ -300,7 +306,7 @@ export default function Personnel() {
                 gap: 6,
               }}
             >
-              {blokData.adalar.find((a) => a.ada === editAda)?.bloklar.map((b) => {
+              {adalar.find((a) => a.ada === editAda)?.bloklar.map((b) => {
                 const secili = editBlokAtama[editAda] || [];
                 const active = secili.includes(b.blok_no);
                 return (
@@ -483,7 +489,7 @@ export default function Personnel() {
       )}
 
       {adaLabelli.map(({ ada, personel }) => {
-        const sef = personelData.santiye_sefleri.find((s) => s.adalar.includes(ada));
+        const sef = sefler.find((s) => s.yetkili_adalar.includes(ada));
         return (
           <div key={ada} style={{ marginBottom: 20 }}>
             <h2

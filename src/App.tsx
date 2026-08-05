@@ -1,12 +1,14 @@
 import { BrowserRouter, HashRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { Capacitor } from '@capacitor/core';
-import { lazy, Suspense, useEffect, useState } from 'react';
+import { lazy, Suspense, useEffect, useState, useSyncExternalStore } from 'react';
 import Layout from './components/Layout';
 import ErrorBoundary from './components/ErrorBoundary';
 import Toast from './components/Toast';
-import { isLoggedIn, isAdmin, supabaseAuthInit, subscribeAuthChanges } from './store/authStore';
-import { supabaseRaporlariYukle, aboneOlRaporGuncellemeleri, realtimeRaporAboneliktenCik } from './store/reportStore';
-import { supabaseAtamalariYukle, aboneOlAtamaGuncellemeleri, realtimeAtamaAboneliktenCik } from './store/atamaStore';
+import { isLoggedIn, isAdmin, supabaseAuthInit, subscribeAuthChanges } from './stores/authStore';
+import { supabaseRaporlariYukle, aboneOlRaporGuncellemeleri, realtimeRaporAboneliktenCik } from './stores/reportStore';
+import { supabaseAtamalariYukle, aboneOlAtamaGuncellemeleri, realtimeAtamaAboneliktenCik } from './stores/atamaStore';
+import { supabaseKullanicilariYukle } from './stores/kullanicilarStore';
+import { getSiteConfig, subscribeSiteConfig } from './config/site';
 import { isSupabaseReady } from './lib/supabase';
 
 const Dashboard = lazy(() => import('./pages/Dashboard'));
@@ -19,12 +21,21 @@ const BulkReport = lazy(() => import('./pages/BulkReport'));
 const Personnel = lazy(() => import('./pages/Personnel'));
 const Profile = lazy(() => import('./pages/Profile'));
 const Statistics = lazy(() => import('./pages/Statistics'));
+const Settings = lazy(() => import('./pages/Settings'));
 const Login = lazy(() => import('./pages/Login'));
 
 function PageLoader() {
   return (
     <div style={{ padding: 24, color: '#6b7280', fontSize: 14 }}>Yükleniyor...</div>
   );
+}
+
+function TitleUpdater() {
+  const config = useSyncExternalStore(subscribeSiteConfig, getSiteConfig);
+  useEffect(() => {
+    document.title = config.marka.appName || 'Şantiye Takip';
+  }, [config.marka.appName]);
+  return null;
 }
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
@@ -56,7 +67,7 @@ export default function App() {
   useEffect(() => {
     if (!isLoggedIn() || !isSupabaseReady()) return;
 
-    Promise.all([supabaseRaporlariYukle(), supabaseAtamalariYukle()]);
+    Promise.all([supabaseRaporlariYukle(), supabaseAtamalariYukle(), supabaseKullanicilariYukle()]);
 
     aboneOlRaporGuncellemeleri();
     aboneOlAtamaGuncellemeleri();
@@ -77,9 +88,10 @@ export default function App() {
   }, [authTick]);
 
   return (
-    <AppRouter basename={isNative ? undefined : '/santiye_takip_9'}>
+    <AppRouter basename={isNative ? undefined : getSiteConfig().marka.webBasename}>
       <ErrorBoundary>
         <>
+          <TitleUpdater />
           <Toast />
           <Suspense fallback={<PageLoader />}>
             <Routes>
@@ -100,6 +112,7 @@ export default function App() {
                         <Route path="/toplu-rapor" element={<AdminRoute><BulkReport /></AdminRoute>} />
                         <Route path="/profil" element={<Profile />} />
                         <Route path="/istatistik" element={<Statistics />} />
+                        <Route path="/ayarlar" element={<AdminRoute><Settings /></AdminRoute>} />
                       </Routes>
                     </Layout>
                   </ProtectedRoute>

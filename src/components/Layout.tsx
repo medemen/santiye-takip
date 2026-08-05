@@ -1,7 +1,7 @@
 import { useNavigate, NavLink } from 'react-router-dom';
 import { useReducer, useEffect } from 'react';
-import { getCurrentUser, cikisYap, isProjeMuduruSession } from '../store/authStore';
-import { subscribeRaporChanges } from '../store/reportStore';
+import { getCurrentUser, cikisYap, isProjeMuduruSession } from '../stores/authStore';
+import { subscribeRaporChanges } from '../stores/reportStore';
 
 const navItems = [
   { to: '/', label: 'Dashboard', icon: '📊' },
@@ -10,6 +10,7 @@ const navItems = [
   { to: '/raporlar', label: 'Raporlar', icon: '📋' },
   { to: '/personel', label: 'Personel', icon: '👥' },
   { to: '/toplu-rapor', label: 'Toplu', icon: '📦' },
+  { to: '/ayarlar', label: 'Ayarlar', icon: '⚙️' },
 ];
 
 interface Props {
@@ -22,7 +23,7 @@ export default function Layout({ children }: Props) {
   const [, forceUpdate] = useReducer(x => x + 1, 0);
 
   const gorunurNav = navItems.filter(
-    (item) => !['/personel', '/toplu-rapor'].includes(item.to) || (user?.admin ?? false)
+    (item) => !['/personel', '/toplu-rapor', '/ayarlar'].includes(item.to) || (user?.admin ?? false)
   );
 
   useEffect(() => {
