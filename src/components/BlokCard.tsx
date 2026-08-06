@@ -2,33 +2,41 @@ import { memo, useMemo } from 'react';
 import type { Blok, IsDurumu } from '../types';
 import ProgressBar from './ProgressBar';
 import StatusBadge from './StatusBadge';
-import { getBlokProgress, getBlokRaporlari } from '../stores/reportStore';
+import { useRaporlar } from '../hooks/useRaporlar';
 import { getAllKalemler } from '../config/helpers';
 import { useSiteConfig } from '../hooks/useSiteConfig';
 
 interface Props {
   ada: string;
   blok: Blok;
-  onClick?: () => void;
+  onClick?: (blokNo: number) => void;
 }
 
 const BlokCard = memo(function BlokCard({ ada, blok, onClick }: Props) {
   const config = useSiteConfig();
+  const raporlar = useRaporlar();
   const isKalemleri = getAllKalemler(config);
   const blokOzelRaporlar = useMemo(
-    () => getBlokRaporlari(ada, blok.blok_no),
-    [ada, blok.blok_no]
-  );
-  const progress = useMemo(
-    () => getBlokProgress(ada, blok.blok_no, isKalemleri),
-    [ada, blok.blok_no, isKalemleri]
+    () => raporlar.filter((r) => r.ada === ada && r.blok_no === blok.blok_no),
+    [raporlar, ada, blok.blok_no]
   );
 
   const { tamamlanan, geciken, sonDurum } = useMemo(() => {
+    const sonRaporHaritasi = new Map<string, typeof raporlar[number]>();
+    for (const r of raporlar) {
+      if (r.ada !== ada) continue;
+      const anahtar = `${r.blok_no}|${r.is_kalemi}`;
+      const mevcut = sonRaporHaritasi.get(anahtar);
+      if (!mevcut || new Date(r.olusturma_tarihi).getTime() > new Date(mevcut.olusturma_tarihi).getTime()) {
+        sonRaporHaritasi.set(anahtar, r);
+      }
+    }
     let t = 0, g = 0;
     let son: IsDurumu | null = null;
     for (const ik of isKalemleri) {
-      const sonRapor = progress[ik];
+      const sonRapor =
+        sonRaporHaritasi.get(`${blok.blok_no}|${ik}`) ??
+        (blok.blok_no !== 0 ? sonRaporHaritasi.get(`0|${ik}`) : undefined);
       if (sonRapor) {
         if (sonRapor.durum === 'tamamlandi') t++;
         if (sonRapor.durum === 'gecikme') g++;
@@ -36,14 +44,14 @@ const BlokCard = memo(function BlokCard({ ada, blok, onClick }: Props) {
       }
     }
     return { tamamlanan: t, geciken: g, sonDurum: son };
-  }, [progress, isKalemleri]);
+  }, [raporlar, ada, blok.blok_no, isKalemleri]);
 
   const genelIlerleme = isKalemleri.length > 0 ? Math.round((tamamlanan / isKalemleri.length) * 100) : 0;
   const adaGenelinden = blokOzelRaporlar.length === 0;
 
   return (
     <div
-      onClick={onClick}
+      onClick={onClick ? () => onClick(blok.blok_no) : undefined}
       style={{
         backgroundColor: '#fff',
         borderRadius: 12,

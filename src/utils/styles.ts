@@ -73,7 +73,3 @@ export const emptyState = {
   borderRadius: 12,
   border: '1px solid #f0f0f0',
 };
-
-export const hover = {
-  transition: 'transform 0.15s, box-shadow 0.15s',
-};

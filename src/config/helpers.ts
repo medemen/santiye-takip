@@ -1,11 +1,9 @@
 import type {
   AdaBlok,
   BlokYapisi,
-  DurumTespitSatir,
   ImalatGrubu,
   Sablon,
   SantiyeConfig,
-  TahminKural,
 } from './types';
 
 export function getAdaList(cfg: SantiyeConfig): AdaBlok[] {
@@ -36,37 +34,17 @@ export function getGrupByKalem(cfg: SantiyeConfig, kalem: string): ImalatGrubu |
   return cfg.isKalemleri.gruplar.find((g) => g.kalemler.includes(kalem));
 }
 
-export function getGrupAdiByKalem(cfg: SantiyeConfig, kalem: string): string {
-  return getGrupByKalem(cfg, kalem)?.ad ?? '';
-}
+const _kalemCache = new WeakMap<SantiyeConfig, string[]>();
 
 export function getAllKalemler(cfg: SantiyeConfig): string[] {
-  return cfg.isKalemleri.gruplar.flatMap((g) => g.kalemler);
-}
-
-export function getSablonById(cfg: SantiyeConfig, id: string): Sablon | undefined {
-  return cfg.isKalemleri.sablonlar.find((s) => s.id === id);
+  let liste = _kalemCache.get(cfg);
+  if (!liste) {
+    liste = cfg.isKalemleri.gruplar.flatMap((g) => g.kalemler);
+    _kalemCache.set(cfg, liste);
+  }
+  return liste;
 }
 
 export function getSablonKalemleri(cfg: SantiyeConfig, sablon: Sablon): string[] {
   return sablon.grup_idleri.flatMap((id) => getGrupById(cfg, id)?.kalemler ?? []);
-}
-
-export function getDurumTespitSatiri(
-  cfg: SantiyeConfig,
-  grup: string,
-  kalem: string
-): DurumTespitSatir | undefined {
-  return cfg.durumTespit?.satirlar.find(([g, k]) => g === grup && k === kalem);
-}
-
-export function getReferansToplam(
-  cfg: SantiyeConfig,
-  ada: string
-): { kat: number; blok: number } | undefined {
-  return cfg.durumTespit?.referans_toplamlari?.[ada];
-}
-
-export function getTahminKurali(cfg: SantiyeConfig, kalem: string): TahminKural | undefined {
-  return cfg.durumTespit?.tahmin?.find((t) => t.kalem === kalem);
 }

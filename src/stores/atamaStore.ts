@@ -9,18 +9,6 @@ const PREFIX = getSiteConfig().marka.localStoragePrefix;
 const BLOK_KEY = `${PREFIX}_blok_atamalari`;
 const ADA_KEY = `${PREFIX}_ada_atamalari`;
 
-type Listener = () => void;
-const _atamaListeners = new Set<Listener>();
-
-export function subscribeAtamaChanges(listener: Listener): () => void {
-  _atamaListeners.add(listener);
-  return () => { _atamaListeners.delete(listener); };
-}
-
-function notifyAtamaListeners(): void {
-  _atamaListeners.forEach(fn => fn());
-}
-
 let _adaChannel: RealtimeChannel | null = null;
 let _blokChannel: RealtimeChannel | null = null;
 
@@ -34,7 +22,6 @@ export function aboneOlAtamaGuncellemeleri(): void {
         { event: '*', schema: 'public', table: 'kullanici_ada_atamalari' },
         () => {
           supabaseAtamalariYukle();
-          notifyAtamaListeners();
         }
       )
       .subscribe();
@@ -47,7 +34,6 @@ export function aboneOlAtamaGuncellemeleri(): void {
         { event: '*', schema: 'public', table: 'kullanici_blok_atamalari' },
         () => {
           supabaseAtamalariYukle();
-          notifyAtamaListeners();
         }
       )
       .subscribe();
@@ -87,7 +73,6 @@ export function setKullaniciBlokAtamasi(ad_soyad: string, atama: BlokAtamasi): v
   const atamalar = getBlokAtamalar();
   atamalar[ad_soyad] = atama;
   saveBlokAtamalar(atamalar);
-  notifyAtamaListeners();
   if (isSupabaseReady()) {
     const supabase = getSupabase();
     for (const [ada, blokNos] of Object.entries(atama)) {
@@ -118,11 +103,6 @@ export function getKullaniciBloklari(ad_soyad: string, ada: string): number[] {
   return atama[ada] || [];
 }
 
-export function kullaniciAdaAtanmisMi(ad_soyad: string): string[] {
-  const atama = getKullaniciBlokAtamasi(ad_soyad);
-  return Object.keys(atama).filter((ada) => (atama[ada]?.length ?? 0) > 0);
-}
-
 function getAdaAtamalar(): Record<string, string | null> {
   try {
     const data = localStorage.getItem(ADA_KEY);
@@ -144,7 +124,6 @@ export function setKullaniciAdaAtamasi(ad_soyad: string, ada: string | null): vo
     atamalar[ad_soyad] = ada;
   }
   saveAdaAtamalar(atamalar);
-  notifyAtamaListeners();
   if (isSupabaseReady()) {
     if (ada === null) {
       getSupabase().from('kullanici_ada_atamalari').delete().eq('ad_soyad', ad_soyad).then(({ error }) => {
@@ -173,17 +152,6 @@ export function getKullaniciAdaAtamasi(ad_soyad: string): string | null {
     return atamalar[ad_soyad];
   }
   return null;
-}
-
-export function getAdaPersonelListesi(ada: string): string[] {
-  const atamalar = getAdaAtamalar();
-  return Object.entries(atamalar)
-    .filter(([, v]) => v === ada)
-    .map(([k]) => k);
-}
-
-export function getButunAdaAtamalari(): Record<string, string | null> {
-  return getAdaAtamalar();
 }
 
 export async function supabaseAtamalariYukle(): Promise<void> {
@@ -252,7 +220,6 @@ export async function supabaseAtamalariYukle(): Promise<void> {
       }
     }
 
-    notifyAtamaListeners();
   } catch (err) {
     console.error('Supabase atama yükleme hatası:', err);
   }

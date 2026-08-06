@@ -1,5 +1,7 @@
+import { useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { getIstatistikler, getAdaRaporlari, getAdaGenelIlerleme, getPersonelRaporlari } from '../stores/reportStore';
+import { getIstatistikler, getAdaGenelIlerleme } from '../stores/reportStore';
+import { useRaporlar } from '../hooks/useRaporlar';
 import { getAllPersonel } from '../stores/kullanicilarStore';
 import { useSiteConfig } from '../hooks/useSiteConfig';
 import { getAdaList, getAllKalemler } from '../config/helpers';
@@ -11,6 +13,7 @@ import { card, btnGhost, pageTitle } from '../utils/styles';
 export default function Statistics() {
   const navigate = useNavigate();
   const config = useSiteConfig();
+  const raporlar = useRaporlar();
   const stats = getIstatistikler();
   const isKalemleri = getAllKalemler(config);
   const adalar = getAdaList(config);
@@ -22,41 +25,53 @@ export default function Statistics() {
     { name: 'Gecikme', value: stats.gecikenIsler, color: DURUM_RENKLERI.gecikme },
   ];
 
-  const adaProgress = adalar.map((a) => ({
+  const adaDetay = useMemo(() => {
+    const adaSayilari = new Map<string, { toplam: number; tamam: number; devam: number; gecikme: number; plan: number }>();
+    for (const r of raporlar) {
+      let s = adaSayilari.get(r.ada);
+      if (!s) {
+        s = { toplam: 0, tamam: 0, devam: 0, gecikme: 0, plan: 0 };
+        adaSayilari.set(r.ada, s);
+      }
+      s.toplam++;
+      if (r.durum === 'tamamlandi') s.tamam++;
+      else if (r.durum === 'devam_ediyor') s.devam++;
+      else if (r.durum === 'gecikme') s.gecikme++;
+      else if (r.durum === 'planlandi') s.plan++;
+    }
+    return adalar.map((a) => {
+      const s = adaSayilari.get(a.ada) ?? { toplam: 0, tamam: 0, devam: 0, gecikme: 0, plan: 0 };
+      return {
+        ada: a.ada,
+        ...s,
+        ilerleme: getAdaGenelIlerleme(a.ada, a.bloklar, isKalemleri),
+      };
+    });
+  }, [raporlar, adalar, isKalemleri]);
+
+  const adaProgress = adaDetay.map((a) => ({
     name: a.ada,
-    value: getAdaGenelIlerleme(a.ada, a.bloklar, isKalemleri),
+    value: a.ilerleme,
     color: '#f59e0b',
   }));
 
-  const adaDetay = adalar.map((a) => {
-    const raporlar = getAdaRaporlari(a.ada);
-    return {
-      ada: a.ada,
-      toplam: raporlar.length,
-      tamam: raporlar.filter((r) => r.durum === 'tamamlandi').length,
-      devam: raporlar.filter((r) => r.durum === 'devam_ediyor').length,
-      gecikme: raporlar.filter((r) => r.durum === 'gecikme').length,
-      plan: raporlar.filter((r) => r.durum === 'planlandi').length,
-      ilerleme: getAdaGenelIlerleme(a.ada, a.bloklar, isKalemleri),
-    };
-  });
-
-  const personelRaporSiralamasi = getAllPersonel()
-    .map((p) => ({
-      ad_soyad: p.ad_soyad,
-      raporSayisi: getPersonelRaporlari(p.ad_soyad).length,
-    }))
-    .sort((a, b) => b.raporSayisi - a.raporSayisi)
-    .slice(0, 10);
+  const personelRaporSiralamasi = useMemo(() => {
+    const sayilar = new Map<string, number>();
+    for (const r of raporlar) {
+      sayilar.set(r.raporlayan, (sayilar.get(r.raporlayan) ?? 0) + 1);
+    }
+    return getAllPersonel()
+      .map((p) => ({
+        ad_soyad: p.ad_soyad,
+        raporSayisi: sayilar.get(p.ad_soyad) ?? 0,
+      }))
+      .sort((a, b) => b.raporSayisi - a.raporSayisi)
+      .slice(0, 10);
+  }, [raporlar]);
 
   const genelIlerleme =
-    adalar.length > 0
-      ? Math.round(
-          adalar.reduce(
-            (s, a) => s + getAdaGenelIlerleme(a.ada, a.bloklar, isKalemleri),
-            0
-          ) / adalar.length
-        )
+    adaDetay.length > 0
+      ? Math.round(adaDetay.reduce((s, a) => s + a.ilerleme, 0) / adaDetay.length)
       : 0;
 
   return (

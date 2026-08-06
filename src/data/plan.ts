@@ -1,13 +1,5 @@
 import type { Rapor } from '../types';
 
-export function getGecikenIsler(raporlar: Rapor[]): Rapor[] {
-  return raporlar.filter((r) => r.durum === 'gecikme');
-}
-
-export function getPlanlananIsler(raporlar: Rapor[]): Rapor[] {
-  return raporlar.filter((r) => r.durum === 'planlandi');
-}
-
 export function hedefKalanGun(hedefTarih: string): number {
   const bugun = new Date();
   bugun.setHours(0, 0, 0, 0);
@@ -32,27 +24,6 @@ export function getIlerlemeDurumu(
   if (rapor?.durum === 'devam_ediyor') return { label: 'Devam Ediyor', renk: '#3b82f6' };
   if (rapor?.durum === 'planlandi') return { label: 'Planlandı', renk: '#f59e0b' };
   return { label: 'Rapor Yok', renk: '#9ca3af' };
-}
-
-export function getAdaProgramOzeti(
-  adaRaporlar: Rapor[],
-  blokSayisi: number,
-  isKalemleri: readonly string[]
-): {
-  toplamIs: number;
-  tamamlanan: number;
-  geciken: number;
-  devamEden: number;
-  planlanan: number;
-} {
-  const toplamIs = blokSayisi * isKalemleri.length;
-  return {
-    toplamIs,
-    tamamlanan: adaRaporlar.filter((r) => r.durum === 'tamamlandi').length,
-    geciken: adaRaporlar.filter((r) => r.durum === 'gecikme').length,
-    devamEden: adaRaporlar.filter((r) => r.durum === 'devam_ediyor').length,
-    planlanan: adaRaporlar.filter((r) => r.durum === 'planlandi').length,
-  };
 }
 
 export interface HedefOzetItem {

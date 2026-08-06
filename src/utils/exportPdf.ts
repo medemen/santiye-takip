@@ -1,5 +1,4 @@
 import type { Rapor } from '../types';
-import { DURUM_LABELLARI } from '../config/defaultConfig';
 
 export async function elementPdfExport(element: HTMLElement, dosyaAdi: string): Promise<void> {
   const [{ default: html2canvas }, { jsPDF }] = await Promise.all([
@@ -36,18 +35,4 @@ export async function raporPdfExport(rapor: Rapor, element: HTMLElement): Promis
   const safeName = `${rapor.ada}_Blok${rapor.blok_no}_${rapor.is_kalemi}`
     .replace(/[^a-zA-Z0-9_]/g, '_');
   await elementPdfExport(element, `${safeName}.pdf`);
-}
-
-export function raporMetinExport(rapor: Rapor): string {
-  return [
-    `Ada: ${rapor.ada}`,
-    `Blok: ${rapor.blok_no}`,
-    `İş Kalemi: ${rapor.is_kalemi}`,
-    `Durum: ${DURUM_LABELLARI[rapor.durum] || rapor.durum}`,
-    `İlerleme: %${rapor.ilerleme_yuzde}`,
-    `Tarih: ${rapor.tarih}`,
-    `Raporlayan: ${rapor.raporlayan}`,
-    `Açıklama: ${rapor.aciklama || '-'}`,
-    '',
-  ].join('\n');
 }

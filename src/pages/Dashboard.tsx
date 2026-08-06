@@ -1,6 +1,7 @@
 import { useNavigate } from 'react-router-dom';
 import { getIstatistikler, getAdaGenelIlerleme, getRaporlar, getSonRapor } from '../stores/reportStore';
 import { useHedefler } from '../hooks/useHedefler';
+import { useRaporlar } from '../hooks/useRaporlar';
 import { getHedefOzeti } from '../data/plan';
 import { useSiteConfig } from '../hooks/useSiteConfig';
 import { getAdaList, getAllKalemler } from '../config/helpers';
@@ -14,6 +15,7 @@ import { card, btnGhost } from '../utils/styles';
 export default function Dashboard() {
   const navigate = useNavigate();
   const config = useSiteConfig();
+  useRaporlar();
   const stats = getIstatistikler();
   const sonRaporlar = getRaporlar()
     .filter((r) => r.raporlayan !== 'DURUM TESPİT')
@@ -42,11 +44,8 @@ export default function Dashboard() {
   }));
 
   const genelIlerleme =
-    adalar.length > 0
-      ? Math.round(
-          adalar.reduce((s, a) => s + getAdaGenelIlerleme(a.ada, a.bloklar, isKalemleri), 0) /
-            adalar.length
-        )
+    adaProgress.length > 0
+      ? Math.round(adaProgress.reduce((s, a) => s + a.value, 0) / adaProgress.length)
       : 0;
 
   return (

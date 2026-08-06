@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useSiteConfig } from '../hooks/useSiteConfig';
 import { getAda, getAdaList, getAllKalemler, getSablonKalemleri } from '../config/helpers';
@@ -6,7 +6,6 @@ import { DURUM_LABELLARI } from '../config/defaultConfig';
 import { saveRapor, updateRapor, getRaporById } from '../stores/reportStore';
 import { getCurrentUser } from '../stores/authStore';
 import { getKullaniciAdaAtamasi, getKullaniciBloklari } from '../stores/atamaStore';
-import { yukleFotolar, getRaporFotolari, fotoYoluPublic } from '../stores/fotoStore';
 import type { IsDurumu } from '../types';
 import { todayISO } from '../utils/helpers';
 import { toastGoster } from '../stores/toastStore';
@@ -55,11 +54,6 @@ export default function ReportAdd() {
   const [tarih, setTarih] = useState(todayISO());
   const [acikGruplar, setAcikGruplar] = useState<Set<string>>(new Set());
   const [kalemArama, setKalemArama] = useState('');
-  const [seciliFotolar, setSeciliFotolar] = useState<File[]>([]);
-  const [fotoOnizlemeler, setFotoOnizlemeler] = useState<string[]>([]);
-  const [mevcutFotolar, setMevcutFotolar] = useState<string[]>([]);
-  const [fotoYukleniyor, setFotoYukleniyor] = useState(false);
-  const fotoInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     if (editId) {
@@ -72,16 +66,9 @@ export default function ReportAdd() {
         setIlerleme(rapor.ilerleme_yuzde);
         setAciklama(rapor.aciklama);
         setTarih(rapor.tarih);
-        setMevcutFotolar(getRaporFotolari(editId));
       }
     }
   }, [editId]);
-
-  useEffect(() => {
-    return () => {
-      fotoOnizlemeler.forEach((url) => URL.revokeObjectURL(url));
-    };
-  }, [fotoOnizlemeler]);
 
   const adaData = ada ? getAda(config, ada) : null;
 
@@ -137,27 +124,9 @@ export default function ReportAdd() {
     }
   };
 
-  const fotoYuklemeleriniTamamla = async (raporId: string): Promise<void> => {
-    if (seciliFotolar.length === 0) return;
-    setFotoYukleniyor(true);
-    await yukleFotolar(raporId, seciliFotolar);
-    setFotoYukleniyor(false);
-    setSeciliFotolar([]);
-    setFotoOnizlemeler((prev) => { prev.forEach((url) => URL.revokeObjectURL(url)); return []; });
-  };
-
-  const handleFotolar = (files: FileList | null) => {
-    if (!files || files.length === 0) return;
-    const yeniDosyalar = Array.from(files);
-    const yeniUrl = yeniDosyalar.map((f) => URL.createObjectURL(f));
-    setSeciliFotolar((prev) => [...prev, ...yeniDosyalar]);
-    setFotoOnizlemeler((prev) => [...prev, ...yeniUrl]);
-  };
-
   const handleSubmit = async () => {
     const id = kaydetRapor();
     if (!id) return;
-    await fotoYuklemeleriniTamamla(id);
     navigate('/raporlar');
   };
 
@@ -165,13 +134,11 @@ export default function ReportAdd() {
     if (editMode) {
       const id = kaydetRapor();
       if (!id) return;
-      await fotoYuklemeleriniTamamla(id);
       navigate('/raporlar');
       return;
     }
     const id = kaydetRapor();
     if (!id) return;
-    await fotoYuklemeleriniTamamla(id);
     setIsKalemi('');
     setDurum('devam_ediyor');
     setIlerleme(50);
@@ -608,103 +575,6 @@ export default function ReportAdd() {
                   boxSizing: 'border-box',
                 }}
               />
-            </div>
-
-            <div style={{ marginBottom: 16 }}>
-              <label style={{ display: 'block', fontSize: 13, fontWeight: 500, color: '#4b5563', marginBottom: 6 }}>
-                Fotoğraflar
-              </label>
-              <input
-                ref={fotoInputRef}
-                type="file"
-                accept="image/*"
-                multiple
-                capture="environment"
-                onChange={(e) => handleFotolar(e.target.files)}
-                style={{ display: 'none' }}
-              />
-              {mevcutFotolar.length > 0 && (
-                <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginBottom: 8 }}>
-                  {mevcutFotolar.map((yol) => (
-                    <img
-                      key={yol}
-                      src={fotoYoluPublic(yol)}
-                      alt="rapor fotoğrafı"
-                      style={{
-                        width: 64,
-                        height: 64,
-                        borderRadius: 8,
-                        objectFit: 'cover',
-                        border: '1px solid #e5e7eb',
-                      }}
-                    />
-                  ))}
-                </div>
-              )}
-              {fotoOnizlemeler.length > 0 && (
-                <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginBottom: 8 }}>
-                  {fotoOnizlemeler.map((url, i) => (
-                    <div key={url} style={{ position: 'relative' }}>
-                      <img
-                        src={url}
-                        alt="seçilen fotoğraf"
-                        style={{
-                          width: 64,
-                          height: 64,
-                          borderRadius: 8,
-                          objectFit: 'cover',
-                          border: '1px solid #e5e7eb',
-                        }}
-                      />
-                      <button
-                        onClick={() => {
-                          setSeciliFotolar((prev) => prev.filter((_, j) => j !== i));
-                          setFotoOnizlemeler((prev) => {
-                            URL.revokeObjectURL(prev[i]);
-                            return prev.filter((_, j) => j !== i);
-                          });
-                        }}
-                        style={{
-                          position: 'absolute',
-                          top: -6,
-                          right: -6,
-                          width: 18,
-                          height: 18,
-                          borderRadius: '50%',
-                          border: 'none',
-                          backgroundColor: '#ef4444',
-                          color: '#fff',
-                          fontSize: 11,
-                          lineHeight: 1,
-                          cursor: 'pointer',
-                          padding: 0,
-                        }}
-                        aria-label="fotoğrafı kaldır"
-                      >
-                        ×
-                      </button>
-                    </div>
-                  ))}
-                </div>
-              )}
-              <button
-                type="button"
-                onClick={() => fotoInputRef.current?.click()}
-                disabled={fotoYukleniyor}
-                style={{
-                  padding: '10px 14px',
-                  backgroundColor: '#f3f4f6',
-                  border: '1px dashed #d1d5db',
-                  borderRadius: 10,
-                  fontSize: 13,
-                  fontWeight: 500,
-                  color: '#4b5563',
-                  cursor: fotoYukleniyor ? 'not-allowed' : 'pointer',
-                  width: '100%',
-                }}
-              >
-                {fotoYukleniyor ? '⏳ Fotoğraflar yükleniyor...' : '📷 Fotoğraf Ekle'}
-              </button>
             </div>
 
             <div style={{ marginBottom: 16 }}>

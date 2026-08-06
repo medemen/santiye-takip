@@ -1,6 +1,7 @@
-import { useState } from 'react';
+import { useMemo, useState, useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { getRaporlar, getPersonelRaporlari, deleteRapor } from '../stores/reportStore';
+import { deleteRapor } from '../stores/reportStore';
+import { useRaporlar } from '../hooks/useRaporlar';
 import { getCurrentUser, isSahaPersoneli } from '../stores/authStore';
 import { useSiteConfig } from '../hooks/useSiteConfig';
 import { getAdaList } from '../config/helpers';
@@ -10,9 +11,12 @@ import { toastGoster } from '../stores/toastStore';
 import { raporlarXlsxExport } from '../utils/exportXlsx';
 import { getHedef } from '../stores/hedefStore';
 
+const PAGE_SIZE = 20;
+
 export default function ReportList() {
   const navigate = useNavigate();
   const config = useSiteConfig();
+  const raporlar = useRaporlar();
   const [searchParams] = useSearchParams();
   const preAda = searchParams.get('ada') || '';
   const preBlok = searchParams.get('blok') || '';
@@ -23,6 +27,17 @@ export default function ReportList() {
   const [sadeceBenim, setSadeceBenim] = useState(false);
   const [sistemRaporlariDahil, setSistemRaporlariDahil] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
+  const [debouncedTerm, setDebouncedTerm] = useState('');
+  const [sayfa, setSayfa] = useState(1);
+
+  useEffect(() => {
+    const id = setTimeout(() => setDebouncedTerm(searchTerm), 250);
+    return () => clearTimeout(id);
+  }, [searchTerm]);
+
+  useEffect(() => {
+    setSayfa(1);
+  }, [filterAda, filterBlok, filterDurum, sadeceBenim, sistemRaporlariDahil, debouncedTerm]);
 
   const user = getCurrentUser();
   const isAdmin = (user?.admin ?? false) || (user?.proje_muduru ?? false);
@@ -35,35 +50,38 @@ export default function ReportList() {
 
   const canDeleteReport = () => isAdmin;
 
-  let raporlar = getRaporlar().sort(
-    (a, b) => new Date(b.olusturma_tarihi).getTime() - new Date(a.olusturma_tarihi).getTime()
-  );
-
-  if (sadeceBenim && user) {
-    raporlar = getPersonelRaporlari(user.ad_soyad).sort(
-      (a, b) => new Date(b.olusturma_tarihi).getTime() - new Date(a.olusturma_tarihi).getTime()
-    );
-  }
-
-  const filtered = raporlar.filter((r) => {
-    if (!sistemRaporlariDahil && r.raporlayan === 'DURUM TESPİT') return false;
-    if (filterAda && r.ada !== filterAda) return false;
-    if (filterBlok && r.blok_no !== parseInt(filterBlok)) return false;
-    if (filterDurum && r.durum !== filterDurum) return false;
-    if (searchTerm) {
-      const q = searchTerm.toLowerCase();
-      if (!r.ada.toLowerCase().includes(q) &&
-          !String(r.blok_no).includes(q) &&
-          !r.is_kalemi.toLowerCase().includes(q) &&
-          !r.aciklama.toLowerCase().includes(q) &&
-          !r.raporlayan.toLowerCase().includes(q)) {
-        return false;
-      }
-    }
-    return true;
-  });
+  const filtered = useMemo(() => {
+    const kaynak = sadeceBenim && user
+      ? raporlar.filter((r) => r.raporlayan === user.ad_soyad)
+      : raporlar;
+    return [...kaynak]
+      .sort(
+        (a, b) => new Date(b.olusturma_tarihi).getTime() - new Date(a.olusturma_tarihi).getTime()
+      )
+      .filter((r) => {
+        if (!sistemRaporlariDahil && r.raporlayan === 'DURUM TESPİT') return false;
+        if (filterAda && r.ada !== filterAda) return false;
+        if (filterBlok && r.blok_no !== parseInt(filterBlok)) return false;
+        if (filterDurum && r.durum !== filterDurum) return false;
+        if (debouncedTerm) {
+          const q = debouncedTerm.toLowerCase();
+          if (!r.ada.toLowerCase().includes(q) &&
+              !String(r.blok_no).includes(q) &&
+              !r.is_kalemi.toLowerCase().includes(q) &&
+              !r.aciklama.toLowerCase().includes(q) &&
+              !r.raporlayan.toLowerCase().includes(q)) {
+            return false;
+          }
+        }
+        return true;
+      });
+  }, [raporlar, user, sadeceBenim, sistemRaporlariDahil, filterAda, filterBlok, filterDurum, debouncedTerm]);
 
   const adaList = getAdaList(config);
+
+  const toplamSayfa = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
+  const gecerliSayfa = Math.min(sayfa, toplamSayfa);
+  const gorunenRaporlar = filtered.slice((gecerliSayfa - 1) * PAGE_SIZE, gecerliSayfa * PAGE_SIZE);
 
   const handleDelete = (id: string) => {
     if (window.confirm('Bu raporu silmek istediğinize emin misiniz?')) {
@@ -242,7 +260,7 @@ export default function ReportList() {
             <p style={{ fontSize: 12 }}>Filtreleri temizleyip tekrar deneyin</p>
           </div>
         ) : (
-          filtered.map((r) => {
+          gorunenRaporlar.map((r) => {
             const editable = canEditReport(r.raporlayan);
             return (
             <div
@@ -284,6 +302,44 @@ export default function ReportList() {
           })
         )}
       </div>
+
+      {toplamSayfa > 1 && (
+        <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: 10, marginTop: 12 }}>
+          <button
+            onClick={() => setSayfa((s) => Math.max(1, s - 1))}
+            disabled={gecerliSayfa === 1}
+            style={{
+              background: 'none',
+              border: '1px solid #e5e7eb',
+              borderRadius: 8,
+              padding: '6px 12px',
+              fontSize: 12,
+              color: gecerliSayfa === 1 ? '#d1d5db' : '#6b7280',
+              cursor: gecerliSayfa === 1 ? 'not-allowed' : 'pointer',
+            }}
+          >
+            ‹ Önceki
+          </button>
+          <span style={{ fontSize: 12, color: '#6b7280' }}>
+            Sayfa {gecerliSayfa} / {toplamSayfa}
+          </span>
+          <button
+            onClick={() => setSayfa((s) => Math.min(toplamSayfa, s + 1))}
+            disabled={gecerliSayfa === toplamSayfa}
+            style={{
+              background: 'none',
+              border: '1px solid #e5e7eb',
+              borderRadius: 8,
+              padding: '6px 12px',
+              fontSize: 12,
+              color: gecerliSayfa === toplamSayfa ? '#d1d5db' : '#6b7280',
+              cursor: gecerliSayfa === toplamSayfa ? 'not-allowed' : 'pointer',
+            }}
+          >
+            Sonraki ›
+          </button>
+        </div>
+      )}
 
       <div style={{ marginTop: 12, fontSize: 12, color: '#9ca3af', textAlign: 'center' }}>
         Toplam {filtered.length} rapor

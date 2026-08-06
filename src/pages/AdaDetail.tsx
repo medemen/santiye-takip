@@ -1,9 +1,10 @@
 import { useParams, useNavigate } from 'react-router-dom';
-import { useState } from 'react';
+import { useCallback, useState } from 'react';
 import BlokCard from '../components/BlokCard';
 import ProgressBar from '../components/ProgressBar';
 import { useSiteConfig } from '../hooks/useSiteConfig';
 import { useHedefler } from '../hooks/useHedefler';
+import { useRaporlar } from '../hooks/useRaporlar';
 import { getAda, getBloklar, getAllKalemler } from '../config/helpers';
 import { getSantiyeSefi, getBlokSorumlulari } from '../stores/kullanicilarStore';
 import { getAdaGenelIlerleme, getSonRapor } from '../stores/reportStore';
@@ -14,6 +15,7 @@ export default function AdaDetail() {
   const navigate = useNavigate();
   const config = useSiteConfig();
   const [filterTip, setFilterTip] = useState('');
+  useRaporlar();
 
   const hedefler = useHedefler();
   const hedefOzeti = getHedefOzeti(
@@ -22,13 +24,17 @@ export default function AdaDetail() {
   );
 
   const adaData = getAda(config, ada!);
+  const bloklar = getBloklar(config, ada!);
+  const ilerleme = getAdaGenelIlerleme(ada!, bloklar, getAllKalemler(config));
+  const blokNavigate = useCallback(
+    (blokNo: number) => navigate(`/ada/${ada}/blok/${blokNo}`),
+    [navigate, ada]
+  );
 
   if (!adaData) {
     return <div style={{ padding: 40, textAlign: 'center', color: '#9ca3af' }}>Ada bulunamadı</div>;
   }
 
-  const bloklar = getBloklar(config, ada!);
-  const ilerleme = getAdaGenelIlerleme(ada!, bloklar, getAllKalemler(config));
   const santiyeSefi = getSantiyeSefi(ada!);
   const sorumlular = getBlokSorumlulari(ada!);
 
@@ -222,7 +228,7 @@ export default function AdaDetail() {
             key={blok.blok_no}
             ada={ada!}
             blok={blok}
-            onClick={() => navigate(`/ada/${ada}/blok/${blok.blok_no}`)}
+            onClick={blokNavigate}
           />
         ))}
       </div>

@@ -4,20 +4,68 @@ import { getSiteConfig } from '../config/site';
 import type { RealtimeChannel } from '@supabase/supabase-js';
 import { toastGoster } from './toastStore';
 import { getCurrentUser } from './authStore';
-import { sunucudanFotolariSil } from './fotoStore';
 
 const STORAGE_KEY = `${getSiteConfig().marka.localStoragePrefix}_raporlar`;
 
 type Listener = () => void;
 const _raporListeners = new Set<Listener>();
+let _version = 0;
+
+// modul seviyesi cache: JSON.parse sadece ilk okumada yapilir
+let _raporCache: Rapor[] | null = null;
+// "ada|blokNo|isKalemi" -> en son rapor (tek parse'ta kurulur)
+let _sonRaporHaritasi = new Map<string, Rapor>();
 
 export function subscribeRaporChanges(listener: Listener): () => void {
   _raporListeners.add(listener);
   return () => { _raporListeners.delete(listener); };
 }
 
+export function getRaporVersion(): number {
+  return _version;
+}
+
 function notifyRaporListeners(): void {
+  _version++;
   _raporListeners.forEach(fn => fn());
+}
+
+function sonRaporHaritasiniKur(liste: Rapor[]): Map<string, Rapor> {
+  const harita = new Map<string, Rapor>();
+  for (const r of liste) {
+    const anahtar = `${r.ada}|${r.blok_no}|${r.is_kalemi}`;
+    const mevcut = harita.get(anahtar);
+    if (!mevcut || new Date(r.olusturma_tarihi).getTime() > new Date(mevcut.olusturma_tarihi).getTime()) {
+      harita.set(anahtar, r);
+    }
+  }
+  return harita;
+}
+
+function setRaporlar(next: Rapor[]): void {
+  _raporCache = next;
+  _sonRaporHaritasi = sonRaporHaritasiniKur(next);
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(next));
+  } catch {
+    /* localStorage dolu/engelli olabilir */
+  }
+  notifyRaporListeners();
+}
+
+export function getRaporlar(): Rapor[] {
+  if (!_raporCache) {
+    let okunan: Rapor[] = [];
+    try {
+      const data = localStorage.getItem(STORAGE_KEY);
+      okunan = data ? JSON.parse(data) : [];
+    } catch {
+      /* bozuk veri olabilir */
+    }
+    _raporCache = okunan;
+    _sonRaporHaritasi = sonRaporHaritasiniKur(okunan);
+  }
+  return _raporCache;
 }
 
 function raporToSupabase(r: Rapor) {
@@ -46,24 +94,16 @@ export function aboneOlRaporGuncellemeleri(): void {
       { event: '*', schema: 'public', table: 'raporlar' },
       (payload) => {
         if (payload.eventType === 'INSERT') {
-          const raporlar = getRaporlar();
-          if (!raporlar.find(r => r.id === payload.new.id)) {
-            raporlar.push(payload.new as Rapor);
-            localStorage.setItem(STORAGE_KEY, JSON.stringify(raporlar));
+          const yeni = payload.new as Rapor;
+          if (!getRaporlar().find(r => r.id === yeni.id)) {
+            setRaporlar([...getRaporlar(), yeni]);
           }
         } else if (payload.eventType === 'UPDATE') {
-          const raporlar = getRaporlar();
-          const idx = raporlar.findIndex(r => r.id === payload.new.id);
-          if (idx !== -1) {
-            raporlar[idx] = payload.new as Rapor;
-            localStorage.setItem(STORAGE_KEY, JSON.stringify(raporlar));
-          }
+          const guncel = payload.new as Rapor;
+          setRaporlar(getRaporlar().map((r) => r.id === guncel.id ? guncel : r));
         } else if (payload.eventType === 'DELETE') {
-          const raporlar = getRaporlar();
-          const filtered = raporlar.filter(r => r.id !== payload.old.id);
-          localStorage.setItem(STORAGE_KEY, JSON.stringify(filtered));
+          setRaporlar(getRaporlar().filter(r => r.id !== payload.old.id));
         }
-        notifyRaporListeners();
       }
     )
     .subscribe();
@@ -73,15 +113,6 @@ export function realtimeRaporAboneliktenCik(): void {
   if (_raporChannel) {
     getSupabase().removeChannel(_raporChannel);
     _raporChannel = null;
-  }
-}
-
-export function getRaporlar(): Rapor[] {
-  try {
-    const data = localStorage.getItem(STORAGE_KEY);
-    return data ? JSON.parse(data) : [];
-  } catch {
-    return [];
   }
 }
 
@@ -98,8 +129,7 @@ export async function supabaseRaporlariYukle(): Promise<void> {
     const yerel = getRaporlar();
     const bekleyen = yerel.filter((r) => !sunucuIdleri.has(r.id));
     const birlestirilmis = [...sunucu, ...bekleyen];
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(birlestirilmis));
-    notifyRaporListeners();
+    setRaporlar(birlestirilmis);
     if (bekleyen.length > 0) {
       const { error: upsertError } = await getSupabase()
         .from('raporlar')
@@ -120,10 +150,7 @@ export function saveRapor(rapor: Omit<Rapor, 'id' | 'olusturma_tarihi'>): Rapor 
     id: Date.now().toString(36) + Math.random().toString(36).slice(2, 8),
     olusturma_tarihi: new Date().toISOString(),
   };
-  const raporlar = getRaporlar();
-  raporlar.push(yeni);
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(raporlar));
-  notifyRaporListeners();
+  setRaporlar([...getRaporlar(), yeni]);
   if (isSupabaseReady()) {
     getSupabase().from('raporlar').insert(raporToSupabase(yeni)).then(({ error }) => {
       if (error) {
@@ -139,11 +166,12 @@ export function updateRapor(id: string, guncelleme: Partial<Omit<Rapor, 'id' | '
   const raporlar = getRaporlar();
   const idx = raporlar.findIndex((r) => r.id === id);
   if (idx === -1) return false;
-  raporlar[idx] = { ...raporlar[idx], ...guncelleme };
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(raporlar));
-  notifyRaporListeners();
+  const guncel = { ...raporlar[idx], ...guncelleme };
+  const yeniListe = [...raporlar];
+  yeniListe[idx] = guncel;
+  setRaporlar(yeniListe);
   if (isSupabaseReady()) {
-    getSupabase().from('raporlar').update(raporToSupabase(raporlar[idx])).eq('id', id).then(({ error }) => {
+    getSupabase().from('raporlar').update(raporToSupabase(guncel)).eq('id', id).then(({ error }) => {
       if (error) {
         console.warn('Supabase rapor güncelleme hatası:', error.message);
         toastGoster('Rapor sunucuya güncellenemedi: ' + error.message, 'error');
@@ -155,14 +183,8 @@ export function updateRapor(id: string, guncelleme: Partial<Omit<Rapor, 'id' | '
 
 export function deleteRapor(id: string): boolean {
   const raporlar = getRaporlar();
-  const idx = raporlar.findIndex((r) => r.id === id);
-  if (idx === -1) return false;
-  raporlar.splice(idx, 1);
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(raporlar));
-  notifyRaporListeners();
-  // fotoğrafları hem yerel cache'ten hem sunucudan temizle
-  // eslint-disable-next-line no-void
-  void sunucudanFotolariSil(id);
+  if (!raporlar.find((r) => r.id === id)) return false;
+  setRaporlar(raporlar.filter((r) => r.id !== id));
   if (isSupabaseReady()) {
     getSupabase().from('raporlar').delete().eq('id', id).then(({ error }) => {
       if (error) {
@@ -193,24 +215,8 @@ export function getPersonelRaporlari(adSoyad: string): Rapor[] {
 }
 
 export function getSonRapor(ada: string, blokNo: number, isKalemi: string): Rapor | null {
-  return getRaporlar()
-    .filter((r) => r.ada === ada && r.blok_no === blokNo && r.is_kalemi === isKalemi)
-    .sort(
-      (a, b) =>
-        new Date(b.olusturma_tarihi).getTime() -
-        new Date(a.olusturma_tarihi).getTime()
-    )[0] ?? null;
-}
-
-function sonRaporBul(raporlar: Rapor[], ik: string): Rapor | null {
-  const son = raporlar
-    .filter((r) => r.is_kalemi === ik)
-    .sort(
-      (a, b) =>
-        new Date(b.olusturma_tarihi).getTime() -
-        new Date(a.olusturma_tarihi).getTime()
-    );
-  return son.length > 0 ? son[0] : null;
+  getRaporlar();
+  return _sonRaporHaritasi.get(`${ada}|${blokNo}|${isKalemi}`) ?? null;
 }
 
 export function getBlokProgress(
@@ -218,16 +224,15 @@ export function getBlokProgress(
   blokNo: number,
   isKalemleri: readonly string[]
 ): Record<string, Rapor | null> {
-  const raporlar = getBlokRaporlari(ada, blokNo);
+  getRaporlar();
   // blok_no=0 ada geneli raporlar devralma; blok özel raporu varsa o kazanır
-  const adaGenel = blokNo !== 0
-    ? getRaporlar().filter((r) => r.ada === ada && r.blok_no === 0)
-    : [];
+  const blokAnahtari = `${ada}|${blokNo}|`;
+  const adaGenelAnahtari = `${ada}|0|`;
   const progress: Record<string, Rapor | null> = {};
   for (const ik of isKalemleri) {
-    progress[ik] =
-      sonRaporBul(raporlar, ik) ??
-      (blokNo !== 0 ? sonRaporBul(adaGenel, ik) : null);
+    const blokRapor = _sonRaporHaritasi.get(blokAnahtari + ik);
+    const adaGenelRapor = blokNo !== 0 ? _sonRaporHaritasi.get(adaGenelAnahtari + ik) ?? null : null;
+    progress[ik] = blokRapor ?? adaGenelRapor;
   }
   return progress;
 }
@@ -260,29 +265,24 @@ export function getAdaGenelIlerleme(
   return Math.round(toplam / blokList.length);
 }
 
-export function getSonRaporlar(limit = 10): Rapor[] {
-  return getRaporlar()
-    .sort(
-      (a, b) =>
-        new Date(b.olusturma_tarihi).getTime() -
-        new Date(a.olusturma_tarihi).getTime()
-    )
-    .slice(0, limit);
-}
-
 export function getIstatistikler() {
   const raporlar = getRaporlar();
-  const tamamlananIsler = raporlar.filter((r) => r.durum === 'tamamlandi').length;
-  const devamEdenIsler = raporlar.filter((r) => r.durum === 'devam_ediyor').length;
-  const planlananIsler = raporlar.filter((r) => r.durum === 'planlandi').length;
-  const gecikenIsler = raporlar.filter((r) => r.durum === 'gecikme').length;
-  const toplamRapor = raporlar.length;
+  let tamamlananIsler = 0;
+  let devamEdenIsler = 0;
+  let planlananIsler = 0;
+  let gecikenIsler = 0;
+  for (const r of raporlar) {
+    if (r.durum === 'tamamlandi') tamamlananIsler++;
+    else if (r.durum === 'devam_ediyor') devamEdenIsler++;
+    else if (r.durum === 'planlandi') planlananIsler++;
+    else if (r.durum === 'gecikme') gecikenIsler++;
+  }
 
   return {
     tamamlananIsler,
     devamEdenIsler,
     planlananIsler,
     gecikenIsler,
-    toplamRapor,
+    toplamRapor: raporlar.length,
   };
 }

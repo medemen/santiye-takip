@@ -6,7 +6,6 @@ import ErrorBoundary from './components/ErrorBoundary';
 import Toast from './components/Toast';
 import { isLoggedIn, isAdmin, isProjeMuduruSession, supabaseAuthInit, subscribeAuthChanges } from './stores/authStore';
 import { supabaseRaporlariYukle, aboneOlRaporGuncellemeleri, realtimeRaporAboneliktenCik } from './stores/reportStore';
-import { supabaseFotolariYukle } from './stores/fotoStore';
 import { supabaseAtamalariYukle, aboneOlAtamaGuncellemeleri, realtimeAtamaAboneliktenCik } from './stores/atamaStore';
 import { supabaseKullanicilariYukle } from './stores/kullanicilarStore';
 import { supabaseHedefleriYukle, aboneOlHedefGuncellemeleri, realtimeHedefAboneliktenCik } from './stores/hedefStore';
@@ -87,7 +86,6 @@ export default function App() {
       supabaseAtamalariYukle(),
       supabaseKullanicilariYukle(),
       supabaseHedefleriYukle(),
-      supabaseFotolariYukle(),
     ]);
 
     aboneOlRaporGuncellemeleri();
@@ -100,7 +98,6 @@ export default function App() {
         supabaseRaporlariYukle();
         supabaseAtamalariYukle();
         supabaseHedefleriYukle();
-        supabaseFotolariYukle();
       }
     };
     document.addEventListener('visibilitychange', handleVisibility);

@@ -10,26 +10,6 @@ import ReportCard from '../components/ReportCard';
 import { YeniKullaniciForm, KullaniciYetkiKarti } from '../components/KullaniciYonetim';
 import { toastGoster } from '../stores/toastStore';
 
-function exportCSV() {
-  const rows = [['Ad Soyad', 'Rol', 'Atanan Ada', 'Atanan Bloklar']];
-  for (const p of getAllPersonel()) {
-    const lsAda = getKullaniciAdaAtamasi(p.ad_soyad);
-    const atananAda = lsAda !== null ? lsAda : (p.atanan_ada || '');
-    const blokAtama = getKullaniciBlokAtamasi(p.ad_soyad);
-    const blokStr = atananAda && blokAtama[atananAda] ? blokAtama[atananAda].sort((a, b) => a - b).join('; ') : '';
-    rows.push([p.ad_soyad, p.rol, atananAda, blokStr]);
-  }
-  const csv = rows.map((r) => r.map((c) => `"${c}"`).join(',')).join('\r\n');
-  const blob = new Blob(['\ufeff' + csv], { type: 'text/csv;charset=utf-8;' });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = 'personel_atamalari.csv';
-  a.click();
-  URL.revokeObjectURL(url);
-  toastGoster('CSV dosyası indiriliyor', 'success');
-}
-
 export default function Personnel() {
   const config = useSiteConfig();
   const [selectedPerson, setSelectedPerson] = useState<string | null>(null);
@@ -371,21 +351,6 @@ export default function Personnel() {
           Personel
         </h1>
         <div style={{ display: 'flex', gap: 6 }}>
-          <button
-            onClick={exportCSV}
-            style={{
-              background: 'none',
-              border: '1px solid #e5e7eb',
-              borderRadius: 8,
-              padding: '4px 10px',
-              fontSize: 11,
-              color: '#6b7280',
-              cursor: 'pointer',
-            }}
-            title="CSV Dışa Aktar"
-          >
-            📥 CSV
-          </button>
           {isPm && !bulkMode && (
             <button
               onClick={() => setYeniKullanici(true)}

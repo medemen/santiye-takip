@@ -1,9 +1,10 @@
 import { useParams, useNavigate } from 'react-router-dom';
-import { useState, useEffect, useRef } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useSiteConfig } from '../hooks/useSiteConfig';
 import { useHedefler } from '../hooks/useHedefler';
+import { useRaporlar } from '../hooks/useRaporlar';
 import { getBlok, getAllKalemler, getGrupByKalem } from '../config/helpers';
-import { getBlokProgress, getBlokRaporlari, getBlokGenelIlerleme } from '../stores/reportStore';
+import { getBlokProgress } from '../stores/reportStore';
 import { getSantiyeSefi } from '../stores/kullanicilarStore';
 import {
   setHedef,
@@ -25,17 +26,30 @@ export default function BlokDetail() {
   const navigate = useNavigate();
   const config = useSiteConfig();
   const blokNum = parseInt(blokNo || '0');
+  const raporlar = useRaporlar();
 
   const blok = getBlok(config, ada!, blokNum);
   const isKalemleri = getAllKalemler(config);
 
   const progress = getBlokProgress(ada!, blokNum, isKalemleri);
-  const genelIlerleme = getBlokGenelIlerleme(ada!, blokNum, isKalemleri);
+  const genelIlerleme = (() => {
+    const values = Object.values(progress);
+    if (values.length === 0) return 0;
+    const toplam = values.reduce((sum, r) => {
+      if (!r) return sum;
+      if (r.durum === 'tamamlandi') return sum + 100;
+      return sum + r.ilerleme_yuzde;
+    }, 0);
+    return Math.round(toplam / values.length);
+  })();
   const santiyeSefi = getSantiyeSefi(ada!);
-  const raporlar = getBlokRaporlari(ada!, blokNum).sort(
-    (a, b) => new Date(b.olusturma_tarihi).getTime() - new Date(a.olusturma_tarihi).getTime()
+  const blokRaporlar = useMemo(
+    () => raporlar
+      .filter((r) => r.ada === ada && r.blok_no === blokNum)
+      .sort((a, b) => new Date(b.olusturma_tarihi).getTime() - new Date(a.olusturma_tarihi).getTime()),
+    [raporlar, ada, blokNum]
   );
-  const blokOzelRaporVar = raporlar.length > 0;
+  const blokOzelRaporVar = blokRaporlar.length > 0;
 
   const hedefler = useHedefler();
   const hedefDuzenleyebilir = hedefDuzetmeYetkisiVarMi();
@@ -400,7 +414,7 @@ export default function BlokDetail() {
         </button>
       </div>
 
-      {raporlar.length > 0 && (
+      {blokRaporlar.length > 0 && (
         <div
           style={{
             backgroundColor: '#fff',
@@ -411,10 +425,10 @@ export default function BlokDetail() {
           }}
         >
           <h3 style={{ fontSize: 14, fontWeight: 600, color: '#4b5563', margin: 0, marginBottom: 12 }}>
-            Rapor Geçmişi ({raporlar.length})
+            Rapor Geçmişi ({blokRaporlar.length})
           </h3>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-            {raporlar.map((r) => (
+            {blokRaporlar.map((r) => (
               <ReportCard key={r.id} rapor={r} />
             ))}
           </div>
