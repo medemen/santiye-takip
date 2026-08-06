@@ -8,6 +8,7 @@ import ReportCard from '../components/ReportCard';
 import { DURUM_LABELLARI } from '../config/defaultConfig';
 import { toastGoster } from '../stores/toastStore';
 import { raporlarXlsxExport } from '../utils/exportXlsx';
+import { getHedef } from '../stores/hedefStore';
 
 export default function ReportList() {
   const navigate = useNavigate();
@@ -75,7 +76,7 @@ export default function ReportList() {
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
         <h1 style={{ fontSize: 20, fontWeight: 700, color: '#1f2937', margin: 0 }}>Raporlar</h1>
         <button
-          onClick={async () => { await raporlarXlsxExport(filtered); toastGoster(`${filtered.length} rapor Excel olarak indiriliyor`, 'success'); }}
+          onClick={async () => { await raporlarXlsxExport(filtered, 'raporlar.xlsx', getHedef); toastGoster(`${filtered.length} rapor Excel olarak indiriliyor`, 'success'); }}
           style={{
             background: 'none', border: '1px solid #e5e7eb', borderRadius: 8,
             padding: '4px 10px', fontSize: 11, color: '#6b7280', cursor: 'pointer',

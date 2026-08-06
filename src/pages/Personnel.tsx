@@ -7,6 +7,7 @@ import { getKullaniciBlokAtamasi, setKullaniciBlokAtamasi, getKullaniciAdaAtamas
 import { getCurrentUser } from '../stores/authStore';
 import type { BlokAtamasi } from '../types';
 import ReportCard from '../components/ReportCard';
+import { YeniKullaniciForm, KullaniciYetkiKarti } from '../components/KullaniciYonetim';
 import { toastGoster } from '../stores/toastStore';
 
 function exportCSV() {
@@ -38,6 +39,7 @@ export default function Personnel() {
   const [bulkMode, setBulkMode] = useState(false);
   const [seciliKisiler, setSeciliKisiler] = useState<Set<string>>(new Set());
   const [bulkAda, setBulkAda] = useState('');
+  const [yeniKullanici, setYeniKullanici] = useState(false);
 
   const user = getCurrentUser();
   const isAdmin = user?.admin ?? false;
@@ -134,6 +136,15 @@ export default function Personnel() {
     setEditBlokAtama({});
   };
 
+  if (yeniKullanici) {
+    return (
+      <YeniKullaniciForm
+        onIptal={() => setYeniKullanici(false)}
+        onKaydedildi={() => setYeniKullanici(false)}
+      />
+    );
+  }
+
   if (selectedPerson) {
     return (
       <div>
@@ -179,6 +190,7 @@ export default function Personnel() {
 
   if (editPerson) {
     const person = personelList.find((p) => p.ad_soyad === editPerson);
+    const kullanici = getKullanicilar().find((k) => k.ad_soyad === editPerson);
     return (
       <div>
         <div
@@ -334,6 +346,12 @@ export default function Personnel() {
             </p>
           </div>
         )}
+
+        {kullanici && (
+          <div style={{ marginTop: 20 }}>
+            <KullaniciYetkiKarti kullanici={kullanici} />
+          </div>
+        )}
       </div>
     );
   }
@@ -363,6 +381,24 @@ export default function Personnel() {
           >
             📥 CSV
           </button>
+          {isAdmin && !bulkMode && (
+            <button
+              onClick={() => setYeniKullanici(true)}
+              style={{
+                background: 'none',
+                border: '1px solid #f59e0b',
+                borderRadius: 8,
+                padding: '4px 10px',
+                fontSize: 11,
+                color: '#f59e0b',
+                fontWeight: 600,
+                cursor: 'pointer',
+              }}
+              title="Yeni Kullanıcı Oluştur"
+            >
+              + Yeni Kullanıcı
+            </button>
+          )}
           {isAdmin && !bulkMode && (
             <button
               onClick={() => setBulkMode(true)}

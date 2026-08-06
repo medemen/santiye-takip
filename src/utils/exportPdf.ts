@@ -1,7 +1,7 @@
 import type { Rapor } from '../types';
 import { DURUM_LABELLARI } from '../config/defaultConfig';
 
-export async function raporPdfExport(rapor: Rapor, element: HTMLElement): Promise<void> {
+export async function elementPdfExport(element: HTMLElement, dosyaAdi: string): Promise<void> {
   const [{ default: html2canvas }, { jsPDF }] = await Promise.all([
     import('html2canvas'),
     import('jspdf'),
@@ -29,9 +29,13 @@ export async function raporPdfExport(rapor: Rapor, element: HTMLElement): Promis
     heightLeft -= pdf.internal.pageSize.getHeight() - 20;
   }
 
+  pdf.save(dosyaAdi);
+}
+
+export async function raporPdfExport(rapor: Rapor, element: HTMLElement): Promise<void> {
   const safeName = `${rapor.ada}_Blok${rapor.blok_no}_${rapor.is_kalemi}`
     .replace(/[^a-zA-Z0-9_]/g, '_');
-  pdf.save(`${safeName}.pdf`);
+  await elementPdfExport(element, `${safeName}.pdf`);
 }
 
 export function raporMetinExport(rapor: Rapor): string {

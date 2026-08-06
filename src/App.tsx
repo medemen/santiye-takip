@@ -6,13 +6,16 @@ import ErrorBoundary from './components/ErrorBoundary';
 import Toast from './components/Toast';
 import { isLoggedIn, isAdmin, supabaseAuthInit, subscribeAuthChanges } from './stores/authStore';
 import { supabaseRaporlariYukle, aboneOlRaporGuncellemeleri, realtimeRaporAboneliktenCik } from './stores/reportStore';
+import { supabaseFotolariYukle } from './stores/fotoStore';
 import { supabaseAtamalariYukle, aboneOlAtamaGuncellemeleri, realtimeAtamaAboneliktenCik } from './stores/atamaStore';
 import { supabaseKullanicilariYukle } from './stores/kullanicilarStore';
 import { supabaseHedefleriYukle, aboneOlHedefGuncellemeleri, realtimeHedefAboneliktenCik } from './stores/hedefStore';
 import { getSiteConfig, subscribeSiteConfig } from './config/site';
 import { isSupabaseReady } from './lib/supabase';
+import { bildirimKontrolunuBaslat, bildirimKontrolunuDurdur } from './stores/notificationStore';
 
 const Dashboard = lazy(() => import('./pages/Dashboard'));
+const HedefTakvim = lazy(() => import('./pages/HedefTakvim'));
 const AdaList = lazy(() => import('./pages/AdaList'));
 const AdaDetail = lazy(() => import('./pages/AdaDetail'));
 const BlokDetail = lazy(() => import('./pages/BlokDetail'));
@@ -74,17 +77,20 @@ export default function App() {
       supabaseAtamalariYukle(),
       supabaseKullanicilariYukle(),
       supabaseHedefleriYukle(),
+      supabaseFotolariYukle(),
     ]);
 
     aboneOlRaporGuncellemeleri();
     aboneOlAtamaGuncellemeleri();
     aboneOlHedefGuncellemeleri();
+    bildirimKontrolunuBaslat();
 
     const handleVisibility = () => {
       if (document.visibilityState === 'visible') {
         supabaseRaporlariYukle();
         supabaseAtamalariYukle();
         supabaseHedefleriYukle();
+        supabaseFotolariYukle();
       }
     };
     document.addEventListener('visibilitychange', handleVisibility);
@@ -93,6 +99,7 @@ export default function App() {
       realtimeRaporAboneliktenCik();
       realtimeAtamaAboneliktenCik();
       realtimeHedefAboneliktenCik();
+      bildirimKontrolunuDurdur();
       document.removeEventListener('visibilitychange', handleVisibility);
     };
   }, [authTick]);
@@ -113,6 +120,7 @@ export default function App() {
                     <Layout>
                       <Routes>
                         <Route path="/" element={<Dashboard />} />
+                        <Route path="/hedef-takvim" element={<HedefTakvim />} />
                         <Route path="/adalar" element={<AdaList />} />
                         <Route path="/ada/:ada" element={<AdaDetail />} />
                         <Route path="/ada/:ada/blok/:blokNo" element={<BlokDetail />} />

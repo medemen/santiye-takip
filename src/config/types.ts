@@ -68,6 +68,8 @@ export interface Sablon {
   aciklama: string;
   grup_idleri: string[];
   varsayilan_durum: IsDurumu;
+  varsayilan_ilerleme?: number;
+  varsayilan_aciklama?: string;
 }
 
 export interface DurumTespitBilgi {

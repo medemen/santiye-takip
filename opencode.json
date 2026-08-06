@@ -3,8 +3,11 @@
   "mcp": {
     "supabase": {
       "type": "remote",
-      "url": "https://mcp.supabase.com/mcp",
-      "enabled": true
+      "url": "https://mcp.supabase.com/mcp?project_ref=fwsempxzolmxvecfpmgl&features=docs%2Caccount%2Cdatabase%2Cdebugging%2Cdevelopment%2Cfunctions%2Cbranching",
+      "enabled": true,
+      "headers": {
+        "Authorization": "Bearer {env:SUPABASE_ACCESS_TOKEN}"
+      }
     }
   },
   "plugin": [

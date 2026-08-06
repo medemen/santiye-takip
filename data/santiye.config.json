@@ -1355,7 +1355,9 @@
         "grup_idleri": [
           "kaba-isler"
         ],
-        "varsayilan_durum": "tamamlandi"
+        "varsayilan_durum": "tamamlandi",
+        "varsayilan_ilerleme": 100,
+        "varsayilan_aciklama": "Kaba iş imalatları tamamlanmıştır."
       },
       {
         "id": "duvar-yalitim",
@@ -1364,7 +1366,9 @@
         "grup_idleri": [
           "duvar-yalitim"
         ],
-        "varsayilan_durum": "devam_ediyor"
+        "varsayilan_durum": "devam_ediyor",
+        "varsayilan_ilerleme": 60,
+        "varsayilan_aciklama": "Duvar ve yalıtım işleri devam etmektedir."
       },
       {
         "id": "ince-isler",
@@ -1378,7 +1382,9 @@
           "mobilya-kapi",
           "mermer"
         ],
-        "varsayilan_durum": "devam_ediyor"
+        "varsayilan_durum": "devam_ediyor",
+        "varsayilan_ilerleme": 40,
+        "varsayilan_aciklama": "İnce işler imalatı devam etmektedir."
       },
       {
         "id": "mekanik-elektrik",
@@ -1390,7 +1396,9 @@
           "asansor",
           "zayif-akim"
         ],
-        "varsayilan_durum": "devam_ediyor"
+        "varsayilan_durum": "devam_ediyor",
+        "varsayilan_ilerleme": 45,
+        "varsayilan_aciklama": "Mekanik ve elektrik tesisat imalatları devam etmektedir."
       },
       {
         "id": "cephe-cati",
@@ -1401,7 +1409,9 @@
           "korkuluk",
           "bina-giris"
         ],
-        "varsayilan_durum": "devam_ediyor"
+        "varsayilan_durum": "devam_ediyor",
+        "varsayilan_ilerleme": 35,
+        "varsayilan_aciklama": "Cephe ve çatı imalatları devam etmektedir."
       }
     ]
   },

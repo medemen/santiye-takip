@@ -1,8 +1,9 @@
-import { memo, useRef } from 'react';
+import { memo, useRef, useSyncExternalStore } from 'react';
 import type { Rapor } from '../types';
 import StatusBadge from './StatusBadge';
 import { formatDateTime } from '../utils/helpers';
 import { raporPdfExport } from '../utils/exportPdf';
+import { getRaporFotolari, fotoYoluPublic, subscribeFotoChanges } from '../stores/fotoStore';
 
 interface Props {
   rapor: Rapor;
@@ -12,6 +13,7 @@ interface Props {
 
 const ReportCard = memo(function ReportCard({ rapor, onClick, showActions }: Props) {
   const cardRef = useRef<HTMLDivElement>(null);
+  const fotolar = useSyncExternalStore(subscribeFotoChanges, () => getRaporFotolari(rapor.id));
 
   return (
     <div
@@ -69,6 +71,25 @@ const ReportCard = memo(function ReportCard({ rapor, onClick, showActions }: Pro
       {rapor.aciklama && (
         <div style={{ fontSize: 12, color: '#6b7280', marginBottom: 6, lineHeight: 1.4 }}>
           {rapor.aciklama}
+        </div>
+      )}
+      {fotolar.length > 0 && (
+        <div style={{ display: 'flex', gap: 6, marginBottom: 6, flexWrap: 'wrap' }}>
+          {fotolar.map((yol) => (
+            <img
+              key={yol}
+              src={fotoYoluPublic(yol)}
+              alt="rapor fotoğrafı"
+              loading="lazy"
+              style={{
+                width: 64,
+                height: 64,
+                borderRadius: 8,
+                objectFit: 'cover',
+                border: '1px solid #f3f4f6',
+              }}
+            />
+          ))}
         </div>
       )}
       <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 11, color: '#9ca3af' }}>

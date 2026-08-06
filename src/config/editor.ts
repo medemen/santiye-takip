@@ -99,6 +99,8 @@ export function sablonlariUret(gruplar: ImalatGrubu[]): Sablon[] {
     aciklama: '',
     grup_idleri: [g.id],
     varsayilan_durum: 'devam_ediyor',
+    varsayilan_ilerleme: 50,
+    varsayilan_aciklama: '',
   }));
 }
 
@@ -149,6 +151,13 @@ export function configValidate(cfg: SantiyeConfig): string[] {
         hata.push(`'${s.ad}' şablonu bilinmeyen grup '${gid}' referans veriyor.`);
       }
     });
+    const ilerleme = s.varsayilan_ilerleme;
+    if (ilerleme !== undefined && (Number.isNaN(ilerleme) || ilerleme < 0 || ilerleme > 100)) {
+      hata.push(`'${s.ad}' şablonunun varsayılan ilerlemesi 0-100 arasında olmalı.`);
+    }
+    if (!s.grup_idleri.length) {
+      hata.push(`'${s.ad}' şablonu hiçbir grubu kapsamıyor.`);
+    }
   });
 
   return hata;

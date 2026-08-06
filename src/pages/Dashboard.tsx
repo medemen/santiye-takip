@@ -127,9 +127,15 @@ export default function Dashboard() {
       {hedefOzeti.toplam > 0 && (
         <div style={{ ...card, marginBottom: 16 }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 }}>
-            <h3 style={{ fontSize: 14, fontWeight: 600, color: '#4b5563', margin: 0 }}>
-              🎯 Hedef Takvimi
-            </h3>
+            <button
+              onClick={() => navigate('/hedef-takvim')}
+              style={{
+                background: 'none', border: 'none', padding: 0, cursor: 'pointer',
+                fontSize: 14, fontWeight: 600, color: '#4b5563',
+              }}
+            >
+              🎯 Hedef Takvimi <span style={{ fontSize: 11, color: '#f59e0b', fontWeight: 700 }}>→</span>
+            </button>
             <span style={{ fontSize: 12, color: '#9ca3af' }}>{hedefOzeti.toplam} hedef</span>
           </div>
           <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginBottom: 10 }}>

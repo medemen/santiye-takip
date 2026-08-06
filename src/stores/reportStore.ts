@@ -4,6 +4,7 @@ import { getSiteConfig } from '../config/site';
 import type { RealtimeChannel } from '@supabase/supabase-js';
 import { toastGoster } from './toastStore';
 import { getCurrentUser } from './authStore';
+import { sunucudanFotolariSil } from './fotoStore';
 
 const STORAGE_KEY = `${getSiteConfig().marka.localStoragePrefix}_raporlar`;
 
@@ -159,6 +160,9 @@ export function deleteRapor(id: string): boolean {
   raporlar.splice(idx, 1);
   localStorage.setItem(STORAGE_KEY, JSON.stringify(raporlar));
   notifyRaporListeners();
+  // fotoğrafları hem yerel cache'ten hem sunucudan temizle
+  // eslint-disable-next-line no-void
+  void sunucudanFotolariSil(id);
   if (isSupabaseReady()) {
     getSupabase().from('raporlar').delete().eq('id', id).then(({ error }) => {
       if (error) {
