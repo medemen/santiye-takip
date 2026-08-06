@@ -10,9 +10,15 @@ type FotoHarita = Record<string, string[]>;
 
 type Listener = () => void;
 const _fotoListeners = new Set<Listener>();
+let _fotoVersion = 0;
 
 function notifyFotoListeners(): void {
+  _fotoVersion++;
   _fotoListeners.forEach((fn) => fn());
+}
+
+export function getFotoVersion(): number {
+  return _fotoVersion;
 }
 
 export function subscribeFotoChanges(listener: Listener): () => void {

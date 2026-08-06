@@ -3,7 +3,7 @@ import type { Rapor } from '../types';
 import StatusBadge from './StatusBadge';
 import { formatDateTime } from '../utils/helpers';
 import { raporPdfExport } from '../utils/exportPdf';
-import { getRaporFotolari, fotoYoluPublic, subscribeFotoChanges } from '../stores/fotoStore';
+import { getRaporFotolari, fotoYoluPublic, subscribeFotoChanges, getFotoVersion } from '../stores/fotoStore';
 
 interface Props {
   rapor: Rapor;
@@ -13,7 +13,8 @@ interface Props {
 
 const ReportCard = memo(function ReportCard({ rapor, onClick, showActions }: Props) {
   const cardRef = useRef<HTMLDivElement>(null);
-  const fotolar = useSyncExternalStore(subscribeFotoChanges, () => getRaporFotolari(rapor.id));
+  useSyncExternalStore(subscribeFotoChanges, getFotoVersion);
+  const fotolar = getRaporFotolari(rapor.id);
 
   return (
     <div
