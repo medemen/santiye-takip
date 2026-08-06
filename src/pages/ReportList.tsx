@@ -25,13 +25,15 @@ export default function ReportList() {
   const [searchTerm, setSearchTerm] = useState('');
 
   const user = getCurrentUser();
-  const isAdmin = user?.admin ?? false;
+  const isAdmin = (user?.admin ?? false) || (user?.proje_muduru ?? false);
 
   const canEditReport = (raporlayan: string) => {
     if (!user) return false;
     if (isAdmin) return true;
     return isSahaPersoneli(user.rol) && user.ad_soyad === raporlayan;
   };
+
+  const canDeleteReport = () => isAdmin;
 
   let raporlar = getRaporlar().sort(
     (a, b) => new Date(b.olusturma_tarihi).getTime() - new Date(a.olusturma_tarihi).getTime()
@@ -249,7 +251,7 @@ export default function ReportList() {
               style={{ cursor: editable ? 'pointer' : 'default', position: 'relative' }}
             >
               <ReportCard rapor={r} showActions />
-              {editable && (
+              {canDeleteReport() && (
               <div
                 onClick={(e) => e.stopPropagation()}
                 style={{

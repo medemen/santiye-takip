@@ -38,10 +38,10 @@ export default function Settings() {
   const [kaydediliyor, setKaydediliyor] = useState(false);
   const [dogrulama, setDogrulama] = useState<string[]>([]);
 
-  if (!user?.admin) {
+  if (!user?.proje_muduru) {
     return (
       <div style={{ padding: 40, textAlign: 'center', color: '#9ca3af' }}>
-        Bu sayfaya yalnızca yöneticiler erişebilir.
+        Bu sayfaya yalnızca proje müdürü erişebilir.
       </div>
     );
   }

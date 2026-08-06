@@ -17,14 +17,15 @@ export default function BulkReport() {
   const kullaniciAdi = user?.ad_soyad ?? '';
 
   const atananAda = getKullaniciAdaAtamasi(kullaniciAdi);
+  const isAdmin = (user?.admin ?? false) || (user?.proje_muduru ?? false);
   const yetkiliAdalar: string[] = [];
-  if (user?.admin) {
-    yetkiliAdalar.push(...user.yetkili_adalar);
+  if (isAdmin) {
+    yetkiliAdalar.push(...(user?.yetkili_adalar ?? []));
   } else if (atananAda) {
     yetkiliAdalar.push(atananAda);
   }
 
-  const gosterilecekAdalar = user?.admin
+  const gosterilecekAdalar = isAdmin
     ? getAdaList(config).filter((a) => yetkiliAdalar.includes(a.ada))
     : atananAda
       ? getAdaList(config).filter((a) => a.ada === atananAda)

@@ -1,6 +1,6 @@
 import { useNavigate, NavLink } from 'react-router-dom';
 import { useReducer, useEffect } from 'react';
-import { getCurrentUser, cikisYap, isProjeMuduruSession } from '../stores/authStore';
+import { getCurrentUser, cikisYap, isProjeMuduruSession, isAdmin } from '../stores/authStore';
 import { subscribeRaporChanges } from '../stores/reportStore';
 
 const navItems = [
@@ -22,9 +22,12 @@ export default function Layout({ children }: Props) {
   const user = getCurrentUser();
   const [, forceUpdate] = useReducer(x => x + 1, 0);
 
-  const gorunurNav = navItems.filter(
-    (item) => !['/personel', '/toplu-rapor', '/ayarlar'].includes(item.to) || (user?.admin ?? false)
-  );
+  const gorunurNav = navItems.filter((item) => {
+    if (item.to === '/personel') return true;
+    if (item.to === '/ayarlar') return isProjeMuduruSession();
+    if (item.to === '/toplu-rapor') return isAdmin();
+    return true;
+  });
 
   useEffect(() => {
     const unsub = subscribeRaporChanges(() => forceUpdate());

@@ -54,10 +54,10 @@ export default function NewSantiyeWizard() {
   const [adimNotu, setAdimNotu] = useState('');
   const [yayinlaniyor, setYayinlaniyor] = useState(false);
 
-  if (!user?.admin) {
+  if (!user?.proje_muduru) {
     return (
       <div style={{ padding: 40, textAlign: 'center', color: '#9ca3af' }}>
-        Bu sayfaya yalnızca yöneticiler erişebilir.
+        Bu sayfaya yalnızca proje müdürü erişebilir.
       </div>
     );
   }

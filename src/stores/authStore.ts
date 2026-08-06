@@ -123,7 +123,8 @@ export function isLoggedIn(): boolean {
 }
 
 export function isAdmin(): boolean {
-  return getCurrentUser()?.admin ?? false;
+  const user = getCurrentUser();
+  return user ? (user.admin || user.proje_muduru) : false;
 }
 
 export function isProjeMuduruSession(): boolean {

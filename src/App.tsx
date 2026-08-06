@@ -4,7 +4,7 @@ import { lazy, Suspense, useEffect, useState, useSyncExternalStore } from 'react
 import Layout from './components/Layout';
 import ErrorBoundary from './components/ErrorBoundary';
 import Toast from './components/Toast';
-import { isLoggedIn, isAdmin, supabaseAuthInit, subscribeAuthChanges } from './stores/authStore';
+import { isLoggedIn, isAdmin, isProjeMuduruSession, supabaseAuthInit, subscribeAuthChanges } from './stores/authStore';
 import { supabaseRaporlariYukle, aboneOlRaporGuncellemeleri, realtimeRaporAboneliktenCik } from './stores/reportStore';
 import { supabaseFotolariYukle } from './stores/fotoStore';
 import { supabaseAtamalariYukle, aboneOlAtamaGuncellemeleri, realtimeAtamaAboneliktenCik } from './stores/atamaStore';
@@ -55,6 +55,16 @@ function AdminRoute({ children }: { children: React.ReactNode }) {
     return <Navigate to="/login" replace />;
   }
   if (!isAdmin()) {
+    return <Navigate to="/" replace />;
+  }
+  return <>{children}</>;
+}
+
+function PmRoute({ children }: { children: React.ReactNode }) {
+  if (!isLoggedIn()) {
+    return <Navigate to="/login" replace />;
+  }
+  if (!isProjeMuduruSession()) {
     return <Navigate to="/" replace />;
   }
   return <>{children}</>;
@@ -126,12 +136,12 @@ export default function App() {
                         <Route path="/ada/:ada/blok/:blokNo" element={<BlokDetail />} />
                         <Route path="/rapor-ekle" element={<ReportAdd />} />
                         <Route path="/raporlar" element={<ReportList />} />
-                        <Route path="/personel" element={<AdminRoute><Personnel /></AdminRoute>} />
+                        <Route path="/personel" element={<Personnel />} />
                         <Route path="/toplu-rapor" element={<AdminRoute><BulkReport /></AdminRoute>} />
                         <Route path="/profil" element={<Profile />} />
                         <Route path="/istatistik" element={<Statistics />} />
-                        <Route path="/ayarlar" element={<AdminRoute><Settings /></AdminRoute>} />
-                        <Route path="/yeni-santiye" element={<AdminRoute><NewSantiyeWizard /></AdminRoute>} />
+                        <Route path="/ayarlar" element={<PmRoute><Settings /></PmRoute>} />
+                        <Route path="/yeni-santiye" element={<PmRoute><NewSantiyeWizard /></PmRoute>} />
                       </Routes>
                     </Layout>
                   </ProtectedRoute>

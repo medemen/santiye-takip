@@ -4,7 +4,7 @@ import { getAdaList } from '../config/helpers';
 import { getAllPersonel, getKullanicilar } from '../stores/kullanicilarStore';
 import { getPersonelRaporlari } from '../stores/reportStore';
 import { getKullaniciBlokAtamasi, setKullaniciBlokAtamasi, getKullaniciAdaAtamasi, setKullaniciAdaAtamasi } from '../stores/atamaStore';
-import { getCurrentUser } from '../stores/authStore';
+import { getCurrentUser, isProjeMuduruSession } from '../stores/authStore';
 import type { BlokAtamasi } from '../types';
 import ReportCard from '../components/ReportCard';
 import { YeniKullaniciForm, KullaniciYetkiKarti } from '../components/KullaniciYonetim';
@@ -42,7 +42,8 @@ export default function Personnel() {
   const [yeniKullanici, setYeniKullanici] = useState(false);
 
   const user = getCurrentUser();
-  const isAdmin = user?.admin ?? false;
+  const isAdmin = (user?.admin ?? false) || (user?.proje_muduru ?? false);
+  const isPm = isProjeMuduruSession();
   const yetkiliAdalar = user?.yetkili_adalar ?? [];
 
   const adalar = getAdaList(config);
@@ -50,17 +51,21 @@ export default function Personnel() {
   const raporlar = selectedPerson ? getPersonelRaporlari(selectedPerson) : [];
 
   const rolRenkleri: Record<string, string> = {
-    'Saha Mühendisi': '#dbeafe',
-    'Saha Mimarı': '#ede9fe',
-    'Saha Teknikeri': '#d1fae5',
+    'İnşaat Mühendisi': '#dbeafe',
+    'Mimar': '#ede9fe',
+    'Tekniker': '#d1fae5',
     'Formen': '#fef3c7',
+    'Makine Mühendisi': '#cffafe',
+    'Elektrik Mühendisi': '#fce7f3',
   };
 
   const rolYaziRenkleri: Record<string, string> = {
-    'Saha Mühendisi': '#1e40af',
-    'Saha Mimarı': '#5b21b6',
-    'Saha Teknikeri': '#065f46',
+    'İnşaat Mühendisi': '#1e40af',
+    'Mimar': '#5b21b6',
+    'Tekniker': '#065f46',
     'Formen': '#92400e',
+    'Makine Mühendisi': '#0e7490',
+    'Elektrik Mühendisi': '#9d174d',
   };
 
   const personelList = getAllPersonel();
@@ -347,7 +352,7 @@ export default function Personnel() {
           </div>
         )}
 
-        {kullanici && (
+        {kullanici && isPm && (
           <div style={{ marginTop: 20 }}>
             <KullaniciYetkiKarti kullanici={kullanici} />
           </div>
@@ -381,7 +386,7 @@ export default function Personnel() {
           >
             📥 CSV
           </button>
-          {isAdmin && !bulkMode && (
+          {isPm && !bulkMode && (
             <button
               onClick={() => setYeniKullanici(true)}
               style={{

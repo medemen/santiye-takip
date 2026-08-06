@@ -8,22 +8,28 @@
   },
   "marka": {
     "appName": "Güneyşehir Takip",
-    "webBasename": "santiye_takip_11",
+    "webBasename": "santiye_takip_15",
     "emailDomain": "santiye.com",
     "localStoragePrefix": "santiyev2",
     "capacitorAppId": "com.santiyetakip.app"
   },
   "roller": {
     "sahaPersoneliRolleri": [
-      "Saha Mühendisi",
-      "Saha Mimarı"
+      "İnşaat Mühendisi",
+      "Mimar",
+      "Makine Mühendisi",
+      "Elektrik Mühendisi",
+      "Tekniker",
+      "Formen"
     ],
     "secilebilirRoller": [
       "Proje Müdürü",
       "Şantiye Şefi",
-      "Saha Mühendisi",
-      "Saha Mimarı",
-      "Saha Teknikeri",
+      "İnşaat Mühendisi",
+      "Mimar",
+      "Makine Mühendisi",
+      "Elektrik Mühendisi",
+      "Tekniker",
       "Formen"
     ]
   },

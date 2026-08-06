@@ -28,14 +28,16 @@ export default function ReportAdd() {
   const atananAda = getKullaniciAdaAtamasi(kullaniciAdi);
   const userBloklar = atananAda ? getKullaniciBloklari(kullaniciAdi, atananAda) : [];
 
+  const isAdmin = (user?.admin ?? false) || (user?.proje_muduru ?? false);
+
   const yetkiliAdalar: string[] = [];
-  if (user?.admin) {
-    yetkiliAdalar.push(...user.yetkili_adalar);
+  if (isAdmin) {
+    yetkiliAdalar.push(...(user?.yetkili_adalar ?? []));
   } else if (atananAda) {
     yetkiliAdalar.push(atananAda);
   }
 
-  const gosterilecekAdalar = user?.admin
+  const gosterilecekAdalar = isAdmin
     ? getAdaList(config).filter((a) => yetkiliAdalar.includes(a.ada))
     : atananAda
       ? getAdaList(config).filter((a) => a.ada === atananAda)
@@ -85,7 +87,7 @@ export default function ReportAdd() {
 
   const getBlokFiltre = () => {
     if (!ada) return [];
-    if (user?.admin) {
+    if (isAdmin) {
       const blokAtama = getKullaniciBloklari(kullaniciAdi, ada);
       return blokAtama.length > 0 ? blokAtama : adaData?.bloklar.map((b) => b.blok_no) ?? [];
     }
@@ -253,7 +255,7 @@ export default function ReportAdd() {
           <div style={{ fontSize: 40, marginBottom: 12 }}>🔒</div>
           <p style={{ fontSize: 14, color: '#6b7280', margin: 0 }}>
             Size atanmış bir ada bulunmuyor.
-            {user?.admin ? ' Personel sayfasından atama yapabilirsiniz.' : ''}
+            {isAdmin ? ' Personel sayfasından atama yapabilirsiniz.' : ''}
           </p>
         </div>
       </div>
