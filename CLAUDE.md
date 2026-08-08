@@ -1,0 +1,3 @@
+# Şantiye Takip
+
+@AGENTS.md
