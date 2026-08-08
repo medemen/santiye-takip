@@ -1,5 +1,6 @@
+import { useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { getIstatistikler, getAdaGenelIlerleme, getRaporlar, getSonRapor } from '../stores/reportStore';
+import { getIstatistikler, getAdaGenelIlerleme, getSonRapor } from '../stores/reportStore';
 import { useHedefler } from '../hooks/useHedefler';
 import { useRaporlar } from '../hooks/useRaporlar';
 import { getHedefOzeti } from '../data/plan';
@@ -15,33 +16,43 @@ import { card, btnGhost } from '../utils/styles';
 export default function Dashboard() {
   const navigate = useNavigate();
   const config = useSiteConfig();
-  useRaporlar();
-  const stats = getIstatistikler();
-  const sonRaporlar = getRaporlar()
-    .filter((r) => r.raporlayan !== 'DURUM TESPİT')
-    .sort((a, b) => new Date(b.olusturma_tarihi).getTime() - new Date(a.olusturma_tarihi).getTime())
-    .slice(0, 5);
-  const tumRaporlar = getRaporlar();
-  const gecikenIsler = tumRaporlar.filter((r) => r.durum === 'gecikme');
+  const raporlar = useRaporlar();
+  const stats = useMemo(() => getIstatistikler(raporlar), [raporlar]);
+  const sonRaporlar = useMemo(
+    () =>
+      raporlar
+        .filter((r) => r.raporlayan !== 'DURUM TESPİT')
+        .sort((a, b) => new Date(b.olusturma_tarihi).getTime() - new Date(a.olusturma_tarihi).getTime())
+        .slice(0, 5),
+    [raporlar]
+  );
+  const gecikenIsler = useMemo(() => raporlar.filter((r) => r.durum === 'gecikme'), [raporlar]);
 
   const hedefler = useHedefler();
   const hedefOzeti = getHedefOzeti(hedefler, (a, b, ik) => getSonRapor(a, b, ik));
 
-  const donutData = [
-    { name: 'Tamamlandı', value: stats.tamamlananIsler, color: DURUM_RENKLERI.tamamlandi },
-    { name: 'Devam Ediyor', value: stats.devamEdenIsler, color: DURUM_RENKLERI.devam_ediyor },
-    { name: 'Planlandı', value: stats.planlananIsler, color: DURUM_RENKLERI.planlandi },
-    { name: 'Gecikme', value: stats.gecikenIsler, color: DURUM_RENKLERI.gecikme },
-  ];
+  const donutData = useMemo(
+    () => [
+      { name: 'Tamamlandı', value: stats.tamamlananIsler, color: DURUM_RENKLERI.tamamlandi },
+      { name: 'Devam Ediyor', value: stats.devamEdenIsler, color: DURUM_RENKLERI.devam_ediyor },
+      { name: 'Planlandı', value: stats.planlananIsler, color: DURUM_RENKLERI.planlandi },
+      { name: 'Gecikme', value: stats.gecikenIsler, color: DURUM_RENKLERI.gecikme },
+    ],
+    [stats]
+  );
 
   const isKalemleri = getAllKalemler(config);
   const adalar = getAdaList(config);
 
-  const adaProgress = adalar.map((a) => ({
-    name: a.ada,
-    value: getAdaGenelIlerleme(a.ada, a.bloklar, isKalemleri),
-    color: '#f59e0b',
-  }));
+  const adaProgress = useMemo(
+    () =>
+      adalar.map((a) => ({
+        name: a.ada,
+        value: getAdaGenelIlerleme(a.ada, a.bloklar, isKalemleri),
+        color: '#f59e0b',
+      })),
+    [adalar, isKalemleri]
+  );
 
   const genelIlerleme =
     adaProgress.length > 0

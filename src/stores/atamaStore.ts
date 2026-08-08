@@ -12,7 +12,7 @@ const ADA_KEY = `${PREFIX}_ada_atamalari`;
 let _adaChannel: RealtimeChannel | null = null;
 let _blokChannel: RealtimeChannel | null = null;
 
-export function aboneOlAtamaGuncellemeleri(): void {
+export function aboneOlAtamaGuncellemeleri(onChannelStatus?: (status: string) => void): void {
   if (!isSupabaseReady()) return;
 
   if (!_adaChannel) {
@@ -24,7 +24,7 @@ export function aboneOlAtamaGuncellemeleri(): void {
           supabaseAtamalariYukle();
         }
       )
-      .subscribe();
+      .subscribe((status) => onChannelStatus?.(status));
   }
 
   if (!_blokChannel) {
@@ -36,7 +36,7 @@ export function aboneOlAtamaGuncellemeleri(): void {
           supabaseAtamalariYukle();
         }
       )
-      .subscribe();
+      .subscribe((status) => onChannelStatus?.(status));
   }
 }
 

@@ -1,7 +1,5 @@
 import { useNavigate, NavLink } from 'react-router-dom';
-import { useReducer, useEffect } from 'react';
 import { getCurrentUser, cikisYap, isProjeMuduruSession, isAdmin } from '../stores/authStore';
-import { subscribeRaporChanges } from '../stores/reportStore';
 
 const navItems = [
   { to: '/', label: 'Dashboard', icon: '📊' },
@@ -20,7 +18,6 @@ interface Props {
 export default function Layout({ children }: Props) {
   const navigate = useNavigate();
   const user = getCurrentUser();
-  const [, forceUpdate] = useReducer(x => x + 1, 0);
 
   const gorunurNav = navItems.filter((item) => {
     if (item.to === '/personel') return true;
@@ -28,11 +25,6 @@ export default function Layout({ children }: Props) {
     if (item.to === '/toplu-rapor') return isAdmin();
     return true;
   });
-
-  useEffect(() => {
-    const unsub = subscribeRaporChanges(() => forceUpdate());
-    return unsub;
-  }, []);
 
   const handleLogout = () => {
     if (window.confirm('Çıkış yapmak istediğinize emin misiniz?')) {

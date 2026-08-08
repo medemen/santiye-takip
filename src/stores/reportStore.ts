@@ -1,6 +1,7 @@
 import type { Rapor } from '../types';
 import { getSupabase, isSupabaseReady } from '../lib/supabase';
 import { getSiteConfig } from '../config/site';
+import { idbGet, idbSet } from '../lib/db';
 import type { RealtimeChannel } from '@supabase/supabase-js';
 import { toastGoster } from './toastStore';
 import { getCurrentUser } from './authStore';
@@ -42,14 +43,62 @@ function sonRaporHaritasiniKur(liste: Rapor[]): Map<string, Rapor> {
   return harita;
 }
 
-function setRaporlar(next: Rapor[]): void {
-  _raporCache = next;
-  _sonRaporHaritasi = sonRaporHaritasiniKur(next);
+let _persistZamanlayici: ReturnType<typeof setTimeout> | null = null;
+let _bekleyenVeri: Rapor[] | null = null;
+let _persistDinleyiciBaglandi = false;
+let _idbHydrasyonPromise: Promise<void> | null = null;
+
+function raporlariYaz(liste: Rapor[]): void {
   try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(next));
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(liste));
   } catch {
     /* localStorage dolu/engelli olabilir */
   }
+  void idbSet('raporlar', 'raporlar', liste);
+}
+
+function raporlariPersistEt(liste: Rapor[]): void {
+  _bekleyenVeri = liste;
+  if (_persistZamanlayici) clearTimeout(_persistZamanlayici);
+  _persistZamanlayici = setTimeout(() => {
+    _persistZamanlayici = null;
+    if (_bekleyenVeri) {
+      raporlariYaz(_bekleyenVeri);
+      _bekleyenVeri = null;
+    }
+  }, 300);
+  if (!_persistDinleyiciBaglandi) {
+    _persistDinleyiciBaglandi = true;
+    const bosalt = () => {
+      if (_persistZamanlayici) clearTimeout(_persistZamanlayici);
+      _persistZamanlayici = null;
+      if (_bekleyenVeri) {
+        raporlariYaz(_bekleyenVeri);
+        _bekleyenVeri = null;
+      }
+    };
+    window.addEventListener('pagehide', bosalt);
+    window.addEventListener('visibilitychange', () => {
+      if (document.visibilityState === 'hidden') bosalt();
+    });
+  }
+}
+
+function idbHydrasyonuBaslat(): Promise<void> {
+  if (!_idbHydrasyonPromise) {
+    _idbHydrasyonPromise = idbGet<Rapor[]>('raporlar', 'raporlar').then((veri) => {
+      if (veri && veri.length > 0) {
+        setRaporlar(veri);
+      }
+    });
+  }
+  return _idbHydrasyonPromise;
+}
+
+function setRaporlar(next: Rapor[]): void {
+  _raporCache = next;
+  _sonRaporHaritasi = sonRaporHaritasiniKur(next);
+  raporlariPersistEt(next);
   notifyRaporListeners();
 }
 
@@ -64,6 +113,7 @@ export function getRaporlar(): Rapor[] {
     }
     _raporCache = okunan;
     _sonRaporHaritasi = sonRaporHaritasiniKur(okunan);
+    void idbHydrasyonuBaslat();
   }
   return _raporCache;
 }
@@ -86,7 +136,7 @@ function raporToSupabase(r: Rapor) {
 
 let _raporChannel: RealtimeChannel | null = null;
 
-export function aboneOlRaporGuncellemeleri(): void {
+export function aboneOlRaporGuncellemeleri(onChannelStatus?: (status: string) => void): void {
   if (!isSupabaseReady() || _raporChannel) return;
   _raporChannel = getSupabase()
     .channel('raporlar-realtime')
@@ -106,7 +156,7 @@ export function aboneOlRaporGuncellemeleri(): void {
         }
       }
     )
-    .subscribe();
+    .subscribe((status) => onChannelStatus?.(status));
 }
 
 export function realtimeRaporAboneliktenCik(): void {
@@ -119,6 +169,7 @@ export function realtimeRaporAboneliktenCik(): void {
 export async function supabaseRaporlariYukle(): Promise<void> {
   if (!isSupabaseReady()) return;
   try {
+    await idbHydrasyonuBaslat();
     const { data, error } = await getSupabase()
       .from('raporlar')
       .select('*')
@@ -160,6 +211,29 @@ export function saveRapor(rapor: Omit<Rapor, 'id' | 'olusturma_tarihi'>): Rapor 
     });
   }
   return yeni;
+}
+
+export function saveRaporlar(
+  raporlar: Array<Omit<Rapor, 'id' | 'olusturma_tarihi'>>
+): Rapor[] {
+  const yeniler: Rapor[] = raporlar.map((r) => ({
+    ...r,
+    id: Date.now().toString(36) + Math.random().toString(36).slice(2, 8),
+    olusturma_tarihi: new Date().toISOString(),
+  }));
+  setRaporlar([...getRaporlar(), ...yeniler]);
+  if (isSupabaseReady()) {
+    getSupabase()
+      .from('raporlar')
+      .insert(yeniler.map(raporToSupabase))
+      .then(({ error }) => {
+        if (error) {
+          console.warn('Supabase toplu rapor kaydetme hatası:', error.message);
+          toastGoster('Raporlar sunucuya kaydedilemedi: ' + error.message, 'error');
+        }
+      });
+  }
+  return yeniler;
 }
 
 export function updateRapor(id: string, guncelleme: Partial<Omit<Rapor, 'id' | 'olusturma_tarihi'>>): boolean {
@@ -265,8 +339,7 @@ export function getAdaGenelIlerleme(
   return Math.round(toplam / blokList.length);
 }
 
-export function getIstatistikler() {
-  const raporlar = getRaporlar();
+export function getIstatistikler(raporlar: Rapor[]) {
   let tamamlananIsler = 0;
   let devamEdenIsler = 0;
   let planlananIsler = 0;

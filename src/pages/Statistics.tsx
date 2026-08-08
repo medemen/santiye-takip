@@ -14,16 +14,19 @@ export default function Statistics() {
   const navigate = useNavigate();
   const config = useSiteConfig();
   const raporlar = useRaporlar();
-  const stats = getIstatistikler();
+  const stats = useMemo(() => getIstatistikler(raporlar), [raporlar]);
   const isKalemleri = getAllKalemler(config);
   const adalar = getAdaList(config);
 
-  const donutData = [
-    { name: 'Tamamlandı', value: stats.tamamlananIsler, color: DURUM_RENKLERI.tamamlandi },
-    { name: 'Devam Ediyor', value: stats.devamEdenIsler, color: DURUM_RENKLERI.devam_ediyor },
-    { name: 'Planlandı', value: stats.planlananIsler, color: DURUM_RENKLERI.planlandi },
-    { name: 'Gecikme', value: stats.gecikenIsler, color: DURUM_RENKLERI.gecikme },
-  ];
+  const donutData = useMemo(
+    () => [
+      { name: 'Tamamlandı', value: stats.tamamlananIsler, color: DURUM_RENKLERI.tamamlandi },
+      { name: 'Devam Ediyor', value: stats.devamEdenIsler, color: DURUM_RENKLERI.devam_ediyor },
+      { name: 'Planlandı', value: stats.planlananIsler, color: DURUM_RENKLERI.planlandi },
+      { name: 'Gecikme', value: stats.gecikenIsler, color: DURUM_RENKLERI.gecikme },
+    ],
+    [stats]
+  );
 
   const adaDetay = useMemo(() => {
     const adaSayilari = new Map<string, { toplam: number; tamam: number; devam: number; gecikme: number; plan: number }>();
@@ -49,11 +52,10 @@ export default function Statistics() {
     });
   }, [raporlar, adalar, isKalemleri]);
 
-  const adaProgress = adaDetay.map((a) => ({
-    name: a.ada,
-    value: a.ilerleme,
-    color: '#f59e0b',
-  }));
+  const adaProgress = useMemo(
+    () => adaDetay.map((a) => ({ name: a.ada, value: a.ilerleme, color: '#f59e0b' })),
+    [adaDetay]
+  );
 
   const personelRaporSiralamasi = useMemo(() => {
     const sayilar = new Map<string, number>();

@@ -1,12 +1,4 @@
-import {
-  BarChart as RechartsBarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  Tooltip,
-  ResponsiveContainer,
-  Cell,
-} from 'recharts';
+import { memo } from 'react';
 
 interface DataItem {
   name: string;
@@ -19,7 +11,7 @@ interface Props {
   height?: number;
 }
 
-export default function BarChart({ data, height = 200 }: Props) {
+const BarChart = memo(function BarChart({ data, height = 200 }: Props) {
   if (data.length === 0) {
     return (
       <div style={{ height, display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#9ca3af', fontSize: 14 }}>
@@ -28,31 +20,60 @@ export default function BarChart({ data, height = 200 }: Props) {
     );
   }
 
+  const chartHeight = height - 24;
+
   return (
-    <ResponsiveContainer width="100%" height={height}>
-      <RechartsBarChart data={data} margin={{ top: 5, right: 5, bottom: 5, left: -10 }}>
-        <XAxis
-          dataKey="name"
-          tick={{ fontSize: 11, fill: '#6b7280' }}
-          axisLine={false}
-          tickLine={false}
-        />
-        <YAxis
-          tick={{ fontSize: 11, fill: '#9ca3af' }}
-          axisLine={false}
-          tickLine={false}
-          domain={[0, 100]}
-        />
-        <Tooltip
-          formatter={(value) => [`%${value}`, 'İlerleme']}
-          contentStyle={{ borderRadius: 8, border: 'none', boxShadow: '0 2px 8px rgba(0,0,0,0.15)' }}
-        />
-        <Bar dataKey="value" radius={[4, 4, 0, 0]} maxBarSize={30}>
-          {data.map((entry, index) => (
-            <Cell key={index} fill={entry.color || '#3b82f6'} />
-          ))}
-        </Bar>
-      </RechartsBarChart>
-    </ResponsiveContainer>
+    <div style={{ width: '100%', height }}>
+      <div style={{ display: 'flex', alignItems: 'flex-end', gap: 8, height: chartHeight }}>
+        {data.map((d, i) => (
+          <div
+            key={i}
+            title={`${d.name}: %${d.value}`}
+            style={{
+              flex: 1,
+              display: 'flex',
+              alignItems: 'flex-end',
+              justifyContent: 'center',
+              height: '100%',
+              minWidth: 0,
+            }}
+          >
+            <div
+              style={{
+                width: '100%',
+                maxWidth: 30,
+                height: `${Math.max(0, Math.min(100, d.value))}%`,
+                minHeight: d.value > 0 ? 3 : 0,
+                backgroundColor: d.color || '#3b82f6',
+                borderTopLeftRadius: 4,
+                borderTopRightRadius: 4,
+                transition: 'height 0.3s ease',
+              }}
+            />
+          </div>
+        ))}
+      </div>
+      <div style={{ display: 'flex', gap: 8, marginTop: 4 }}>
+        {data.map((d, i) => (
+          <div
+            key={i}
+            style={{
+              flex: 1,
+              textAlign: 'center',
+              fontSize: 11,
+              color: '#6b7280',
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+              whiteSpace: 'nowrap',
+              minWidth: 0,
+            }}
+          >
+            {d.name}
+          </div>
+        ))}
+      </div>
+    </div>
   );
-}
+});
+
+export default BarChart;

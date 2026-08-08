@@ -3,10 +3,10 @@ import { useNavigate } from 'react-router-dom';
 import { useSiteConfig } from '../hooks/useSiteConfig';
 import { getAda, getAdaList, getAllKalemler } from '../config/helpers';
 import { DURUM_LABELLARI, DURUM_RENKLERI } from '../config/defaultConfig';
-import { saveRapor, getRaporlar, getBlokProgress } from '../stores/reportStore';
+import { saveRaporlar, getRaporlar, getBlokProgress } from '../stores/reportStore';
 import { getCurrentUser } from '../stores/authStore';
 import { getKullaniciAdaAtamasi } from '../stores/atamaStore';
-import type { IsDurumu } from '../types';
+import type { IsDurumu, Rapor } from '../types';
 import { todayISO } from '../utils/helpers';
 import { toastGoster } from '../stores/toastStore';
 
@@ -88,8 +88,9 @@ export default function BulkReport() {
   const handleSubmit = () => {
     if (!ada || !isKalemi || !user) return;
     if (!adaGeneli && seciliBloklar.length === 0) return;
+    const yeniRaporlar: Array<Omit<Rapor, 'id' | 'olusturma_tarihi'>> = [];
     if (adaGeneli) {
-      saveRapor({
+      yeniRaporlar.push({
         tarih,
         raporlayan: kullaniciAdi,
         ada,
@@ -99,10 +100,9 @@ export default function BulkReport() {
         ilerleme_yuzde: durum === 'tamamlandi' ? 100 : ilerleme,
         aciklama,
       });
-      toastGoster('Ada geneli rapor kaydedildi', 'success');
     } else {
       for (const blokNo of seciliBloklar) {
-        saveRapor({
+        yeniRaporlar.push({
           tarih,
           raporlayan: kullaniciAdi,
           ada,
@@ -113,8 +113,14 @@ export default function BulkReport() {
           aciklama,
         });
       }
-      toastGoster(`${seciliBloklar.length} blok için rapor kaydedildi`, 'success');
     }
+    saveRaporlar(yeniRaporlar);
+    toastGoster(
+      adaGeneli
+        ? 'Ada geneli rapor kaydedildi'
+        : `${seciliBloklar.length} blok için rapor kaydedildi`,
+      'success'
+    );
     navigate('/raporlar');
   };
 

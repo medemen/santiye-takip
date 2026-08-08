@@ -81,26 +81,49 @@ export default function App() {
   useEffect(() => {
     if (!isLoggedIn() || !isSupabaseReady()) return;
 
-    Promise.all([
-      supabaseRaporlariYukle(),
-      supabaseAtamalariYukle(),
-      supabaseKullanicilariYukle(),
-      supabaseHedefleriYukle(),
-    ]);
+    const sonGorunurRefetch = { zaman: 0 };
+    const sonHataRefetch = { zaman: 0 };
 
-    aboneOlRaporGuncellemeleri();
-    aboneOlAtamaGuncellemeleri();
-    aboneOlHedefGuncellemeleri();
+    const tumunuYukle = () => {
+      Promise.all([
+        supabaseRaporlariYukle(),
+        supabaseAtamalariYukle(),
+        supabaseKullanicilariYukle(),
+        supabaseHedefleriYukle(),
+      ]);
+    };
+
+    const gorunurRefetch = () => {
+      const simdi = Date.now();
+      if (simdi - sonGorunurRefetch.zaman < 5 * 60 * 1000) return;
+      sonGorunurRefetch.zaman = simdi;
+      tumunuYukle();
+    };
+
+    const hataRefetch = (status: string) => {
+      if (status !== 'CHANNEL_ERROR' && status !== 'CLOSED') return;
+      const simdi = Date.now();
+      if (simdi - sonHataRefetch.zaman < 30 * 1000) return;
+      sonHataRefetch.zaman = simdi;
+      tumunuYukle();
+    };
+
+    tumunuYukle();
+
+    aboneOlRaporGuncellemeleri(hataRefetch);
+    aboneOlAtamaGuncellemeleri(hataRefetch);
+    aboneOlHedefGuncellemeleri(hataRefetch);
     bildirimKontrolunuBaslat();
 
     const handleVisibility = () => {
       if (document.visibilityState === 'visible') {
-        supabaseRaporlariYukle();
-        supabaseAtamalariYukle();
-        supabaseHedefleriYukle();
+        gorunurRefetch();
       }
     };
     document.addEventListener('visibilitychange', handleVisibility);
+
+    const handleOnline = () => gorunurRefetch();
+    window.addEventListener('online', handleOnline);
 
     return () => {
       realtimeRaporAboneliktenCik();
@@ -108,6 +131,7 @@ export default function App() {
       realtimeHedefAboneliktenCik();
       bildirimKontrolunuDurdur();
       document.removeEventListener('visibilitychange', handleVisibility);
+      window.removeEventListener('online', handleOnline);
     };
   }, [authTick]);
 

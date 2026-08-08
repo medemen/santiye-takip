@@ -79,7 +79,14 @@ interface AcilItem {
   raporYok: boolean;
 }
 
+let _acilCache: { zaman: number; sonuc: AcilItem[] } | null = null;
+const ACIL_CACHE_MS = 5 * 60 * 1000;
+
 function acilIsler(): AcilItem[] {
+  const simdi = Date.now();
+  if (_acilCache && simdi - _acilCache.zaman < ACIL_CACHE_MS) {
+    return _acilCache.sonuc;
+  }
   const bugun = new Date();
   bugun.setHours(0, 0, 0, 0);
 
@@ -93,12 +100,14 @@ function acilIsler(): AcilItem[] {
     .filter((h) => h.kalanGun <= 0);
 
   const goruldu = new Set<string>();
-  return [...gecikenRaporlar, ...hedefAcil].filter((h) => {
+  const sonuc = [...gecikenRaporlar, ...hedefAcil].filter((h) => {
     const anahtar = `${h.ada}|${h.blok_no}|${h.is_kalemi}`;
     if (goruldu.has(anahtar)) return false;
     goruldu.add(anahtar);
     return true;
   });
+  _acilCache = { zaman: simdi, sonuc };
+  return sonuc;
 }
 
 function acilMesaji(): { baslik: string; govde: string; adet: number } | null {

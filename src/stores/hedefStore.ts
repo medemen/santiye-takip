@@ -27,7 +27,7 @@ function notifyHedefListeners(): void {
 
 let _hedefChannel: RealtimeChannel | null = null;
 
-export function aboneOlHedefGuncellemeleri(): void {
+export function aboneOlHedefGuncellemeleri(onChannelStatus?: (status: string) => void): void {
   if (!isSupabaseReady() || _hedefChannel) return;
   _hedefChannel = getSupabase()
     .channel('hedef-realtime')
@@ -38,7 +38,7 @@ export function aboneOlHedefGuncellemeleri(): void {
         notifyHedefListeners();
       }
     )
-    .subscribe();
+    .subscribe((status) => onChannelStatus?.(status));
 }
 
 export function realtimeHedefAboneliktenCik(): void {
