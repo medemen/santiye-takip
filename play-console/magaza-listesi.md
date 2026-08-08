@@ -145,7 +145,8 @@ de engeller.
 - [x] Feature graphic (1024×500) oluştur → `play-console/feature-graphic.png`
 - [x] Telefon ekran görüntülerini 8'e indir → `screenshots/`
 - [x] Gizlilik politikası metnini yaz → `public/gizlilik-politikasi.html`
-- [ ] Gizlilik politikası sayfasını deploy et, yer tutucuları doldur, URL'yi Play Console'a ekle
+- [x] Gizlilik politikasındaki iletişim e-postası yer tutucularını doldur (medemen@gmail.com)
+- [ ] Gizlilik politikası sayfasını deploy et (GitHub Pages — remote/Pages etkinleştirme), URL'yi Play Console'a ekle
 - [ ] Play Console'da içerik derecelendirme anketini doldur (bu dosyadan otomatik doldurulamaz)
 - [ ] Dağıtım track'ini seç (Internal / Closed / Production)
 - [x] İmzalı **release** paketini derle → `android/app/build/outputs/bundle/release/app-release.aab`
