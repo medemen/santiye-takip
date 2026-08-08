@@ -146,7 +146,8 @@ de engeller.
 - [x] Telefon ekran görüntülerini 8'e indir → `screenshots/`
 - [x] Gizlilik politikası metnini yaz → `public/gizlilik-politikasi.html`
 - [x] Gizlilik politikasındaki iletişim e-postası yer tutucularını doldur (medemen@gmail.com)
-- [ ] Gizlilik politikası sayfasını deploy et (GitHub Pages — remote/Pages etkinleştirme), URL'yi Play Console'a ekle
+- [x] Gizlilik politikası sayfasını deploy et (GitHub Pages) → **https://medemen.github.io/santiye-takip/gizlilik-politikasi.html**
+      (site: https://medemen.github.io/santiye-takip/ — bu URL'yi Play Console'daki "Gizlilik Politikası" alanına yapıştır)
 - [ ] Play Console'da içerik derecelendirme anketini doldur (bu dosyadan otomatik doldurulamaz)
 - [ ] Dağıtım track'ini seç (Internal / Closed / Production)
 - [x] İmzalı **release** paketini derle → `android/app/build/outputs/bundle/release/app-release.aab`

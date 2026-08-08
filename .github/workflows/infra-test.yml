@@ -1,9 +1,0 @@
-name: Infra Test
-on:
-  push:
-    branches: [master]
-jobs:
-  echo:
-    runs-on: ubuntu-latest
-    steps:
-      - run: echo hi
