@@ -10,7 +10,7 @@
     "webBasename": "santiye_takip_11",
     "emailDomain": "santiye.com",
     "localStoragePrefix": "santiyev2",
-    "capacitorAppId": "com.santiyetakip.app"
+    "capacitorAppId": "com.santiyem.app"
   },
   "roller": {
     "sahaPersoneliRolleri": ["Saha Mühendisi", "Saha Mimarı"],

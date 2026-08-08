@@ -15,7 +15,7 @@ function markaFromConfig() {
 const marka = markaFromConfig();
 
 const config: CapacitorConfig = {
-  appId: marka.capacitorAppId || 'com.santiyetakip.app',
+  appId: marka.capacitorAppId || 'com.santiyem.app',
   appName: marka.appName || 'Santiye Takip',
   webDir: 'dist',
   bundledWebRuntime: false,

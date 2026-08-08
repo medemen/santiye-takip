@@ -1,4 +1,4 @@
-package com.santiyetakip.app;
+package com.santiyem.app;
 
 import android.os.Bundle;
 import android.webkit.WebView;
