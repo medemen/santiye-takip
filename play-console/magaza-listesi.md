@@ -151,3 +151,4 @@ de engeller.
 - [ ] Dağıtım track'ini seç (Internal / Closed / Production)
 - [x] İmzalı **release** paketini derle → `android/app/build/outputs/bundle/release/app-release.aab`
       (Play Console artık `.apk` değil `.aab` — Android App Bundle — bekliyor; bu dosya doğrudan yüklenebilir)
+- [x] Son kodla (perf optimizasyonları dahil) release paketini yeniden derle → v1.1.11 / code 13 (09.08.2026)
