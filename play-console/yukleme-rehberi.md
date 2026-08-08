@@ -10,7 +10,7 @@ dosya yolları hazırdır.
 |---|---|
 | Paket (applicationId) | `com.santiyem.app` |
 | Uygulama adı | Güneyşehir Takip |
-| Sürüm | 1.1.11 (versionCode 13) |
+| Sürüm | 1.1.12 (versionCode 14) |
 | AAB dosyası | `android/app/build/outputs/bundle/release/app-release.aab` |
 | Keystore | `android/app/release-keystore.jks` |
 | Key alias | `santiye_takip` |
