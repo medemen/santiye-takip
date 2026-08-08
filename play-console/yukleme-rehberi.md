@@ -10,13 +10,13 @@ dosya yolları hazırdır.
 |---|---|
 | Paket (applicationId) | `com.santiyem.app` |
 | Uygulama adı | Güneyşehir Takip |
-| Sürüm | 1.1.12 (versionCode 14) |
+| Sürüm | 1.1.11 (versionCode 13) |
 | AAB dosyası | `android/app/build/outputs/bundle/release/app-release.aab` |
 | Keystore | `android/app/release-keystore.jks` |
 | Key alias | `santiye_takip` |
 | Keystore / key parolası | `santiyetakip` |
 | İmza SHA-256 | `66:DE:4F:C6:90:C8:E4:86:70:B1:E6:4C:B5:7A:F2:B5:BC:2F:33:1C:8F:30:74:12:B2:AB:02:5A:C0:DC:A6:D6` |
-| Gizlilik politikası URL | `https://medemen.github.io/santiye_takip/gizlilik-politikasi.html` |
+| Gizlilik politikası URL | `https://medemen.github.io/santiye-takip/gizlilik-politikasi.html` |
 
 > **⚠️ Kritik:** Keystore ve parolaları kaybederseniz uygulamayı bir daha
 > güncelleyemezsiniz. `release-keystore.jks` dosyasını ve bu parolaları
@@ -70,7 +70,7 @@ Play Console, uygulamanızı kendi anahtarıyla yeniden imzalar (Play App Signin
    - **Telefon ekran görüntüleri:** `screenshots/01-dashboard.png` … `08-istatistik.png`
    - **Tablet (10") görüntüleri:** `screenshots/tablet10/01-dashboard.png` …
 4. **Uygulama kategorisi:** İş
-5. **Gizlilik politikası URL:** `https://medemen.github.io/santiye_takip/gizlilik-politikasi.html`
+5. **Gizlilik politikası URL:** `https://medemen.github.io/santiye-takip/gizlilik-politikasi.html`
 6. **Kaydet** (Save).
 
 ---
@@ -145,6 +145,6 @@ Gizlilik politikasının yayında olması için:
 2. Repo **Settings → Secrets and variables → Actions**'a ekleyin:
    - `VITE_SUPABASE_URL` → `.env.production` dosyasındaki URL
    - `VITE_SUPABASE_ANON_KEY` → `.env.production` dosyasındaki anahtar
-3. Bu iki secret eklenince `main`'e push ettiğinizde veya
+3. Bu iki secret eklenince `master`'a push ettiğinizde veya
    **Actions** sekmesinden **Deploy to GitHub Pages** işini elle çalıştırın.
-4. Adres doğrulama: `https://medemen.github.io/santiye_takip/gizlilik-politikasi.html`
+4. Adres doğrulama: `https://medemen.github.io/santiye-takip/gizlilik-politikasi.html`
