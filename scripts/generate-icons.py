@@ -56,30 +56,48 @@ def build_scene(size, content_scale=1.0, center=True):
     img = Image.new("RGBA", (size, size), (0, 0, 0, 0))
     d = ImageDraw.Draw(img)
 
-    base = 432
-    towers = [
-        (70, 180, 300),
-        (195, 305, 230),
-        (320, 445, 340),
-    ]
+    # ground shadow
+    d.ellipse([X(150), Y(438), X(362), Y(472)], fill=(0, 0, 0, 55))
 
-    d.ellipse([X(56), Y(436), X(456), Y(472)], fill=(0, 0, 0, 55))
+    # foundation
+    d.rectangle([X(196), Y(404), X(316), Y(432)], fill=BUILDING)
 
-    xstep, ystep, ww, wh = 56, 62, 30, 40
-    for x0, x1, top in towers:
-        d.rectangle([X(x0), Y(top), X(x1), Y(base)], fill=BUILDING)
-        startx = x0 + 22
-        while startx + ww <= x1 - 16:
-            y = top + 26
-            while y + wh <= base - 14:
-                d.rectangle([X(startx), Y(y), X(startx + ww), Y(y + wh)], fill=WINDOW)
-                y += ystep
-            startx += xstep
+    # mast (vertical tower)
+    mast_l, mast_r = 244, 268
+    mast_top, mast_bot = 150, 410
+    d.rectangle([X(mast_l), Y(mast_top), X(mast_r), Y(mast_bot)], fill=BUILDING)
 
-    pts = [(130, 300), (232, 405), (395, 180)]
-    scaled = [(X(p[0]), Y(p[1])) for p in pts]
-    d.line(scaled, fill=CHECK_SHADOW, width=max(1, int(62 * s)), joint="curve")
-    d.line(scaled, fill=WHITE, width=max(1, int(48 * s)), joint="curve")
+    # operator cab, just below the jib
+    d.rectangle([X(230), Y(150), X(282), Y(182)], fill=BUILDING)
+    d.rectangle([X(240), Y(159), X(272), Y(173)], fill=WINDOW)
+
+    # cathead (apex above the jib, anchors the support cables)
+    apex_top = 84
+    jib_top, jib_bot = 128, 150
+    d.rectangle([X(242), Y(apex_top + 10), X(270), Y(jib_top)], fill=BUILDING)
+    d.polygon(
+        [(X(240), Y(apex_top + 14)), (X(272), Y(apex_top + 14)), (X(256), Y(apex_top))],
+        fill=BUILDING,
+    )
+
+    # jib (long, right) and counter-jib (short, left)
+    jib_left, jib_right = 128, 452
+    d.rectangle([X(jib_left), Y(jib_top), X(jib_right), Y(jib_bot)], fill=BUILDING)
+
+    # support cables from the apex to both jib tips
+    cable_w = max(1, int(11 * s))
+    apex_pt = (X(256), Y(apex_top))
+    d.line([apex_pt, (X(jib_right - 14), Y(jib_top))], fill=WHITE, width=cable_w, joint="curve")
+    d.line([apex_pt, (X(jib_left + 14), Y(jib_top))], fill=WHITE, width=cable_w, joint="curve")
+
+    # counterweight, hanging from the short counter-jib end
+    d.rectangle([X(jib_left + 4), Y(jib_bot), X(jib_left + 52), Y(jib_bot + 42)], fill=BUILDING)
+
+    # hoist line and hook block, hanging from the long jib end
+    hook_x = jib_right - 34
+    hook_w = max(1, int(9 * s))
+    d.line([(X(hook_x), Y(jib_bot)), (X(hook_x), Y(296))], fill=BUILDING, width=hook_w)
+    d.rectangle([X(hook_x - 24), Y(296), X(hook_x + 24), Y(332)], fill=WINDOW)
 
     return img
 
