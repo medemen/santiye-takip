@@ -1,5 +1,36 @@
 apply plugin: 'com.android.application'
 
+// versionCode/versionName artik version.properties'ten okunur ve her
+// apk/aab uretiminde (assemble*/bundle* gorevleri) otomatik artirilir.
+def versionPropsFile = file('version.properties')
+def versionProps = new Properties()
+if (versionPropsFile.exists()) {
+    versionPropsFile.withInputStream { versionProps.load(it) }
+} else {
+    versionProps['VERSION_CODE'] = '1'
+    versionProps['VERSION_NAME'] = '1.0.0'
+}
+
+def appVersionCode = versionProps['VERSION_CODE'].toInteger()
+def appVersionName = versionProps['VERSION_NAME'].toString()
+
+def requestedTasks = gradle.startParameter.taskNames.join(' ').toLowerCase()
+def isPackagingBuild = requestedTasks.contains('assemble') || requestedTasks.contains('bundle')
+
+if (isPackagingBuild) {
+    appVersionCode += 1
+    def parts = appVersionName.split('\\.')
+    parts[-1] = (parts[-1].toInteger() + 1).toString()
+    appVersionName = parts.join('.')
+
+    versionProps['VERSION_CODE'] = appVersionCode.toString()
+    versionProps['VERSION_NAME'] = appVersionName
+    versionPropsFile.withOutputStream {
+        versionProps.store(it, 'Otomatik surum artisi (assemble/bundle calistirildiginda build.gradle tarafindan guncellenir)')
+    }
+    logger.lifecycle("Surum otomatik artirildi -> versionCode=${appVersionCode}, versionName=${appVersionName}")
+}
+
 android {
     namespace = "com.santiyem.app"
     compileSdk = rootProject.ext.compileSdkVersion
@@ -7,8 +38,8 @@ android {
         applicationId "com.santiyem.app"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 8
-        versionName "1.1.6"
+        versionCode appVersionCode
+        versionName appVersionName
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         aaptOptions {
              // Files and dirs to omit from the packaged assets dir, modified to accommodate modern web apps.

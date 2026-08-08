@@ -16,7 +16,7 @@ bir şantiye için yayınlanırsa (`npm run new:santiye`), bu dosya o
 |---|---|
 | Paket adı (applicationId) | `com.santiyem.app` |
 | Uygulama adı | Güneyşehir Takip |
-| Sürüm | 1.1.6 (versionCode 8) |
+| Sürüm | `android/app/version.properties`'ten okunur — her `assemble*`/`bundle*` (apk/aab) görevinde otomatik artar, elle güncellenmez |
 | Kategori | İş (Business) — alternatif: Üretkenlik |
 | Uygulama türü | Uygulama (Game değil) |
 | Ücretsiz / Ücretli | Ücretsiz |
