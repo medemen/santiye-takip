@@ -21,6 +21,10 @@ android/.gradle
 android/app/build
 android/build
 
+# Python (scripts/generate-icons.py, generate-feature-graphic.py)
+__pycache__/
+*.pyc
+
 # Yerel yedekler
 yedek
 
