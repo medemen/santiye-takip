@@ -59,8 +59,18 @@ function statikOturum(ad_soyad: string, rol: string): Oturum {
   };
 }
 
+// modul seviyesi cache: her getCurrentUser cagrisinda JSON.parse yapilmaz
+let _oturumCache: Oturum | null = null;
+let _oturumCacheDolu = false;
+
+function oturumCacheSet(oturum: Oturum | null): void {
+  _oturumCache = oturum;
+  _oturumCacheDolu = true;
+}
+
 function oturumuKaydet(oturum: Oturum): void {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(oturum));
+  oturumCacheSet(oturum);
   notifyAuthListeners();
 }
 
@@ -103,6 +113,7 @@ export async function girisYap(ad_soyad: string, rol: string): Promise<Oturum> {
 
 export function cikisYap(): void {
   localStorage.removeItem(STORAGE_KEY);
+  oturumCacheSet(null);
   if (isSupabaseReady()) {
     getSupabase().auth.signOut();
   }
@@ -110,12 +121,16 @@ export function cikisYap(): void {
 }
 
 export function getCurrentUser(): Oturum | null {
-  try {
-    const data = localStorage.getItem(STORAGE_KEY);
-    return data ? JSON.parse(data) : null;
-  } catch {
-    return null;
+  if (!_oturumCacheDolu) {
+    try {
+      const data = localStorage.getItem(STORAGE_KEY);
+      _oturumCache = data ? JSON.parse(data) : null;
+    } catch {
+      _oturumCache = null;
+    }
+    _oturumCacheDolu = true;
   }
+  return _oturumCache;
 }
 
 export function isLoggedIn(): boolean {
@@ -129,6 +144,10 @@ export function isAdmin(): boolean {
 
 export function isProjeMuduruSession(): boolean {
   return getCurrentUser()?.proje_muduru ?? false;
+}
+
+export function supabaseOturumAktif(): boolean {
+  return isSupabaseReady() && (getCurrentUser()?.user_id != null);
 }
 
 export function isSahaPersoneli(rol: string): boolean {
@@ -179,6 +198,7 @@ export async function supabaseAuthInit(): Promise<void> {
       }
     } else if (event === 'SIGNED_OUT') {
       localStorage.removeItem(STORAGE_KEY);
+      oturumCacheSet(null);
     }
   });
 }

@@ -72,6 +72,16 @@ function PmRoute({ children }: { children: React.ReactNode }) {
 const isNative = Capacitor.isNativePlatform();
 const AppRouter = isNative ? HashRouter : BrowserRouter;
 
+function resolveAppBasename(): string | undefined {
+  if (isNative) return undefined;
+  const cfgBase = getSiteConfig().marka.webBasename.replace(/^\/+|\/+$/g, '');
+  if (!cfgBase) return '/';
+  const path = window.location.pathname;
+  return path === '/' + cfgBase || path.startsWith('/' + cfgBase + '/')
+    ? '/' + cfgBase
+    : '/';
+}
+
 export default function App() {
   const [authTick, setAuthTick] = useState(0);
 
@@ -136,7 +146,7 @@ export default function App() {
   }, [authTick]);
 
   return (
-    <AppRouter basename={isNative ? undefined : getSiteConfig().marka.webBasename}>
+    <AppRouter basename={resolveAppBasename()}>
       <ErrorBoundary>
         <>
           <TitleUpdater />

@@ -4,6 +4,7 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
+    "predev": "node scripts/ensure-dev-port.mjs",
     "dev": "vite",
     "build": "tsc -b && vite build",
     "build:analyze": "vite build --config vite.analyze.config.ts",
@@ -15,6 +16,7 @@
     "bootstrap:admin": "node scripts/bootstrap-admin.mjs",
     "new:santiye": "node scripts/new-santiye.mjs",
     "build:config": "node scripts/build-config.mjs && node scripts/validate-config.mjs",
+    "test:browser": "node scripts/browser-test.mjs",
     "cap:init": "npx cap init",
     "cap:add:android": "npx cap add android",
     "cap:sync": "npx cap sync",

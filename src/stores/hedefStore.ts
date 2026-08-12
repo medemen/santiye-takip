@@ -3,7 +3,7 @@ import { getSupabase, isSupabaseReady } from '../lib/supabase';
 import { getSiteConfig } from '../config/site';
 import type { RealtimeChannel } from '@supabase/supabase-js';
 import { toastGoster } from './toastStore';
-import { getCurrentUser } from './authStore';
+import { getCurrentUser, supabaseOturumAktif } from './authStore';
 
 const STORAGE_KEY = `${getSiteConfig().marka.localStoragePrefix}_hedefler`;
 
@@ -28,7 +28,7 @@ function notifyHedefListeners(): void {
 let _hedefChannel: RealtimeChannel | null = null;
 
 export function aboneOlHedefGuncellemeleri(onChannelStatus?: (status: string) => void): void {
-  if (!isSupabaseReady() || _hedefChannel) return;
+  if (!supabaseOturumAktif() || _hedefChannel) return;
   _hedefChannel = getSupabase()
     .channel('hedef-realtime')
     .on('postgres_changes',
@@ -48,13 +48,21 @@ export function realtimeHedefAboneliktenCik(): void {
   }
 }
 
+// modul seviyesi cache: JSON.parse yalnizca ilk okumada yapilir
+let _hedefCache: IsKalemiHedefi[] | null = null;
+
 export function getHedefler(): IsKalemiHedefi[] {
-  try {
-    const data = localStorage.getItem(STORAGE_KEY);
-    return data ? JSON.parse(data) : [];
-  } catch {
-    return [];
+  if (!_hedefCache) {
+    let okunan: IsKalemiHedefi[] = [];
+    try {
+      const data = localStorage.getItem(STORAGE_KEY);
+      okunan = data ? JSON.parse(data) : [];
+    } catch {
+      /* bozuk veri olabilir */
+    }
+    _hedefCache = okunan;
   }
+  return _hedefCache;
 }
 
 export async function supabaseHedefleriYukle(): Promise<void> {
@@ -62,9 +70,11 @@ export async function supabaseHedefleriYukle(): Promise<void> {
   try {
     const { data, error } = await getSupabase()
       .from('is_kalemi_hedefleri')
-      .select('*');
+      .select('id, ada, blok_no, is_kalemi, hedef_tarih');
     if (error) throw error;
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(data ?? []));
+    const sunucu = (data ?? []) as IsKalemiHedefi[];
+    _hedefCache = sunucu;
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(sunucu));
     notifyHedefListeners();
   } catch {
     /* supabase offline, cache devam */
@@ -115,7 +125,7 @@ export function setHedef(
   localStorage.setItem(STORAGE_KEY, JSON.stringify(hedefler));
   notifyHedefListeners();
 
-  if (isSupabaseReady()) {
+  if (supabaseOturumAktif()) {
     if (hedefTarih === null || hedefTarih === '') {
       getSupabase()
         .from('is_kalemi_hedefleri')

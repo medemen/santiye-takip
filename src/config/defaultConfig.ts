@@ -18,10 +18,3 @@ export const DURUM_LABELLARI: Record<string, string> = {
   tamamlandi: 'Tamamlandı',
   gecikme: 'Gecikme',
 };
-
-export const DURUM_SIRALAMA: Record<string, number> = {
-  planlandi: 0,
-  devam_ediyor: 1,
-  gecikme: 2,
-  tamamlandi: 3,
-};

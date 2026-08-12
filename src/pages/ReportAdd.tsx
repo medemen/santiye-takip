@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useSiteConfig } from '../hooks/useSiteConfig';
-import { getAda, getAdaList, getAllKalemler, getSablonKalemleri } from '../config/helpers';
+import { getAda, getAdaList, getAllKalemler } from '../config/helpers';
 import { DURUM_LABELLARI } from '../config/defaultConfig';
 import { saveRapor, updateRapor, getRaporById } from '../stores/reportStore';
 import { getCurrentUser } from '../stores/authStore';
@@ -144,12 +144,6 @@ export default function ReportAdd() {
     setIlerleme(50);
     setAciklama('');
     setStep('is_kalemi');
-  };
-
-  const sablonVarsayilanlariniUygula = (s: { varsayilan_durum: IsDurumu; varsayilan_ilerleme?: number; varsayilan_aciklama?: string }) => {
-    setDurum(s.varsayilan_durum);
-    setIlerleme(s.varsayilan_ilerleme ?? 50);
-    setAciklama(s.varsayilan_aciklama ?? '');
   };
 
   const kalemButonlari = (kalemler: readonly string[]) => (
@@ -369,47 +363,6 @@ export default function ReportAdd() {
               {ada} - {blokNo === 0 ? 'Ada Geneli' : `Blok ${blokNo}`} — İş Kalemi
             </h3>
 
-            {!editMode && config.isKalemleri.sablonlar.length > 0 && (
-              <div style={{ marginBottom: 12 }}>
-                <label style={{ display: 'block', fontSize: 12, fontWeight: 500, color: '#6b7280', marginBottom: 4 }}>
-                  Hızlı Şablon
-                </label>
-                <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
-                  {config.isKalemleri.sablonlar.map((s) => {
-                    const kalemler = getSablonKalemleri(config, s);
-                    return (
-                      <button
-                        key={s.id}
-                        onClick={() => {
-                          sablonVarsayilanlariniUygula(s);
-                          if (kalemler.length === 1) {
-                            setIsKalemi(kalemler[0]);
-                            setStep('detay');
-                          } else {
-                            const secim = window.prompt(`"${s.ad}" şablonu seçildi. İş kalemi seçin:\n${kalemler.map((ik, i) => `${i + 1}. ${ik}`).join('\n')}`);
-                            if (secim) {
-                              const idx = parseInt(secim) - 1;
-                              if (idx >= 0 && idx < kalemler.length) {
-                                setIsKalemi(kalemler[idx]);
-                                setStep('detay');
-                              }
-                            }
-                          }
-                        }}
-                        style={{
-                          padding: '6px 12px', backgroundColor: '#fef3c7', border: '1px solid #f59e0b',
-                          borderRadius: 8, fontSize: 11, fontWeight: 500, color: '#92400e',
-                          cursor: 'pointer',
-                        }}
-                        title={s.aciklama}
-                      >
-                        📋 {s.ad}
-                      </button>
-                    );
-                  })}
-                </div>
-              </div>
-            )}
             <div style={{ marginBottom: 12 }}>
               <input
                 type="text"

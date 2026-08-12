@@ -109,11 +109,21 @@ def save_png(img, rel_path):
     return path
 
 
+def developer_icon(size=512):
+    """Play Console developer page icon: 24-bit PNG, no transparency."""
+    img = gradient(size)
+    img.alpha_composite(build_scene(size))
+    return img.convert("RGB")
+
+
 def main():
     created = []
 
     master = Image.alpha_composite(rounded_bg(512), build_scene(512))
     created.append(save_png(master, "public/icon-512.png"))
+
+    dev_icon = developer_icon(512)
+    created.append(save_png(dev_icon, "play-console/developer-icon.png"))
 
     legacy_densities = {
         "mipmap-mdpi": 48,

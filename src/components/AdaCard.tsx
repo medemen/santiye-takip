@@ -1,9 +1,10 @@
-import { memo } from 'react';
+import { memo, useMemo } from 'react';
 import type { Blok } from '../types';
 import { getSantiyeSefi } from '../stores/kullanicilarStore';
 import { getAdaGenelIlerleme } from '../stores/reportStore';
 import { getAllKalemler } from '../config/helpers';
 import { useSiteConfig } from '../hooks/useSiteConfig';
+import { useRaporlar } from '../hooks/useRaporlar';
 import ProgressBar from './ProgressBar';
 
 interface Props {
@@ -17,8 +18,12 @@ interface Props {
 
 const AdaCard = memo(function AdaCard({ ada, blokSayisi, toplamDaire, toplamKat, bloklar, onClick }: Props) {
   const config = useSiteConfig();
+  const raporlar = useRaporlar();
   const santiyeSefi = getSantiyeSefi(ada);
-  const ilerleme = getAdaGenelIlerleme(ada, bloklar, getAllKalemler(config));
+  const ilerleme = useMemo(() => {
+    void raporlar;
+    return getAdaGenelIlerleme(ada, bloklar, getAllKalemler(config));
+  }, [ada, bloklar, config, raporlar]);
 
   return (
     <div

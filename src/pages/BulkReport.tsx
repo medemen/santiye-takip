@@ -3,7 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import { useSiteConfig } from '../hooks/useSiteConfig';
 import { getAda, getAdaList, getAllKalemler } from '../config/helpers';
 import { DURUM_LABELLARI, DURUM_RENKLERI } from '../config/defaultConfig';
-import { saveRaporlar, getRaporlar, getBlokProgress } from '../stores/reportStore';
+import { saveRaporlar, getBlokProgress } from '../stores/reportStore';
+import { useRaporlar } from '../hooks/useRaporlar';
 import { getCurrentUser } from '../stores/authStore';
 import { getKullaniciAdaAtamasi } from '../stores/atamaStore';
 import type { IsDurumu, Rapor } from '../types';
@@ -15,6 +16,7 @@ export default function BulkReport() {
   const config = useSiteConfig();
   const user = getCurrentUser();
   const kullaniciAdi = user?.ad_soyad ?? '';
+  const raporlar = useRaporlar();
 
   const atananAda = getKullaniciAdaAtamasi(kullaniciAdi);
   const isAdmin = (user?.admin ?? false) || (user?.proje_muduru ?? false);
@@ -46,12 +48,12 @@ export default function BulkReport() {
 
   const blokDurumMap = useMemo(() => {
     if (!ada || !isKalemi) return {} as Record<number, { durum: IsDurumu; ilerleme_yuzde: number; adaGenel: boolean }>;
-    const raporlar = getRaporlar().filter((r) => r.ada === ada && r.is_kalemi === isKalemi);
+    const adaKalemRaporlari = raporlar.filter((r) => r.ada === ada && r.is_kalemi === isKalemi);
     const map: Record<number, { durum: IsDurumu; ilerleme_yuzde: number; adaGenel: boolean }> = {};
     for (const b of adaData?.bloklar ?? []) {
       const sonRapor = getBlokProgress(ada, b.blok_no, [isKalemi])[isKalemi];
       if (!sonRapor) continue;
-      const blokOzelVar = raporlar.some((r) => r.blok_no === b.blok_no);
+      const blokOzelVar = adaKalemRaporlari.some((r) => r.blok_no === b.blok_no);
       map[b.blok_no] = {
         durum: sonRapor.durum,
         ilerleme_yuzde: sonRapor.ilerleme_yuzde,
@@ -59,7 +61,7 @@ export default function BulkReport() {
       };
     }
     return map;
-  }, [ada, isKalemi, adaData]);
+  }, [ada, isKalemi, adaData, raporlar]);
 
   const toggleBlok = (blokNo: number) => {
     setSeciliBloklar((prev) =>

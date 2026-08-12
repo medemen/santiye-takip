@@ -1,10 +1,11 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useHedefler } from '../hooks/useHedefler';
+import { useRaporlar } from '../hooks/useRaporlar';
 import { useSiteConfig } from '../hooks/useSiteConfig';
 import { getAdaList } from '../config/helpers';
-import { getSonRapor } from '../stores/reportStore';
 import { getIlerlemeDurumu, hedefKalanGun } from '../data/plan';
+import type { Rapor } from '../types';
 import { hedeflerXlsxExport } from '../utils/exportXlsx';
 import { elementPdfExport } from '../utils/exportPdf';
 import { toastGoster } from '../stores/toastStore';
@@ -34,6 +35,7 @@ export default function HedefTakvim() {
   const navigate = useNavigate();
   const config = useSiteConfig();
   const hedefler = useHedefler();
+  const raporlar = useRaporlar();
 
   const bugun = new Date();
   const [gorunenAy, setGorunenAy] = useState(() => new Date(bugun.getFullYear(), bugun.getMonth(), 1));
@@ -42,25 +44,50 @@ export default function HedefTakvim() {
 
   const adalar = getAdaList(config);
 
-  const gorunenHedefler = hedefler
-    .filter((h) => !seciliAda || h.ada === seciliAda)
-    .map((h) => ({
-      ...h,
-      rapor: getSonRapor(h.ada, h.blok_no, h.is_kalemi),
-      durum: getIlerlemeDurumu(getSonRapor(h.ada, h.blok_no, h.is_kalemi), h.hedef_tarih),
-    }));
+  const gorunenHedefler = useMemo(() => {
+    const sonRaporlarMap = new Map<string, Rapor>();
+    for (const r of raporlar) {
+      const anahtar = `${r.ada}|${r.blok_no}|${r.is_kalemi}`;
+      const mevcut = sonRaporlarMap.get(anahtar);
+      if (!mevcut || new Date(r.olusturma_tarihi).getTime() > new Date(mevcut.olusturma_tarihi).getTime()) {
+        sonRaporlarMap.set(anahtar, r);
+      }
+    }
+    return hedefler
+      .filter((h) => !seciliAda || h.ada === seciliAda)
+      .map((h) => {
+        const rapor = sonRaporlarMap.get(`${h.ada}|${h.blok_no}|${h.is_kalemi}`) ?? null;
+        return { ...h, rapor, durum: getIlerlemeDurumu(rapor, h.hedef_tarih) };
+      });
+  }, [hedefler, seciliAda, raporlar]);
+
+  const tarihHedefleri = useMemo(() => {
+    const harita = new Map<string, (typeof gorunenHedefler)[number][]>();
+    for (const h of gorunenHedefler) {
+      const liste = harita.get(h.hedef_tarih) ?? [];
+      liste.push(h);
+      harita.set(h.hedef_tarih, liste);
+    }
+    return harita;
+  }, [gorunenHedefler]);
 
   const ayAnahtari = isoDate(gorunenAy).slice(0, 7);
-  const ayHedefleri = gorunenHedefler.filter((h) => h.hedef_tarih.startsWith(ayAnahtari));
+  const ayHedefleri = useMemo(
+    () => gorunenHedefler.filter((h) => h.hedef_tarih.startsWith(ayAnahtari)),
+    [gorunenHedefler, ayAnahtari]
+  );
 
-  const tamamlanan = gorunenHedefler.filter((h) => h.rapor?.durum === 'tamamlandi').length;
-  const aktif = gorunenHedefler.filter((h) => h.rapor?.durum !== 'tamamlandi');
-  const suresiGecen = aktif.filter((h) => hedefKalanGun(h.hedef_tarih) < 0).length;
-  const bugunku = aktif.filter((h) => hedefKalanGun(h.hedef_tarih) === 0).length;
-  const haftaUcunda = aktif.filter((h) => {
-    const k = hedefKalanGun(h.hedef_tarih);
-    return k > 0 && k <= 7;
-  }).length;
+  const ozet = useMemo(() => {
+    const tamamlanan = gorunenHedefler.filter((h) => h.rapor?.durum === 'tamamlandi').length;
+    const aktif = gorunenHedefler.filter((h) => h.rapor?.durum !== 'tamamlandi');
+    const suresiGecen = aktif.filter((h) => hedefKalanGun(h.hedef_tarih) < 0).length;
+    const bugunku = aktif.filter((h) => hedefKalanGun(h.hedef_tarih) === 0).length;
+    const haftaUcunda = aktif.filter((h) => {
+      const k = hedefKalanGun(h.hedef_tarih);
+      return k > 0 && k <= 7;
+    }).length;
+    return { tamamlanan, suresiGecen, bugunku, haftaUcunda };
+  }, [gorunenHedefler]);
 
   const chipRenk = (durum: { label: string; renk: string }, tamam: boolean): string => {
     if (tamam) return '#22c55e';
@@ -84,7 +111,11 @@ export default function HedefTakvim() {
           </button>
           <button
             onClick={async () => {
-              await hedeflerXlsxExport(gorunenHedefler, (a, b, ik) => getSonRapor(a, b, ik), 'hedef-takvimi.xlsx');
+              await hedeflerXlsxExport(
+                gorunenHedefler,
+                (a, b, ik) => gorunenHedefler.find((h) => h.ada === a && h.blok_no === b && h.is_kalemi === ik)?.rapor ?? null,
+                'hedef-takvimi.xlsx'
+              );
               toastGoster(`${gorunenHedefler.length} hedef Excel olarak indiriliyor`, 'success');
             }}
             style={{ background: 'none', border: '1px solid #e5e7eb', borderRadius: 8, padding: '4px 10px', fontSize: 12, color: '#6b7280', cursor: 'pointer' }}
@@ -129,17 +160,17 @@ export default function HedefTakvim() {
       )}
 
       <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginBottom: 12 }}>
-        <span style={{ fontSize: 12, backgroundColor: '#fef2f2', color: '#ef4444', padding: '3px 10px', borderRadius: 12, fontWeight: suresiGecen > 0 ? 700 : 400 }}>
-          ⛔ {suresiGecen} geçmiş
+        <span style={{ fontSize: 12, backgroundColor: '#fef2f2', color: '#ef4444', padding: '3px 10px', borderRadius: 12, fontWeight: ozet.suresiGecen > 0 ? 700 : 400 }}>
+          ⛔ {ozet.suresiGecen} geçmiş
         </span>
-        <span style={{ fontSize: 12, backgroundColor: bugunku > 0 ? '#fef3c7' : '#f3f4f6', color: bugunku > 0 ? '#92400e' : '#4b5563', padding: '3px 10px', borderRadius: 12, fontWeight: bugunku > 0 ? 700 : 400 }}>
-          📅 {bugunku} bugün
+        <span style={{ fontSize: 12, backgroundColor: ozet.bugunku > 0 ? '#fef3c7' : '#f3f4f6', color: ozet.bugunku > 0 ? '#92400e' : '#4b5563', padding: '3px 10px', borderRadius: 12, fontWeight: ozet.bugunku > 0 ? 700 : 400 }}>
+          📅 {ozet.bugunku} bugün
         </span>
-        <span style={{ fontSize: 12, backgroundColor: haftaUcunda > 0 ? '#fef3c7' : '#f3f4f6', color: haftaUcunda > 0 ? '#92400e' : '#4b5563', padding: '3px 10px', borderRadius: 12, fontWeight: haftaUcunda > 0 ? 700 : 400 }}>
-          ⏳ {haftaUcunda} ≤7 gün
+        <span style={{ fontSize: 12, backgroundColor: ozet.haftaUcunda > 0 ? '#fef3c7' : '#f3f4f6', color: ozet.haftaUcunda > 0 ? '#92400e' : '#4b5563', padding: '3px 10px', borderRadius: 12, fontWeight: ozet.haftaUcunda > 0 ? 700 : 400 }}>
+          ⏳ {ozet.haftaUcunda} ≤7 gün
         </span>
         <span style={{ fontSize: 12, backgroundColor: '#f0fdf4', color: '#16a34a', padding: '3px 10px', borderRadius: 12 }}>
-          ✅ {tamamlanan} tamam
+          ✅ {ozet.tamamlanan} tamam
         </span>
       </div>
 
@@ -153,7 +184,7 @@ export default function HedefTakvim() {
           {ayHucreleri(gorunenAy.getFullYear(), gorunenAy.getMonth()).map((tarih, i) => {
             if (!tarih) return <div key={`bos-${i}`} style={{ minHeight: 46 }} />;
             const gun = new Date(tarih);
-            const gunHedefleri = gorunenHedefler.filter((h) => h.hedef_tarih === tarih);
+            const gunHedefleri = tarihHedefleri.get(tarih) ?? [];
             const bugunMu = tarih === isoDate(bugun);
             const digerAydan = gun.getMonth() !== gorunenAy.getMonth();
             return (

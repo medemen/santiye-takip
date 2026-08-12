@@ -26,7 +26,8 @@ const DonutChart = memo(function DonutChart({ data, height = 220 }: Props) {
   const STROKE = 30;
   const CIRC = 2 * Math.PI * RADIUS;
   const PADDING = 3;
-  const size = RADIUS + STROKE + 8;
+  const size = RADIUS * 2 + STROKE + 8;
+  const center = size / 2;
 
   let offset = 0;
   const segments = filtered.map((d) => {
@@ -35,8 +36,8 @@ const DonutChart = memo(function DonutChart({ data, height = 220 }: Props) {
     const el = (
       <circle
         key={d.name}
-        cx={size / 2}
-        cy={size / 2}
+        cx={center}
+        cy={center}
         r={RADIUS}
         fill="none"
         stroke={d.color}
@@ -58,8 +59,8 @@ const DonutChart = memo(function DonutChart({ data, height = 220 }: Props) {
         viewBox={`0 0 ${size} ${size}`}
         style={{ maxHeight: height, maxWidth: height }}
       >
-        <g transform={`rotate(-90 ${size / 2} ${size / 2})`}>
-          <circle cx={size / 2} cy={size / 2} r={RADIUS} fill="none" stroke="#f3f4f6" strokeWidth={STROKE} />
+        <g transform={`rotate(-90 ${center} ${center})`}>
+          <circle cx={center} cy={center} r={RADIUS} fill="none" stroke="#f3f4f6" strokeWidth={STROKE} />
           {segments}
         </g>
       </svg>

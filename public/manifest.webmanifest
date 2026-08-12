@@ -1,0 +1,19 @@
+{
+  "name": "Şantiye Takip",
+  "short_name": "Şantiye",
+  "description": "İnşaat şantiyelerinde ada/blok bazlı iş kalemi ilerlemesini takip eden uygulama.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#f59e0b",
+  "lang": "tr",
+  "icons": [
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ]
+}

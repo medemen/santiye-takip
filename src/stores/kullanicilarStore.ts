@@ -75,8 +75,14 @@ function cachedKullanicilar(): Kullanici[] | null {
   }
 }
 
+// modul seviyesi cache: JSON.parse yalnizca ilk okumada yapilir
+let _kullaniciCache: Kullanici[] | null = null;
+
 export function getKullanicilar(): Kullanici[] {
-  return cachedKullanicilar() ?? bundledKullanicilar();
+  if (!_kullaniciCache) {
+    _kullaniciCache = cachedKullanicilar() ?? bundledKullanicilar();
+  }
+  return _kullaniciCache;
 }
 
 export async function supabaseKullanicilariYukle(): Promise<void> {
@@ -87,6 +93,7 @@ export async function supabaseKullanicilariYukle(): Promise<void> {
       .select('id, ad_soyad, rol, admin, proje_muduru, yetkili_adalar, atanan_ada');
     if (error) throw error;
     const sunucu = (data ?? []) as Kullanici[];
+    _kullaniciCache = sunucu;
     localStorage.setItem(STORAGE_KEY, JSON.stringify(sunucu));
     notifyListeners();
   } catch {

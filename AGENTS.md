@@ -22,10 +22,14 @@ Oxlint. Global state kütüphanesi yok — bkz. "Mimari" altında store deseni.
 ```bash
 npm install
 cp .env.example .env      # VITE_SUPABASE_URL / VITE_SUPABASE_ANON_KEY
-npm run dev                # http://localhost:5173
+npm run dev                # http://localhost:5173 (predev: porttaki yabanci vite'i kapatir)
 npm run build               # tsc -b && vite build -> dist/
 npm run lint                 # oxlint
+npm run test:browser         # headless Chrome smoke testi (dev server ayaktayken; --auto-start ile kendisi baslatir)
 ```
+
+Not: `npm run dev` öncesi `scripts/ensure-dev-port.mjs` çalışır; 5173'ü yanlış projeden
+alan eski/devam eden vite prosesini kapatıp temiz başlatır (bkz. `vite.config.ts` `strictPort`).
 
 Diğer script'ler (`seed:*`, `bootstrap:admin`, `new:santiye`, `cap:*`) için
 [README.md](README.md#scriptler) ve `package.json`'a bakın.

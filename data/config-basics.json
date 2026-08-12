@@ -7,7 +7,7 @@
   },
   "marka": {
     "appName": "Güneyşehir Takip",
-    "webBasename": "santiye_takip_11",
+    "webBasename": "santiye-takip",
     "emailDomain": "santiye.com",
     "localStoragePrefix": "santiyev2",
     "capacitorAppId": "com.santiyem.app"

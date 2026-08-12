@@ -106,11 +106,13 @@ drop policy if exists "Raporlar sahibi gunceller" on public.raporlar;
 drop policy if exists "Raporlar herkes siler" on public.raporlar;
 drop policy if exists "Raporlar admin siler" on public.raporlar;
 
+drop policy if exists "Raporlar kendi adina ekler" on public.raporlar;
 create policy "Raporlar kendi adina ekler" on public.raporlar
   for insert with check (
     raporlayan = santiye_ad_soyad() or santiye_is_admin() or santiye_is_pm()
   );
 
+drop policy if exists "Raporlar kendi adina gunceller" on public.raporlar;
 create policy "Raporlar kendi adina gunceller" on public.raporlar
   for update using (
     raporlayan = santiye_ad_soyad() or santiye_is_admin() or santiye_is_pm()
@@ -119,6 +121,7 @@ create policy "Raporlar kendi adina gunceller" on public.raporlar
     raporlayan = santiye_ad_soyad() or santiye_is_admin() or santiye_is_pm()
   );
 
+drop policy if exists "Raporlar kendi adina siler" on public.raporlar;
 create policy "Raporlar kendi adina siler" on public.raporlar
   for delete using (
     raporlayan = santiye_ad_soyad() or santiye_is_admin() or santiye_is_pm()
@@ -128,11 +131,13 @@ drop policy if exists "Ada atamalari herkes ekler" on public.kullanici_ada_atama
 drop policy if exists "Ada atamalari herkes gunceller" on public.kullanici_ada_atamalari;
 drop policy if exists "Ada atamalari herkes siler" on public.kullanici_ada_atamalari;
 
+drop policy if exists "Ada atamalari admin/PM ekler" on public.kullanici_ada_atamalari;
 create policy "Ada atamalari admin/PM ekler" on public.kullanici_ada_atamalari
   for insert with check (
     santiye_is_pm() or (santiye_is_admin() and ada = any(santiye_yetkili_adalar()))
   );
 
+drop policy if exists "Ada atamalari admin/PM gunceller" on public.kullanici_ada_atamalari;
 create policy "Ada atamalari admin/PM gunceller" on public.kullanici_ada_atamalari
   for update using (
     santiye_is_pm() or (santiye_is_admin() and ada = any(santiye_yetkili_adalar()))
@@ -141,6 +146,7 @@ create policy "Ada atamalari admin/PM gunceller" on public.kullanici_ada_atamala
     santiye_is_pm() or (santiye_is_admin() and ada = any(santiye_yetkili_adalar()))
   );
 
+drop policy if exists "Ada atamalari admin/PM siler" on public.kullanici_ada_atamalari;
 create policy "Ada atamalari admin/PM siler" on public.kullanici_ada_atamalari
   for delete using (
     santiye_is_pm() or (santiye_is_admin() and ada = any(santiye_yetkili_adalar()))
@@ -150,11 +156,13 @@ drop policy if exists "Blok atamalari herkes ekler" on public.kullanici_blok_ata
 drop policy if exists "Blok atamalari herkes gunceller" on public.kullanici_blok_atamalari;
 drop policy if exists "Blok atamalari herkes siler" on public.kullanici_blok_atamalari;
 
+drop policy if exists "Blok atamalari admin/PM ekler" on public.kullanici_blok_atamalari;
 create policy "Blok atamalari admin/PM ekler" on public.kullanici_blok_atamalari
   for insert with check (
     santiye_is_pm() or (santiye_is_admin() and ada = any(santiye_yetkili_adalar()))
   );
 
+drop policy if exists "Blok atamalari admin/PM gunceller" on public.kullanici_blok_atamalari;
 create policy "Blok atamalari admin/PM gunceller" on public.kullanici_blok_atamalari
   for update using (
     santiye_is_pm() or (santiye_is_admin() and ada = any(santiye_yetkili_adalar()))
@@ -163,38 +171,25 @@ create policy "Blok atamalari admin/PM gunceller" on public.kullanici_blok_atama
     santiye_is_pm() or (santiye_is_admin() and ada = any(santiye_yetkili_adalar()))
   );
 
+drop policy if exists "Blok atamalari admin/PM siler" on public.kullanici_blok_atamalari;
 create policy "Blok atamalari admin/PM siler" on public.kullanici_blok_atamalari
   for delete using (
     santiye_is_pm() or (santiye_is_admin() and ada = any(santiye_yetkili_adalar()))
   );
 
-create policy "Adalar admin/PM yazar" on public.adalar
-  for insert with check (santiye_is_admin() or santiye_is_pm());
+-- adalar/bloklar tablolari v2'de kaldirildi (bkz. 0001_v2_initial_schema notu);
+-- bu tablolara ait politika bloklari bu yuzden bulunmaz.
 
-create policy "Adalar admin/PM gunceller" on public.adalar
-  for update using (santiye_is_admin() or santiye_is_pm())
-  with check (santiye_is_admin() or santiye_is_pm());
-
-create policy "Adalar admin/PM siler" on public.adalar
-  for delete using (santiye_is_admin() or santiye_is_pm());
-
-create policy "Bloklar admin/PM yazar" on public.bloklar
-  for insert with check (santiye_is_admin() or santiye_is_pm());
-
-create policy "Bloklar admin/PM gunceller" on public.bloklar
-  for update using (santiye_is_admin() or santiye_is_pm())
-  with check (santiye_is_admin() or santiye_is_pm());
-
-create policy "Bloklar admin/PM siler" on public.bloklar
-  for delete using (santiye_is_admin() or santiye_is_pm());
-
+drop policy if exists "Hedefler admin/PM yazar" on public.is_kalemi_hedefleri;
 create policy "Hedefler admin/PM yazar" on public.is_kalemi_hedefleri
   for insert with check (santiye_is_admin() or santiye_is_pm());
 
+drop policy if exists "Hedefler admin/PM gunceller" on public.is_kalemi_hedefleri;
 create policy "Hedefler admin/PM gunceller" on public.is_kalemi_hedefleri
   for update using (santiye_is_admin() or santiye_is_pm())
   with check (santiye_is_admin() or santiye_is_pm());
 
+drop policy if exists "Hedefler admin/PM siler" on public.is_kalemi_hedefleri;
 create policy "Hedefler admin/PM siler" on public.is_kalemi_hedefleri
   for delete using (santiye_is_admin() or santiye_is_pm());
 

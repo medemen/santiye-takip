@@ -8,6 +8,8 @@ export default defineConfig({
   base: './',
   server: {
     allowedHosts: true,
+    port: 5173,
+    strictPort: true,
   },
   build: {
     target: 'es2020',

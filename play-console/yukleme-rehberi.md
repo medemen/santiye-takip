@@ -69,6 +69,8 @@ Play Console, uygulamanızı kendi anahtarıyla yeniden imzalar (Play App Signin
    - **Öne çıkan görsel:** `play-console/feature-graphic.png`
    - **Telefon ekran görüntüleri:** `screenshots/01-dashboard.png` … `08-istatistik.png`
    - **Tablet (10") görüntüleri:** `screenshots/tablet10/01-dashboard.png` …
+   - Geliştirici sayfası başlık resmi (Grow → Store presence → Geliştirici sayfası):
+     `play-console/developer-header.png`
 4. **Uygulama kategorisi:** İş
 5. **Gizlilik politikası URL:** `https://medemen.github.io/santiye-takip/gizlilik-politikasi.html`
 6. **Kaydet** (Save).

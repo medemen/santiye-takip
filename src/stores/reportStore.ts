@@ -4,7 +4,7 @@ import { getSiteConfig } from '../config/site';
 import { idbGet, idbSet } from '../lib/db';
 import type { RealtimeChannel } from '@supabase/supabase-js';
 import { toastGoster } from './toastStore';
-import { getCurrentUser } from './authStore';
+import { getCurrentUser, supabaseOturumAktif } from './authStore';
 
 const STORAGE_KEY = `${getSiteConfig().marka.localStoragePrefix}_raporlar`;
 
@@ -137,7 +137,7 @@ function raporToSupabase(r: Rapor) {
 let _raporChannel: RealtimeChannel | null = null;
 
 export function aboneOlRaporGuncellemeleri(onChannelStatus?: (status: string) => void): void {
-  if (!isSupabaseReady() || _raporChannel) return;
+  if (!supabaseOturumAktif() || _raporChannel) return;
   _raporChannel = getSupabase()
     .channel('raporlar-realtime')
     .on('postgres_changes',
@@ -172,7 +172,7 @@ export async function supabaseRaporlariYukle(): Promise<void> {
     await idbHydrasyonuBaslat();
     const { data, error } = await getSupabase()
       .from('raporlar')
-      .select('*')
+      .select('id, tarih, raporlayan, ada, blok_no, is_kalemi, durum, ilerleme_yuzde, aciklama, olusturma_tarihi')
       .order('olusturma_tarihi', { ascending: false });
     if (error) throw error;
     const sunucu = data ?? [];
@@ -181,7 +181,7 @@ export async function supabaseRaporlariYukle(): Promise<void> {
     const bekleyen = yerel.filter((r) => !sunucuIdleri.has(r.id));
     const birlestirilmis = [...sunucu, ...bekleyen];
     setRaporlar(birlestirilmis);
-    if (bekleyen.length > 0) {
+    if (bekleyen.length > 0 && supabaseOturumAktif()) {
       const { error: upsertError } = await getSupabase()
         .from('raporlar')
         .upsert(bekleyen.map(raporToSupabase), { onConflict: 'id' });
@@ -202,7 +202,7 @@ export function saveRapor(rapor: Omit<Rapor, 'id' | 'olusturma_tarihi'>): Rapor 
     olusturma_tarihi: new Date().toISOString(),
   };
   setRaporlar([...getRaporlar(), yeni]);
-  if (isSupabaseReady()) {
+  if (supabaseOturumAktif()) {
     getSupabase().from('raporlar').insert(raporToSupabase(yeni)).then(({ error }) => {
       if (error) {
         console.warn('Supabase rapor kaydetme hatası:', error.message);
@@ -222,7 +222,7 @@ export function saveRaporlar(
     olusturma_tarihi: new Date().toISOString(),
   }));
   setRaporlar([...getRaporlar(), ...yeniler]);
-  if (isSupabaseReady()) {
+  if (supabaseOturumAktif()) {
     getSupabase()
       .from('raporlar')
       .insert(yeniler.map(raporToSupabase))
@@ -244,7 +244,7 @@ export function updateRapor(id: string, guncelleme: Partial<Omit<Rapor, 'id' | '
   const yeniListe = [...raporlar];
   yeniListe[idx] = guncel;
   setRaporlar(yeniListe);
-  if (isSupabaseReady()) {
+  if (supabaseOturumAktif()) {
     getSupabase().from('raporlar').update(raporToSupabase(guncel)).eq('id', id).then(({ error }) => {
       if (error) {
         console.warn('Supabase rapor güncelleme hatası:', error.message);
@@ -259,7 +259,7 @@ export function deleteRapor(id: string): boolean {
   const raporlar = getRaporlar();
   if (!raporlar.find((r) => r.id === id)) return false;
   setRaporlar(raporlar.filter((r) => r.id !== id));
-  if (isSupabaseReady()) {
+  if (supabaseOturumAktif()) {
     getSupabase().from('raporlar').delete().eq('id', id).then(({ error }) => {
       if (error) {
         console.warn('Supabase rapor silme hatası:', error.message);
@@ -272,16 +272,6 @@ export function deleteRapor(id: string): boolean {
 
 export function getRaporById(id: string): Rapor | undefined {
   return getRaporlar().find((r) => r.id === id);
-}
-
-export function getBlokRaporlari(ada: string, blokNo: number): Rapor[] {
-  return getRaporlar().filter(
-    (r) => r.ada === ada && r.blok_no === blokNo
-  );
-}
-
-export function getAdaRaporlari(ada: string): Rapor[] {
-  return getRaporlar().filter((r) => r.ada === ada);
 }
 
 export function getPersonelRaporlari(adSoyad: string): Rapor[] {

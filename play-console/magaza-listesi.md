@@ -89,6 +89,7 @@ Excel/PDF dışa aktarma.
 |---|---|---|
 | Uygulama simgesi | 512×512 PNG, 32-bit, şeffaflık yok | ✅ `public/icon-512.png` |
 | Öne çıkan görsel (feature graphic) | 1024×500 JPG/PNG | ✅ `play-console/feature-graphic.png` |
+| Geliştirici sayfası başlık resmi | 4096×2304 JPG/24-bit PNG, şeffaflık yok, ≤1 MB | ✅ `play-console/developer-header.png` (73 KB) |
 | Telefon ekran görüntüleri | 2–8 adet, 16:9 veya 9:16 | ✅ `screenshots/` (tam 8 görsel — giriş ekranı `screenshots/ekstra/09-giris.png`'e taşındı) |
 | 10" tablet ekran görüntüleri | 2–8 adet | ✅ `screenshots/tablet10/` (8 görsel) |
 | 7" tablet ekran görüntüleri | Play artık zorunlu tutmuyor | — atlanabilir |
@@ -99,6 +100,11 @@ renklerini yeniden kullanarak üretildi; `data/santiye.config.json`
 içindeki `marka.appName` değerini otomatik okur (başka bir şantiye
 için yeniden markalanırsa script'i tekrar çalıştırmak yeterli:
 `python scripts/generate-feature-graphic.py`).
+
+`play-console/developer-header.png`, geliştirici sayfası başlık resmi
+için aynı markayı kullanan `scripts/generate-developer-header.py` ile
+üretildi. Play Console'da **Grow → Store presence → Geliştirici
+sayfası** bölümüne yüklenir.
 
 ---
 
@@ -152,4 +158,4 @@ de engeller.
 - [ ] Dağıtım track'ini seç (Internal / Closed / Production)
 - [x] İmzalı **release** paketini derle → `android/app/build/outputs/bundle/release/app-release.aab`
       (Play Console artık `.apk` değil `.aab` — Android App Bundle — bekliyor; bu dosya doğrudan yüklenebilir)
-- [x] Son kodla (perf optimizasyonları dahil) release paketini yeniden derle → v1.1.11 / code 13 (09.08.2026)
+- [x] Son kodla (perf optimizasyonları dahil) release paketini yeniden derle → v1.1.12 / code 14 (09.08.2026)

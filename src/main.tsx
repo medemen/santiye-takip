@@ -17,6 +17,14 @@ function hataGoster(msg: string) {
 window.addEventListener('error', (e) => hataGoster(e.message || 'Bilinmeyen hata'))
 window.addEventListener('unhandledrejection', (e) => hataGoster(String(e.reason)))
 
+if (import.meta.env.PROD && 'serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register(import.meta.env.BASE_URL + 'sw.js').catch(() => {
+      /* SW kaydi basarisiz olursa uygulama normal sekilde devam eder */
+    });
+  });
+}
+
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <App />

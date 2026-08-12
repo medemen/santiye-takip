@@ -69,7 +69,22 @@ export function subscribeSiteConfig(fn: (cfg: SantiyeConfig) => void): () => voi
   return () => listeners.delete(fn);
 }
 
+// Bilesen mount sayisi kadar supabase sorgusu atilmamasi icin
+// "zaten yuklendi" bayragi + in-flight promise dedup.
+let _configYuklendi = false;
+let _configYuklemePromise: Promise<SantiyeConfig> | null = null;
+
 export async function loadSiteConfigFromDb(): Promise<SantiyeConfig> {
+  if (_configYuklendi) return current;
+  if (_configYuklemePromise) return _configYuklemePromise;
+
+  _configYuklemePromise = configiDbdenYukle().finally(() => {
+    _configYuklemePromise = null;
+  });
+  return _configYuklemePromise;
+}
+
+async function configiDbdenYukle(): Promise<SantiyeConfig> {
   let merged: SantiyeConfig | null = null;
 
   // localStorage override onceliklidir
@@ -84,6 +99,7 @@ export async function loadSiteConfigFromDb(): Promise<SantiyeConfig> {
 
   // Supabase tablosu varsa ustune islenir
   const { getSupabase, isSupabaseReady } = await import('../lib/supabase');
+  let dbBasarili = false;
   if (isSupabaseReady()) {
     try {
       const { data, error } = await getSupabase()
@@ -96,6 +112,7 @@ export async function loadSiteConfigFromDb(): Promise<SantiyeConfig> {
         if (!merged.durumTespit && data.config.durumTespit) {
           merged = deepMerge(DEFAULT_CONFIG, data.config);
         }
+        dbBasarili = true;
       }
     } catch {
       /* DB'ye ulasilamadiysa cached/devam et */
@@ -103,12 +120,15 @@ export async function loadSiteConfigFromDb(): Promise<SantiyeConfig> {
   }
 
   if (merged) setSiteConfig(merged);
+  if (dbBasarili) _configYuklendi = true;
   return current;
 }
 
 export async function persistConfigToDb(cfg: SantiyeConfig): Promise<void> {
   const { getSupabase, isSupabaseReady } = await import('../lib/supabase');
   if (!isSupabaseReady()) return;
+  const { supabaseOturumAktif } = await import('../stores/authStore');
+  if (!supabaseOturumAktif()) return;
   const { error } = await getSupabase()
     .from('santiye_config')
     .upsert(
@@ -116,8 +136,4 @@ export async function persistConfigToDb(cfg: SantiyeConfig): Promise<void> {
       { onConflict: 'id' }
     );
   if (error) throw error;
-}
-
-export function configStorageKey(): string {
-  return STORAGE_KEY;
 }

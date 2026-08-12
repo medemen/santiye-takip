@@ -10,36 +10,12 @@ export interface SantiyeSefi {
   adalar: string[];
 }
 
-export interface PersonelData {
-  aciklama: string;
-  proje: string;
-  tarih: string;
-  santiye_sefleri: SantiyeSefi[];
-  personel: Personel[];
-}
-
 export interface Blok {
   blok_no: number;
   tip: string;
   daire_sayisi: number;
   yapi_konfigurasyonu: string;
   kat_sayisi: number;
-}
-
-export interface AdaBlok {
-  ada: string;
-  blok_sayisi: number;
-  toplam_daire: number;
-  toplam_kat: number;
-  bloklar: Blok[];
-}
-
-export interface BlokData {
-  aciklama: string;
-  proje: string;
-  adalar: AdaBlok[];
-  pdf_referans_toplamlari: Record<string, { blok: number; daire: number; kat: number }>;
-  not: string;
 }
 
 export interface Oturum {
@@ -78,12 +54,6 @@ export interface Rapor {
   ilerleme_yuzde: number;
   aciklama: string;
   olusturma_tarihi: string;
-}
-
-export interface BlokProgress {
-  blok_no: number;
-  is_kalemleri: Record<string, Rapor | null>;
-  genel_ilerleme: number;
 }
 
 export interface IsKalemiHedefi {

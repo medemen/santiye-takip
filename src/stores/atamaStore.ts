@@ -3,7 +3,7 @@ import { getSupabase, isSupabaseReady } from '../lib/supabase';
 import { getSiteConfig } from '../config/site';
 import type { RealtimeChannel } from '@supabase/supabase-js';
 import { toastGoster } from './toastStore';
-import { getCurrentUser } from './authStore';
+import { getCurrentUser, supabaseOturumAktif } from './authStore';
 
 const PREFIX = getSiteConfig().marka.localStoragePrefix;
 const BLOK_KEY = `${PREFIX}_blok_atamalari`;
@@ -13,7 +13,7 @@ let _adaChannel: RealtimeChannel | null = null;
 let _blokChannel: RealtimeChannel | null = null;
 
 export function aboneOlAtamaGuncellemeleri(onChannelStatus?: (status: string) => void): void {
-  if (!isSupabaseReady()) return;
+  if (!supabaseOturumAktif()) return;
 
   if (!_adaChannel) {
     _adaChannel = getSupabase()
@@ -51,16 +51,25 @@ export function realtimeAtamaAboneliktenCik(): void {
   }
 }
 
+// modul seviyesi cache: her okumada JSON.parse yapilmaz
+let _blokAtamalarCache: KullaniciAtamalari | null = null;
+let _adaAtamalarCache: Record<string, string | null> | null = null;
+
 function getBlokAtamalar(): KullaniciAtamalari {
+  if (_blokAtamalarCache) return _blokAtamalarCache;
+  let okunan: KullaniciAtamalari;
   try {
     const data = localStorage.getItem(BLOK_KEY);
-    return data ? JSON.parse(data) : {};
+    okunan = data ? JSON.parse(data) : {};
   } catch {
-    return {};
+    okunan = {};
   }
+  _blokAtamalarCache = okunan;
+  return okunan;
 }
 
 function saveBlokAtamalar(atamalar: KullaniciAtamalari): void {
+  _blokAtamalarCache = atamalar;
   localStorage.setItem(BLOK_KEY, JSON.stringify(atamalar));
 }
 
@@ -73,7 +82,7 @@ export function setKullaniciBlokAtamasi(ad_soyad: string, atama: BlokAtamasi): v
   const atamalar = getBlokAtamalar();
   atamalar[ad_soyad] = atama;
   saveBlokAtamalar(atamalar);
-  if (isSupabaseReady()) {
+  if (supabaseOturumAktif()) {
     const supabase = getSupabase();
     for (const [ada, blokNos] of Object.entries(atama)) {
       if (blokNos.length === 0) {
@@ -104,15 +113,20 @@ export function getKullaniciBloklari(ad_soyad: string, ada: string): number[] {
 }
 
 function getAdaAtamalar(): Record<string, string | null> {
+  if (_adaAtamalarCache) return _adaAtamalarCache;
+  let okunan: Record<string, string | null>;
   try {
     const data = localStorage.getItem(ADA_KEY);
-    return data ? JSON.parse(data) : {};
+    okunan = data ? JSON.parse(data) : {};
   } catch {
-    return {};
+    okunan = {};
   }
+  _adaAtamalarCache = okunan;
+  return okunan;
 }
 
 function saveAdaAtamalar(atamalar: Record<string, string | null>): void {
+  _adaAtamalarCache = atamalar;
   localStorage.setItem(ADA_KEY, JSON.stringify(atamalar));
 }
 
@@ -124,7 +138,7 @@ export function setKullaniciAdaAtamasi(ad_soyad: string, ada: string | null): vo
     atamalar[ad_soyad] = ada;
   }
   saveAdaAtamalar(atamalar);
-  if (isSupabaseReady()) {
+  if (supabaseOturumAktif()) {
     if (ada === null) {
       getSupabase().from('kullanici_ada_atamalari').delete().eq('ad_soyad', ad_soyad).then(({ error }) => {
         if (error) {
@@ -159,7 +173,7 @@ export async function supabaseAtamalariYukle(): Promise<void> {
   try {
     const { data: adaRows, error: adaError } = await getSupabase()
       .from('kullanici_ada_atamalari')
-      .select('*');
+      .select('ad_soyad, ada');
     if (adaError) throw adaError;
 
     const yerelAda = getAdaAtamalar();
@@ -170,19 +184,21 @@ export async function supabaseAtamalariYukle(): Promise<void> {
     saveAdaAtamalar({ ...yerelAda, ...sunucuAda });
 
     const bekleyenAda = Object.entries(yerelAda).filter(([ad]) => !(ad in sunucuAda));
-    for (const [ad, ada] of bekleyenAda) {
-      const { error } = await getSupabase()
-        .from('kullanici_ada_atamalari')
-        .upsert({ ad_soyad: ad, ada, updated_at: new Date().toISOString(), user_id: getCurrentUser()?.user_id ?? null }, { onConflict: 'ad_soyad' });
-      if (error) {
-        console.warn('Supabase yerel ada atama yükleme hatası:', error.message);
-        toastGoster('Yerel ada atamaları sunucuya yüklenemedi: ' + error.message, 'error');
+    if (supabaseOturumAktif()) {
+      for (const [ad, ada] of bekleyenAda) {
+        const { error } = await getSupabase()
+          .from('kullanici_ada_atamalari')
+          .upsert({ ad_soyad: ad, ada, updated_at: new Date().toISOString(), user_id: getCurrentUser()?.user_id ?? null }, { onConflict: 'ad_soyad' });
+        if (error) {
+          console.warn('Supabase yerel ada atama yükleme hatası:', error.message);
+          toastGoster('Yerel ada atamaları sunucuya yüklenemedi: ' + error.message, 'error');
+        }
       }
     }
 
     const { data: blokRows, error: blokError } = await getSupabase()
       .from('kullanici_blok_atamalari')
-      .select('*');
+      .select('ad_soyad, ada, blok_nos');
     if (blokError) throw blokError;
 
     const yerelBlok = getBlokAtamalar();
@@ -210,7 +226,7 @@ export async function supabaseAtamalariYukle(): Promise<void> {
         }
       }
     }
-    if (bekleyenBlok.length > 0) {
+    if (bekleyenBlok.length > 0 && supabaseOturumAktif()) {
       const { error } = await getSupabase()
         .from('kullanici_blok_atamalari')
         .upsert(bekleyenBlok, { onConflict: 'ad_soyad, ada' });

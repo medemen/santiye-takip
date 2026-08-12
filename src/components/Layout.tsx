@@ -1,11 +1,14 @@
 import { useNavigate, NavLink } from 'react-router-dom';
 import { getCurrentUser, cikisYap, isProjeMuduruSession, isAdmin } from '../stores/authStore';
+import { useSiteConfig } from '../hooks/useSiteConfig';
+import { useIsDesktop } from '../hooks/useIsDesktop';
 
 const navItems = [
   { to: '/', label: 'Dashboard', icon: '📊' },
   { to: '/adalar', label: 'Adalar', icon: '🏗️' },
   { to: '/rapor-ekle', label: 'Rapor', icon: '➕', fab: true },
   { to: '/raporlar', label: 'Raporlar', icon: '📋' },
+  { to: '/istatistik', label: 'İstatistik', icon: '📈', desktopOnly: true },
   { to: '/personel', label: 'Personel', icon: '👥' },
   { to: '/toplu-rapor', label: 'Toplu', icon: '📦' },
   { to: '/ayarlar', label: 'Ayarlar', icon: '⚙️' },
@@ -18,8 +21,11 @@ interface Props {
 export default function Layout({ children }: Props) {
   const navigate = useNavigate();
   const user = getCurrentUser();
+  const config = useSiteConfig();
+  const isDesktop = useIsDesktop();
 
   const gorunurNav = navItems.filter((item) => {
+    if (item.desktopOnly) return isDesktop;
     if (item.to === '/personel') return true;
     if (item.to === '/ayarlar') return isProjeMuduruSession();
     if (item.to === '/toplu-rapor') return isAdmin();
@@ -32,6 +38,115 @@ export default function Layout({ children }: Props) {
       navigate('/login');
     }
   };
+
+  if (isDesktop) {
+    return (
+      <div style={{ maxWidth: 1360, margin: '0 auto', minHeight: '100dvh', backgroundColor: '#f8fafc', display: 'flex' }}>
+        <aside
+          style={{
+            width: 248,
+            flexShrink: 0,
+            backgroundColor: '#fff',
+            borderRight: '1px solid #e5e7eb',
+            position: 'sticky',
+            top: 0,
+            height: '100dvh',
+            display: 'flex',
+            flexDirection: 'column',
+            padding: '20px 14px',
+            overflowY: 'auto',
+          }}
+        >
+          <div
+            onClick={() => navigate('/')}
+            style={{ cursor: 'pointer', padding: '0 8px 18px', borderBottom: '1px solid #f0f0f0', marginBottom: 14 }}
+          >
+            <div style={{ fontSize: 17, fontWeight: 700, color: '#1f2937' }}>{config.genel.santiyeAdi}</div>
+            <div style={{ fontSize: 12, color: '#9ca3af' }}>{config.genel.projeAdi}</div>
+          </div>
+
+          <nav style={{ display: 'flex', flexDirection: 'column', gap: 4, flex: 1 }}>
+            {gorunurNav
+              .filter((item) => !item.fab)
+              .map((item) => (
+                <NavLink
+                  key={item.to}
+                  to={item.to}
+                  end={item.to === '/'}
+                  style={({ isActive }) => ({
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 10,
+                    padding: '10px 12px',
+                    borderRadius: 10,
+                    textDecoration: 'none',
+                    fontSize: 14,
+                    fontWeight: isActive ? 600 : 400,
+                    color: isActive ? '#f59e0b' : '#4b5563',
+                    backgroundColor: isActive ? '#fef3c7' : 'transparent',
+                  })}
+                >
+                  <span style={{ fontSize: 18 }}>{item.icon}</span>
+                  <span>{item.label}</span>
+                </NavLink>
+              ))}
+            {gorunurNav.find((item) => item.fab) && (
+              <NavLink
+                to="/rapor-ekle"
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 10,
+                  padding: '10px 12px',
+                  borderRadius: 10,
+                  marginTop: 6,
+                  textDecoration: 'none',
+                  fontSize: 14,
+                  fontWeight: 600,
+                  color: '#fff',
+                  backgroundColor: '#f59e0b',
+                  boxShadow: '0 2px 8px rgba(245,158,11,0.35)',
+                }}
+              >
+                <span style={{ fontSize: 18 }}>➕</span>
+                <span>Yeni Rapor</span>
+              </NavLink>
+            )}
+          </nav>
+
+          <div style={{ borderTop: '1px solid #f0f0f0', paddingTop: 12 }}>
+            <div style={{ fontSize: 13, color: '#374151', fontWeight: 600 }}>
+              👤 {user?.ad_soyad ?? 'Giriş yapılmadı'}
+            </div>
+            <div style={{ fontSize: 11, color: '#9ca3af', marginBottom: 8 }}>
+              {user?.rol}
+              {isProjeMuduruSession() && ' 👑 Proje Müdürü'}
+              {user?.admin && !isProjeMuduruSession() && ' • Yönetici'}
+            </div>
+            <button
+              onClick={handleLogout}
+              style={{
+                width: '100%',
+                background: 'none',
+                border: '1px solid #e5e7eb',
+                borderRadius: 8,
+                padding: '8px 10px',
+                fontSize: 12,
+                color: '#6b7280',
+                cursor: 'pointer',
+              }}
+            >
+              Çıkış
+            </button>
+          </div>
+        </aside>
+
+        <main style={{ flex: 1, minWidth: 0, padding: '24px 28px 48px' }}>{children}</main>
+      </div>
+    );
+  }
+
+  const mobilNav = gorunurNav.filter((item) => !item.desktopOnly);
 
   return (
     <div style={{ maxWidth: 480, margin: '0 auto', minHeight: '100dvh', backgroundColor: '#f8fafc', position: 'relative', paddingTop: 'env(safe-area-inset-top, 0px)' }}>
@@ -97,7 +212,7 @@ export default function Layout({ children }: Props) {
           boxShadow: '0 -1px 3px rgba(0,0,0,0.05)',
         }}
       >
-        {gorunurNav.map((item) =>
+        {mobilNav.map((item) =>
           item.fab ? (
             <NavLink
               key={item.to}
