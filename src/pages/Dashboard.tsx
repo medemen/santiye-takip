@@ -11,25 +11,18 @@ import { getAdaList, getAllKalemler } from '../config/helpers';
 import { DURUM_RENKLERI } from '../config/defaultConfig';
 import DonutChart from '../components/DonutChart';
 import BarChart from '../components/BarChart';
-import ReportCard from '../components/ReportCard';
-import ProgressBar from '../components/ProgressBar';
-import TrendChart from '../components/TrendChart';
 import BlokMatrisi from '../components/BlokMatrisi';
+import ProgressBar from '../components/ProgressBar';
+import KpiCard from '../components/dashboard/KpiCard';
+import GecikenKart from '../components/dashboard/GecikenKart';
+import HedefKart from '../components/dashboard/HedefKart';
+import YaklasanKart from '../components/dashboard/YaklasanKart';
+import PersonelAktiviteKart from '../components/dashboard/PersonelAktiviteKart';
+import KalemIlerlemeKart from '../components/dashboard/KalemIlerlemeKart';
+import TrendKart from '../components/dashboard/TrendKart';
+import AdaDetayTablo from '../components/dashboard/AdaDetayTablo';
+import SonRaporlarKart from '../components/dashboard/SonRaporlarKart';
 import { card, btnGhost } from '../utils/styles';
-
-function KpiCard({ label, value, color, progress }: { label: string; value: string | number; color: string; progress?: number }) {
-  return (
-    <div style={{ ...card, padding: 16 }}>
-      <div style={{ fontSize: 12, color: '#6b7280', fontWeight: 500, marginBottom: 4 }}>{label}</div>
-      <div style={{ fontSize: 26, fontWeight: 700, color }}>{value}</div>
-      {progress !== undefined && (
-        <div style={{ marginTop: 8 }}>
-          <ProgressBar value={progress} height={8} />
-        </div>
-      )}
-    </div>
-  );
-}
 
 export default function Dashboard() {
   const navigate = useNavigate();
@@ -201,222 +194,21 @@ export default function Dashboard() {
       .slice(0, 8);
   }, [raporlar]);
 
-  const hedefKartlari = (
-    <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginBottom: 10 }}>
-      <span style={{ fontSize: 12, backgroundColor: '#f3f4f6', color: '#4b5563', padding: '3px 10px', borderRadius: 12 }}>
-        ✅ {hedefOzeti.tamamlanan} tamam
-      </span>
-      <span style={{ fontSize: 12, backgroundColor: hedefOzeti.suresiGecen > 0 ? '#fef2f2' : '#f3f4f6', color: hedefOzeti.suresiGecen > 0 ? '#ef4444' : '#4b5563', padding: '3px 10px', borderRadius: 12, fontWeight: hedefOzeti.suresiGecen > 0 ? 700 : 400 }}>
-        ⛔ {hedefOzeti.suresiGecen} süresi geçti
-      </span>
-      <span style={{ fontSize: 12, backgroundColor: hedefOzeti.bugun > 0 ? '#fef3c7' : '#f3f4f6', color: hedefOzeti.bugun > 0 ? '#92400e' : '#4b5563', padding: '3px 10px', borderRadius: 12, fontWeight: hedefOzeti.bugun > 0 ? 700 : 400 }}>
-        📅 {hedefOzeti.bugun} bugün
-      </span>
-      <span style={{ fontSize: 12, backgroundColor: hedefOzeti.yediGun > 0 ? '#fef3c7' : '#f3f4f6', color: hedefOzeti.yediGun > 0 ? '#92400e' : '#4b5563', padding: '3px 10px', borderRadius: 12, fontWeight: hedefOzeti.yediGun > 0 ? 700 : 400 }}>
-        ⏳ {hedefOzeti.yediGun} ≤7 gün
-      </span>
-    </div>
-  );
-
-  const hedefAcilListe = (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-      {hedefOzeti.acil.slice(0, 6).map((h) => (
-        <div
-          key={`${h.ada}-${h.blok_no}-${h.is_kalemi}`}
-          onClick={() => navigate(h.blok_no === 0 ? `/ada/${h.ada}` : `/ada/${h.ada}/blok/${h.blok_no}`)}
-          style={{
-            display: 'flex', justifyContent: 'space-between',
-            padding: '6px 10px', backgroundColor: '#f9fafb',
-            borderRadius: 8, cursor: 'pointer', fontSize: 12,
-          }}
-        >
-          <span style={{ fontWeight: 500 }}>{h.ada} - {h.blok_no === 0 ? 'Ada Geneli' : `Blok ${h.blok_no}`}</span>
-          <span style={{ color: '#374151' }}>{h.is_kalemi}</span>
-          <span style={{ color: h.durum.renk, fontWeight: 600 }}>{h.durum.label}</span>
-        </div>
-      ))}
-    </div>
-  );
-
-  const gecikenKart = (
-    <div
-      style={{
-        backgroundColor: '#fef2f2',
-        borderRadius: 16,
-        padding: 14,
-        marginBottom: 16,
-        border: '1px solid #fecaca',
-      }}
-    >
-      <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
-        <span style={{ fontSize: 18 }}>⚠️</span>
-        <span style={{ fontSize: 14, fontWeight: 600, color: '#ef4444' }}>
-          {gecikenIsler.length} Geciken İş Kalemi
-        </span>
-      </div>
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-        {gecikenIsler.slice(0, 5).map((r) => (
-          <div
-            key={r.id}
-            onClick={() => navigate(r.blok_no === 0 ? `/ada/${r.ada}` : `/ada/${r.ada}/blok/${r.blok_no}`)}
-            style={{
-              display: 'flex', justifyContent: 'space-between',
-              padding: '6px 10px', backgroundColor: '#fff',
-              borderRadius: 8, cursor: 'pointer', fontSize: 12,
-            }}
-          >
-            <span style={{ fontWeight: 500 }}>{r.ada} - {r.blok_no === 0 ? 'Ada Geneli' : `Blok ${r.blok_no}`}</span>
-            <span style={{ color: '#ef4444' }}>{r.is_kalemi}</span>
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-
-  const personelAktiviteKart = personelAktivite7.length > 0 && (
-    <div style={{ ...card, marginBottom: 16 }}>
-      <h3 style={{ fontSize: 14, fontWeight: 600, color: '#4b5563', margin: 0, marginBottom: 12 }}>
-        Son 7 Gün Personel Aktivitesi
-      </h3>
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-        {personelAktivite7.map((p, i) => (
-          <div
-            key={p.ad_soyad}
-            style={{
-              display: 'flex',
-              justifyContent: 'space-between',
-              alignItems: 'center',
-              padding: '8px 12px',
-              backgroundColor: i === 0 ? '#fef3c7' : '#f9fafb',
-              borderRadius: 8,
-            }}
-          >
-            <div style={{ fontSize: 13, fontWeight: 500, color: '#1f2937' }}>
-              {i === 0 && '🥇 '}{i === 1 && '🥈 '}{i === 2 && '🥉 '}
-              {p.ad_soyad}
-            </div>
-            <div style={{ fontSize: 13, fontWeight: 600, color: '#f59e0b' }}>{p.raporSayisi} rapor</div>
-          </div>
-        ))}
-      </div>
-    </div>
-  );
+  const blokNavigate = (ada: string, blokNo: number) =>
+    navigate(blokNo === 0 ? `/ada/${ada}` : `/ada/${ada}/blok/${blokNo}`);
 
   const hedefKart = hedefOzeti.toplam > 0 && (
-    <div style={{ ...card, marginBottom: 16 }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 }}>
-        <button
-          onClick={() => navigate('/hedef-takvim')}
-          style={{
-            background: 'none', border: 'none', padding: 0, cursor: 'pointer',
-            fontSize: 14, fontWeight: 600, color: '#4b5563',
-          }}
-        >
-          🎯 Hedef Takvimi <span style={{ fontSize: 11, color: '#f59e0b', fontWeight: 700 }}>→</span>
-        </button>
-        <span style={{ fontSize: 12, color: '#9ca3af' }}>{hedefOzeti.toplam} hedef</span>
-      </div>
-      {hedefKartlari}
-      {hedefOzeti.acil.length > 0 ? (
-        hedefAcilListe
-      ) : (
-        <p style={{ fontSize: 12, color: '#9ca3af', margin: 0 }}>Tüm hedefler yolunda, acil iş yok. 🎉</p>
-      )}
-    </div>
+    <HedefKart
+      ozet={hedefOzeti}
+      onNavigate={blokNavigate}
+      onHedefTakvim={() => navigate('/hedef-takvim')}
+    />
   );
 
-  const trendKart = (
-    <div style={{ ...card }}>
-      <h3 style={{ fontSize: 14, fontWeight: 600, color: '#4b5563', margin: 0, marginBottom: 8 }}>
-        Zaman Trendi
-      </h3>
-      <div style={{ fontSize: 11, color: '#9ca3af', marginBottom: 4 }}>Son 14 gün rapor hacmi</div>
-      <TrendChart data={trendData} />
-    </div>
-  );
+  const yaklasanKart = <YaklasanKart hedefler={yaklasanHedefler} onNavigate={blokNavigate} />;
 
-  const kalemIlerlemeKart = (
-    <div style={{ ...card }}>
-      <h3 style={{ fontSize: 14, fontWeight: 600, color: '#4b5563', margin: 0, marginBottom: 4 }}>
-        İş Kalemi Bazında İlerleme
-      </h3>
-      <div style={{ fontSize: 11, color: '#9ca3af', marginBottom: 10 }}>
-        {isKalemleri.length} iş kalemi • proje geneli ortalama, en düşükten yükseğe
-      </div>
-      <div style={{ maxHeight: 340, overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: 8, paddingRight: 4 }}>
-        {blokVerisi.kalemIlerleme.map((k) => (
-          <div key={k.kalem} style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-            <span
-              title={`${k.kalem} — %${k.ortalama} (${k.raporluBlok} blokta rapor)`}
-              style={{
-                flex: 1,
-                minWidth: 0,
-                fontSize: 12,
-                color: '#374151',
-                whiteSpace: 'nowrap',
-                overflow: 'hidden',
-                textOverflow: 'ellipsis',
-              }}
-            >
-              {k.kalem}
-            </span>
-            <div style={{ width: 120, flexShrink: 0 }}>
-              <ProgressBar value={k.ortalama} height={6} />
-            </div>
-            <span style={{ width: 42, flexShrink: 0, textAlign: 'right', fontSize: 12, fontWeight: 600, color: '#4b5563' }}>
-              %{k.ortalama}
-            </span>
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-
-  const yaklasanKart = (
-    <div style={{ ...card, marginBottom: 16 }}>
-      <h3 style={{ fontSize: 14, fontWeight: 600, color: '#4b5563', margin: 0, marginBottom: 10 }}>
-        ⏰ Yaklaşan Hedefler
-      </h3>
-      {yaklasanHedefler.length === 0 ? (
-        <p style={{ fontSize: 12, color: '#9ca3af', margin: 0 }}>Sonraki 14 gün içinde hedef yok. 🎉</p>
-      ) : (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-          {yaklasanHedefler.map((h) => (
-            <div
-              key={`${h.ada}-${h.blok_no}-${h.is_kalemi}`}
-              onClick={() => navigate(h.blok_no === 0 ? `/ada/${h.ada}` : `/ada/${h.ada}/blok/${h.blok_no}`)}
-              style={{
-                display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-                padding: '7px 10px', backgroundColor: '#f9fafb', borderRadius: 8, cursor: 'pointer',
-              }}
-            >
-              <div style={{ minWidth: 0 }}>
-                <div style={{ fontSize: 12, fontWeight: 600, color: '#1f2937', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                  {h.ada} - {h.blok_no === 0 ? 'Ada Geneli' : `Blok ${h.blok_no}`}
-                </div>
-                <div style={{ fontSize: 11, color: '#6b7280', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                  {h.is_kalemi} • {h.hedef_tarih}
-                </div>
-              </div>
-              <span
-                style={{
-                  flexShrink: 0,
-                  marginLeft: 8,
-                  fontSize: 11,
-                  fontWeight: 700,
-                  padding: '2px 8px',
-                  borderRadius: 10,
-                  backgroundColor: h.kalanGun === 0 ? '#fef2f2' : h.kalanGun <= 7 ? '#fef3c7' : '#dbeafe',
-                  color: h.kalanGun === 0 ? '#ef4444' : h.kalanGun <= 7 ? '#92400e' : '#1d4ed8',
-                }}
-              >
-                {h.kalanGun === 0 ? 'Bugün' : `${h.kalanGun} gün`}
-              </span>
-            </div>
-          ))}
-        </div>
-      )}
-    </div>
+  const personelAktiviteKart = personelAktivite7.length > 0 && (
+    <PersonelAktiviteKart kisiler={personelAktivite7} />
   );
 
   const altKartlar = [hedefKart, yaklasanKart, personelAktiviteKart].filter(Boolean);
@@ -473,10 +265,10 @@ export default function Dashboard() {
           <KpiCard label="Gecikme" value={stats.gecikenIsler} color="#ef4444" />
         </div>
 
-        {gecikenIsler.length > 0 && gecikenKart}
+        {gecikenIsler.length > 0 && <GecikenKart isler={gecikenIsler} onNavigate={blokNavigate} />}
 
         <div style={{ display: 'grid', gridTemplateColumns: '1.6fr 1fr 1fr', gap: 16, marginBottom: 16 }}>
-          {trendKart}
+          <TrendKart veri={trendData} />
           <div style={{ ...card }}>
             <h3 style={{ fontSize: 14, fontWeight: 600, color: '#4b5563', margin: 0, marginBottom: 8 }}>
               Rapor Dağılımı
@@ -492,7 +284,7 @@ export default function Dashboard() {
         </div>
 
         <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 1.8fr', gap: 16, marginBottom: 16, alignItems: 'start' }}>
-          {kalemIlerlemeKart}
+          <KalemIlerlemeKart kalemler={blokVerisi.kalemIlerleme} toplamKalem={isKalemleri.length} />
           <div style={{ ...card }}>
             <h3 style={{ fontSize: 14, fontWeight: 600, color: '#4b5563', margin: 0, marginBottom: 8 }}>
               Ada × Blok Matrisi
@@ -500,79 +292,18 @@ export default function Dashboard() {
             <BlokMatrisi
               adalar={adalar.map((a) => ({ ada: a.ada, bloklar: a.bloklar.map((b) => b.blok_no) }))}
               ilerleme={blokVerisi.adaBlokMap}
-              onBlokClick={(ada, blokNo) => navigate(`/ada/${ada}/blok/${blokNo}`)}
+              onBlokClick={blokNavigate}
             />
           </div>
         </div>
 
-        <div style={{ ...card, marginBottom: 16 }}>
-          <h3 style={{ fontSize: 14, fontWeight: 600, color: '#4b5563', margin: 0, marginBottom: 10 }}>
-            Ada Detay
-          </h3>
-          <div style={{ display: 'flex', flexDirection: 'column' }}>
-            <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 0.8fr 1fr 1fr 1fr 1.6fr', gap: 8, padding: '8px 12px', fontSize: 11, color: '#9ca3af', fontWeight: 600 }}>
-              <span>Ada</span>
-              <span>Rapor</span>
-              <span>Tamam</span>
-              <span>Devam</span>
-              <span>Gecikme</span>
-              <span>İlerleme</span>
-            </div>
-            {adaDetay.map((a) => (
-              <div
-                key={a.ada}
-                onClick={() => navigate(`/ada/${a.ada}`)}
-                style={{
-                  display: 'grid',
-                  gridTemplateColumns: '1.2fr 0.8fr 1fr 1fr 1fr 1.6fr',
-                  gap: 8,
-                  alignItems: 'center',
-                  padding: '8px 12px',
-                  borderTop: '1px solid #f0f0f0',
-                  fontSize: 13,
-                  cursor: 'pointer',
-                  backgroundColor: '#fff',
-                }}
-              >
-                <span style={{ fontWeight: 600, color: '#1f2937' }}>{a.ada}</span>
-                <span style={{ color: '#6b7280' }}>{a.toplam}</span>
-                <span style={{ color: '#22c55e' }}>✅ {a.tamam}</span>
-                <span style={{ color: '#3b82f6' }}>🔵 {a.devam}</span>
-                <span style={{ color: '#ef4444' }}>⚠️ {a.gecikme}</span>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                  <div style={{ flex: 1 }}>
-                    <ProgressBar value={a.ilerleme} height={8} />
-                  </div>
-                  <span style={{ fontWeight: 600, color: '#4b5563', width: 40, textAlign: 'right' }}>%{a.ilerleme}</span>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
+        <AdaDetayTablo satirlar={adaDetay} onNavigate={(ada) => navigate(`/ada/${ada}`)} />
 
         <div style={{ display: 'grid', gridTemplateColumns: `repeat(${altKartlar.length}, minmax(0, 1fr))`, gap: 16, marginBottom: 16, alignItems: 'start' }}>
           {altKartlar.map((kart, i) => <div key={i}>{kart}</div>)}
         </div>
 
-        <div style={{ ...card }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
-            <h3 style={{ fontSize: 14, fontWeight: 600, color: '#4b5563', margin: 0 }}>
-              Son Raporlar
-            </h3>
-            <button onClick={() => navigate('/raporlar')} style={btnGhost}>
-              Tümü
-            </button>
-          </div>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, minmax(0, 1fr))', gap: 10 }}>
-            {sonRaporlar.length === 0 ? (
-              <p style={{ fontSize: 13, color: '#9ca3af', textAlign: 'center', padding: 20 }}>
-                Henüz rapor eklenmemiş. İlk raporu eklemek için + butonuna tıklayın.
-              </p>
-            ) : (
-              sonRaporlar.map((r) => <ReportCard key={r.id} rapor={r} />)
-            )}
-          </div>
-        </div>
+        <SonRaporlarKart raporlar={sonRaporlar} grid onTumu={() => navigate('/raporlar')} />
       </div>
     );
   }
@@ -630,28 +361,12 @@ export default function Dashboard() {
         <BarChart data={adaProgress} />
       </div>
 
-      {gecikenIsler.length > 0 && gecikenKart}
+      {gecikenIsler.length > 0 && <GecikenKart isler={gecikenIsler} onNavigate={blokNavigate} />}
 
       {hedefKart}
 
-      <div style={{ ...card, marginBottom: 16 }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
-            <h3 style={{ fontSize: 14, fontWeight: 600, color: '#4b5563', margin: 0 }}>
-              Son Raporlar
-            </h3>
-          <button onClick={() => navigate('/raporlar')} style={btnGhost}>
-            Tümü
-          </button>
-        </div>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-          {sonRaporlar.length === 0 ? (
-            <p style={{ fontSize: 13, color: '#9ca3af', textAlign: 'center', padding: 20 }}>
-              Henüz rapor eklenmemiş. İlk raporu eklemek için + butonuna tıklayın.
-            </p>
-          ) : (
-            sonRaporlar.slice(0, 5).map((r) => <ReportCard key={r.id} rapor={r} />)
-          )}
-        </div>
+      <div style={{ marginBottom: 16 }}>
+        <SonRaporlarKart raporlar={sonRaporlar.slice(0, 5)} onTumu={() => navigate('/raporlar')} />
       </div>
     </div>
   );
