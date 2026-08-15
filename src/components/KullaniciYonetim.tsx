@@ -12,6 +12,7 @@ import {
 } from '../stores/kullaniciYonetimStore';
 import { toastGoster } from '../stores/toastStore';
 import { card } from '../utils/styles';
+import { onayla, metinIste } from '../utils/dialog';
 
 export function YeniKullaniciForm({ onIptal, onKaydedildi }: { onIptal: () => void; onKaydedildi: () => void }) {
   const config = useSiteConfig();
@@ -245,7 +246,7 @@ export function KullaniciYetkiKarti({ kullanici }: { kullanici: Kullanici }) {
   };
 
   const sifreSifirla = async () => {
-    const yeniSifre = window.prompt(`${kullanici.ad_soyad} için yeni şifre (en az 6 karakter):`);
+    const yeniSifre = await metinIste(`${kullanici.ad_soyad} için yeni şifre (en az 6 karakter):`);
     if (!yeniSifre) return;
     try {
       await santiyeKullaniciSifreSifirla(kullanici.id!, yeniSifre);
@@ -256,7 +257,7 @@ export function KullaniciYetkiKarti({ kullanici }: { kullanici: Kullanici }) {
   };
 
   const sil = async () => {
-    if (!window.confirm(`${kullanici.ad_soyad} kullanıcısı silinsin mi? Raporları korunur, hesabı kapatılır.`)) return;
+    if (!(await onayla(`${kullanici.ad_soyad} kullanıcısı silinsin mi? Raporları korunur, hesabı kapatılır.`))) return;
     try {
       await santiyeKullaniciSil(kullanici.id!);
       toastGoster('Kullanıcı silindi', 'success');

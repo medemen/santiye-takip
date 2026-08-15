@@ -2,6 +2,7 @@ import { useNavigate, NavLink } from 'react-router-dom';
 import { getCurrentUser, cikisYap, isProjeMuduruSession } from '../stores/authStore';
 import { useSiteConfig } from '../hooks/useSiteConfig';
 import { useIsDesktop } from '../hooks/useIsDesktop';
+import { onayla } from '../utils/dialog';
 
 const navItems = [
   { to: '/', label: 'Dashboard', icon: '📊' },
@@ -30,8 +31,8 @@ export default function Layout({ children }: Props) {
     return true;
   });
 
-  const handleLogout = () => {
-    if (window.confirm('Çıkış yapmak istediğinize emin misiniz?')) {
+  const handleLogout = async () => {
+    if (await onayla('Çıkış yapmak istediğinize emin misiniz?')) {
       cikisYap();
       navigate('/login');
     }

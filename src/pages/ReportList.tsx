@@ -9,6 +9,7 @@ import ReportCard from '../components/ReportCard';
 import { DURUM_LABELLARI } from '../config/defaultConfig';
 import { toastGoster } from '../stores/toastStore';
 import { raporlarXlsxExport } from '../utils/exportXlsx';
+import { onayla } from '../utils/dialog';
 import { getHedef } from '../stores/hedefStore';
 
 const PAGE_SIZE = 20;
@@ -83,8 +84,8 @@ export default function ReportList() {
   const gecerliSayfa = Math.min(sayfa, toplamSayfa);
   const gorunenRaporlar = filtered.slice((gecerliSayfa - 1) * PAGE_SIZE, gecerliSayfa * PAGE_SIZE);
 
-  const handleDelete = (id: string) => {
-    if (window.confirm('Bu raporu silmek istediğinize emin misiniz?')) {
+  const handleDelete = async (id: string) => {
+    if (await onayla('Bu raporu silmek istediğinize emin misiniz?')) {
       if (deleteRapor(id)) {
         toastGoster('Rapor silindi', 'success');
       }

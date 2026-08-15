@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import type { ImalatGrubu } from '../../config/types';
 import { benzersizId } from '../../config/editor';
+import { onayla } from '../../utils/dialog';
 
 interface Props {
   gruplar: ImalatGrubu[];
@@ -143,8 +144,8 @@ export default function KalemGrupEditor({ gruplar, onChange }: Props) {
                 <option value="pdf">PDF</option>
               </select>
               <button
-                onClick={() => {
-                  if (!window.confirm(`'${g.ad}' grubu silinsin mi?`)) return;
+                onClick={async () => {
+                  if (!(await onayla(`'${g.ad}' grubu silinsin mi?`))) return;
                   onChange(gruplar.filter((x) => x.id !== g.id));
                 }}
                 style={{

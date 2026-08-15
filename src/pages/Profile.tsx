@@ -16,6 +16,7 @@ import {
   hedefUyarilariniGoster,
 } from '../stores/notificationStore';
 import { toastGoster } from '../stores/toastStore';
+import { onayla } from '../utils/dialog';
 
 export default function Profile() {
   const navigate = useNavigate();
@@ -43,8 +44,8 @@ export default function Profile() {
   const sefAdalar = isSantiyeSefi(user.ad_soyad) ? getSefAdalar(user.ad_soyad) : [];
   const raporSayisi = getPersonelRaporlari(user.ad_soyad).length;
 
-  const handleLogout = () => {
-    if (window.confirm('Çıkış yapmak istediğinize emin misiniz?')) {
+  const handleLogout = async () => {
+    if (await onayla('Çıkış yapmak istediğinize emin misiniz?')) {
       cikisYap();
       navigate('/login');
     }

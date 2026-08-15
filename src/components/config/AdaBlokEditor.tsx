@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import type { AdaBlok, BlokYapisi } from '../../config/types';
 import { adaBloklariniYenidenUret, adaTamamla, bosBlok } from '../../config/editor';
+import { onayla } from '../../utils/dialog';
 
 interface Props {
   adalar: AdaBlok[];
@@ -200,8 +201,8 @@ export default function AdaBlokEditor({ adalar, onChange }: Props) {
                   {acikMi ? '▾ Kapat' : '▸ Bloklar'}
                 </button>
                 <button
-                  onClick={() => {
-                    if (!window.confirm(`'${a.ada}' adası ve blokları silinsin mi?`)) return;
+                  onClick={async () => {
+                    if (!(await onayla(`'${a.ada}' adası ve blokları silinsin mi?`))) return;
                     onChange(adalar.filter((_, i) => i !== adaIdx));
                     if (acik === adaIdx) setAcik(null);
                   }}

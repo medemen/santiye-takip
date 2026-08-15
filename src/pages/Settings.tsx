@@ -9,6 +9,7 @@ import { configValidate, durumTespitUret } from '../config/editor';
 import type { AdaBlok, ImalatGrubu } from '../config/types';
 import { toastGoster } from '../stores/toastStore';
 import { card, pageTitle, btnGhost } from '../utils/styles';
+import { onayla } from '../utils/dialog';
 import AdaBlokEditor from '../components/config/AdaBlokEditor';
 import KalemGrupEditor from '../components/config/KalemGrupEditor';
 
@@ -99,7 +100,7 @@ export default function Settings() {
   };
 
   const handleSifirla = async () => {
-    if (!window.confirm('Tüm ayarlar varsayılana döndürülecek. Emin misiniz?')) return;
+    if (!(await onayla('Tüm ayarlar varsayılana döndürülecek. Emin misiniz?'))) return;
     resetSiteConfig({ persistDb: true });
     toastGoster('Ayarlar varsayılana döndürüldü', 'success');
     navigate('/');

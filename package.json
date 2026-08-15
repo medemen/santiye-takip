@@ -27,6 +27,7 @@
   "dependencies": {
     "@capacitor/android": "^8.4.2",
     "@capacitor/core": "^8.4.2",
+    "@capacitor/dialog": "^8.0.1",
     "@capacitor/local-notifications": "^8.2.1",
     "@supabase/supabase-js": "^2.111.0",
     "html2canvas": "^1.4.1",
