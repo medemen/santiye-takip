@@ -1,20 +1,44 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useSiteConfig } from '../hooks/useSiteConfig';
-import { getAda, getAdaList, getAllKalemler } from '../config/helpers';
-import { DURUM_LABELLARI } from '../config/defaultConfig';
-import { saveRapor, updateRapor, getRaporById } from '../stores/reportStore';
+import { getAda, getAdaList } from '../config/helpers';
+import { DURUM_LABELLARI, DURUM_RENKLERI } from '../config/defaultConfig';
+import { saveRapor, saveRaporlar, updateRapor, getRaporById, getBlokProgress } from '../stores/reportStore';
+import { useRaporlar } from '../hooks/useRaporlar';
 import { getCurrentUser } from '../stores/authStore';
 import { getKullaniciAdaAtamasi, getKullaniciBloklari } from '../stores/atamaStore';
+import { useIsDesktop } from '../hooks/useIsDesktop';
 import type { IsDurumu } from '../types';
 import { todayISO } from '../utils/helpers';
 import { toastGoster } from '../stores/toastStore';
+import { card } from '../utils/styles';
 
-type Step = 'ada' | 'blok' | 'is_kalemi' | 'detay';
+interface BlokBilgi {
+  durum: IsDurumu;
+  ilerleme_yuzde: number;
+  adaGenel: boolean;
+}
+
+function SectionTitle({ children }: { children: React.ReactNode }) {
+  return (
+    <div style={{ fontSize: 14, fontWeight: 600, color: '#4b5563', marginBottom: 10 }}>{children}</div>
+  );
+}
+
+function filtreliGruplar(config: ReturnType<typeof useSiteConfig>, arama: string) {
+  const q = arama.trim().toLowerCase();
+  return config.isKalemleri.gruplar
+    .map((g) => ({
+      ...g,
+      kalemler: q ? g.kalemler.filter((ik) => ik.toLowerCase().includes(q)) : g.kalemler,
+    }))
+    .filter((g) => g.kalemler.length > 0);
+}
 
 export default function ReportAdd() {
   const navigate = useNavigate();
   const config = useSiteConfig();
+  const isDesktop = useIsDesktop();
   const [searchParams] = useSearchParams();
   const preAda = searchParams.get('ada') || '';
   const preBlok = searchParams.get('blok') || '';
@@ -23,37 +47,43 @@ export default function ReportAdd() {
   const user = getCurrentUser();
   const kullaniciAdi = user?.ad_soyad ?? '';
   const editMode = !!editId;
+  const raporlar = useRaporlar();
 
   const atananAda = getKullaniciAdaAtamasi(kullaniciAdi);
   const userBloklar = atananAda ? getKullaniciBloklari(kullaniciAdi, atananAda) : [];
-
   const isAdmin = (user?.admin ?? false) || (user?.proje_muduru ?? false);
 
-  const yetkiliAdalar: string[] = [];
-  if (isAdmin) {
-    yetkiliAdalar.push(...(user?.yetkili_adalar ?? []));
-  } else if (atananAda) {
-    yetkiliAdalar.push(atananAda);
-  }
+  const yetkiliAdalar = useMemo(() => {
+    const arr: string[] = [];
+    if (isAdmin) arr.push(...(user?.yetkili_adalar ?? []));
+    else if (atananAda) arr.push(atananAda);
+    return arr;
+  }, [isAdmin, user?.yetkili_adalar, atananAda]);
 
-  const gosterilecekAdalar = isAdmin
-    ? getAdaList(config).filter((a) => yetkiliAdalar.includes(a.ada))
-    : atananAda
-      ? getAdaList(config).filter((a) => a.ada === atananAda)
-      : [];
-
-  const [step, setStep] = useState<Step>(
-    editId ? 'detay' : preAda ? 'blok' : 'ada'
+  const gosterilecekAdalar = useMemo(
+    () =>
+      isAdmin
+        ? getAdaList(config).filter((a) => yetkiliAdalar.includes(a.ada))
+        : atananAda
+          ? getAdaList(config).filter((a) => a.ada === atananAda)
+          : [],
+    [config, isAdmin, atananAda, yetkiliAdalar]
   );
-  const [ada, setAda] = useState(preAda);
+
+  const [ada, setAda] = useState(
+    preAda || (gosterilecekAdalar.length === 1 ? gosterilecekAdalar[0].ada : '')
+  );
   const [blokNo, setBlokNo] = useState(preBlok ? parseInt(preBlok) : 0);
+  const [seciliBloklar, setSeciliBloklar] = useState<number[]>(
+    preBlok && parseInt(preBlok) > 0 ? [parseInt(preBlok)] : []
+  );
+  const [adaGeneli, setAdaGeneli] = useState(false);
   const [isKalemi, setIsKalemi] = useState('');
+  const [kalemArama, setKalemArama] = useState('');
   const [durum, setDurum] = useState<IsDurumu>('devam_ediyor');
   const [ilerleme, setIlerleme] = useState(50);
   const [aciklama, setAciklama] = useState('');
   const [tarih, setTarih] = useState(todayISO());
-  const [acikGruplar, setAcikGruplar] = useState<Set<string>>(new Set());
-  const [kalemArama, setKalemArama] = useState('');
 
   useEffect(() => {
     if (editId) {
@@ -70,6 +100,71 @@ export default function ReportAdd() {
     }
   }, [editId]);
 
+  // Ayni ada + is kalemi icin en son raporun durum/ilerleme/aciklama'sini,
+  // kullanici henuz dokunmadiysa otomatik doldur.
+  useEffect(() => {
+    if (!ada || !isKalemi || editMode) return;
+    const son = raporlar
+      .filter((r) => r.ada === ada && r.is_kalemi === isKalemi)
+      .sort(
+        (a, b) =>
+          new Date(b.olusturma_tarihi).getTime() - new Date(a.olusturma_tarihi).getTime()
+      )[0];
+    if (!son) return;
+    if (durum === 'devam_ediyor' && ilerleme === 50 && aciklama === '') {
+      setDurum(son.durum);
+      setIlerleme(son.ilerleme_yuzde);
+      setAciklama(son.aciklama);
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [ada, isKalemi, editMode, raporlar]);
+
+  const sonRapor = useMemo(() => {
+    if (editMode) return null;
+    const adaylar = raporlar.filter(
+      (r) => r.raporlayan === kullaniciAdi && gosterilecekAdalar.some((a) => a.ada === r.ada)
+    );
+    if (adaylar.length === 0) return null;
+    return adaylar
+      .slice()
+      .sort(
+        (a, b) =>
+          new Date(b.olusturma_tarihi).getTime() - new Date(a.olusturma_tarihi).getTime()
+      )[0];
+  }, [raporlar, kullaniciAdi, gosterilecekAdalar, editMode]);
+
+  const sonOneri = useMemo(() => {
+    if (!ada || !isKalemi) return null;
+    return (
+      raporlar
+        .filter((r) => r.ada === ada && r.is_kalemi === isKalemi)
+        .sort(
+          (a, b) =>
+            new Date(b.olusturma_tarihi).getTime() - new Date(a.olusturma_tarihi).getTime()
+        )[0] ?? null
+    );
+  }, [ada, isKalemi, raporlar]);
+
+  const sonRaporuKopyala = () => {
+    if (!sonRapor) return;
+    const r = sonRapor;
+    setAda(r.ada);
+    if (r.blok_no > 0) {
+      setSeciliBloklar([r.blok_no]);
+      setBlokNo(r.blok_no);
+      setAdaGeneli(false);
+    } else {
+      setAdaGeneli(true);
+      setSeciliBloklar([]);
+      setBlokNo(0);
+    }
+    setIsKalemi(r.is_kalemi);
+    setDurum(r.durum);
+    setIlerleme(r.ilerleme_yuzde);
+    setAciklama(r.aciklama);
+    setTarih(todayISO());
+  };
+
   const adaData = ada ? getAda(config, ada) : null;
 
   const getBlokFiltre = () => {
@@ -84,118 +179,100 @@ export default function ReportAdd() {
     return [];
   };
 
-  const toggleGrup = (grupId: string) => {
-    setAcikGruplar((prev) => {
-      const yeni = new Set(prev);
-      if (yeni.has(grupId)) yeni.delete(grupId);
-      else yeni.add(grupId);
+  const yetkiliBloklar = adaData
+    ? adaData.bloklar.filter((b) => getBlokFiltre().includes(b.blok_no)).map((b) => b.blok_no)
+    : [];
+
+  const blokDurumMap = useMemo<Record<number, BlokBilgi>>(() => {
+    if (!ada || !isKalemi) return {};
+    const adaKalemRaporlari = raporlar.filter((r) => r.ada === ada && r.is_kalemi === isKalemi);
+    const map: Record<number, BlokBilgi> = {};
+    for (const b of adaData?.bloklar ?? []) {
+      const sonRapor = getBlokProgress(ada, b.blok_no, [isKalemi])[isKalemi];
+      if (!sonRapor) continue;
+      const blokOzelVar = adaKalemRaporlari.some((r) => r.blok_no === b.blok_no);
+      map[b.blok_no] = {
+        durum: sonRapor.durum,
+        ilerleme_yuzde: sonRapor.ilerleme_yuzde,
+        adaGenel: !blokOzelVar,
+      };
+    }
+    return map;
+  }, [ada, isKalemi, adaData, raporlar]);
+
+  const gruplar = filtreliGruplar(config, kalemArama);
+
+  const selectAda = (a: string) => {
+    setAda(a);
+    setSeciliBloklar([]);
+    setAdaGeneli(false);
+  };
+
+  const toggleBlok = (b: number) => {
+    setSeciliBloklar((prev) =>
+      prev.includes(b) ? prev.filter((x) => x !== b) : [...prev, b]
+    );
+  };
+
+  const tumunuSec = () => setSeciliBloklar(yetkiliBloklar);
+  const temizle = () => setSeciliBloklar([]);
+
+  const toggleAdaGeneli = () => {
+    setAdaGeneli((v) => {
+      const yeni = !v;
+      if (yeni) setSeciliBloklar([]);
       return yeni;
     });
   };
 
   const kaydetRapor = (): string | null => {
     if (!ada || !isKalemi || !user) return null;
+    const veri = {
+      tarih,
+      raporlayan: kullaniciAdi,
+      ada,
+      is_kalemi: isKalemi,
+      durum,
+      ilerleme_yuzde: durum === 'tamamlandi' ? 100 : ilerleme,
+      aciklama,
+    };
     if (editMode && editId) {
-      updateRapor(editId, {
-        tarih,
-        raporlayan: kullaniciAdi,
-        ada,
-        blok_no: blokNo,
-        is_kalemi: isKalemi,
-        durum,
-        ilerleme_yuzde: durum === 'tamamlandi' ? 100 : ilerleme,
-        aciklama,
-      });
+      updateRapor(editId, { ...veri, blok_no: blokNo });
       toastGoster('Rapor güncellendi', 'success');
       return editId;
-    } else {
-      const yeni = saveRapor({
-        tarih,
-        raporlayan: kullaniciAdi,
-        ada,
-        blok_no: blokNo,
-        is_kalemi: isKalemi,
-        durum,
-        ilerleme_yuzde: durum === 'tamamlandi' ? 100 : ilerleme,
-        aciklama,
-      });
+    }
+    if (adaGeneli) {
+      const yeni = saveRapor({ ...veri, blok_no: 0 });
+      toastGoster('Ada geneli rapor kaydedildi', 'success');
+      return yeni.id;
+    }
+    if (seciliBloklar.length === 1) {
+      const yeni = saveRapor({ ...veri, blok_no: seciliBloklar[0] });
       toastGoster('Rapor kaydedildi', 'success');
       return yeni.id;
     }
+    const yeniler = saveRaporlar(seciliBloklar.map((b) => ({ ...veri, blok_no: b })));
+    toastGoster(`${seciliBloklar.length} blok için rapor kaydedildi`, 'success');
+    return yeniler[0]?.id ?? null;
   };
 
-  const handleSubmit = async () => {
+  const handleSubmit = () => {
     const id = kaydetRapor();
     if (!id) return;
     navigate('/raporlar');
   };
 
-  const handleKaydetVeDevamEt = async () => {
-    if (editMode) {
-      const id = kaydetRapor();
-      if (!id) return;
-      navigate('/raporlar');
-      return;
-    }
+  const handleKaydetVeYeni = () => {
     const id = kaydetRapor();
     if (!id) return;
     setIsKalemi('');
+    setKalemArama('');
+    setSeciliBloklar([]);
+    setAdaGeneli(false);
     setDurum('devam_ediyor');
     setIlerleme(50);
     setAciklama('');
-    setStep('is_kalemi');
-  };
-
-  const kalemButonlari = (kalemler: readonly string[]) => (
-    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
-      {kalemler.map((ik) => (
-        <button
-          key={ik}
-          onClick={() => {
-            setIsKalemi(ik);
-            setStep('detay');
-          }}
-          style={{
-            padding: '10px 8px',
-            backgroundColor: isKalemi === ik ? '#f59e0b' : '#f9fafb',
-            border: '1px solid',
-            borderColor: isKalemi === ik ? '#f59e0b' : '#e5e7eb',
-            borderRadius: 10,
-            fontSize: 12,
-            fontWeight: 500,
-            color: isKalemi === ik ? '#fff' : '#374151',
-            cursor: 'pointer',
-          }}
-        >
-          {ik}
-        </button>
-      ))}
-    </div>
-  );
-
-  const renderStepIndicator = () => {
-    const steps = ['ada', 'blok', 'is_kalemi', 'detay'] as Step[];
-    const labels = ['Ada', 'Blok', 'İş Kalemi', 'Detay'];
-    const currentIdx = steps.indexOf(step);
-    return (
-      <div style={{ display: 'flex', gap: 4, marginBottom: 20 }}>
-        {steps.map((s, i) => (
-          <div
-            key={s}
-            style={{
-              flex: 1,
-              height: 4,
-              borderRadius: 2,
-              backgroundColor: i <= currentIdx ? '#f59e0b' : '#e5e7eb',
-              transition: 'background-color 0.3s',
-            }}
-          />
-        ))}
-        <div style={{ fontSize: 11, color: '#9ca3af', textAlign: 'center', width: '100%', marginTop: 4 }}>
-          {labels[currentIdx]} ({currentIdx + 1}/4)
-        </div>
-      </div>
-    );
+    setTarih(todayISO());
   };
 
   if (gosterilecekAdalar.length === 0) {
@@ -223,408 +300,512 @@ export default function ReportAdd() {
     );
   }
 
+  const canSave = ada && isKalemi && (adaGeneli || seciliBloklar.length > 0);
+  const kaydetEtiketi = !isKalemi
+    ? 'İş Kalemi Seçin'
+    : adaGeneli
+      ? 'Ada Geneli Rapor Kaydet'
+      : seciliBloklar.length > 0
+        ? `${seciliBloklar.length} Blok İçin Rapor Kaydet`
+        : 'Blok Seçin';
+
+  const adaSecimi = (
+    <div>
+      <SectionTitle>Ada</SectionTitle>
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
+        {gosterilecekAdalar.map((a) => (
+          <button
+            key={a.ada}
+            onClick={() => selectAda(a.ada)}
+            style={{
+              padding: '12px 14px',
+              backgroundColor: ada === a.ada ? '#f59e0b' : '#f9fafb',
+              border: '1px solid',
+              borderColor: ada === a.ada ? '#f59e0b' : '#e5e7eb',
+              borderRadius: 10,
+              fontSize: 13,
+              fontWeight: 600,
+              color: ada === a.ada ? '#fff' : '#374151',
+              cursor: 'pointer',
+              textAlign: 'left',
+            }}
+          >
+            {a.ada}
+            <div style={{ fontSize: 11, fontWeight: 400, opacity: 0.85 }}>
+              {a.blok_sayisi} blok
+            </div>
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+
+  const isKalemiSecimi = (
+    <div>
+      <SectionTitle>İş Kalemi</SectionTitle>
+      <input
+        type="text"
+        placeholder="İş kalemi ara..."
+        value={kalemArama}
+        onChange={(e) => setKalemArama(e.target.value)}
+        style={{
+          width: '100%',
+          padding: '10px 12px',
+          borderRadius: 10,
+          border: '1px solid #e5e7eb',
+          fontSize: 13,
+          boxSizing: 'border-box',
+          marginBottom: 8,
+        }}
+      />
+      {gruplar.length === 0 ? (
+        <div
+          style={{
+            padding: 24,
+            textAlign: 'center',
+            color: '#9ca3af',
+            fontSize: 13,
+            border: '1px dashed #e5e7eb',
+            borderRadius: 10,
+          }}
+        >
+          Eşleşen iş kalemi bulunamadı
+        </div>
+      ) : (
+        <div
+          style={{
+            maxHeight: 340,
+            overflowY: 'auto',
+            border: '1px solid #e5e7eb',
+            borderRadius: 10,
+          }}
+        >
+          {gruplar.map((g) => (
+            <div key={g.id}>
+              <div
+                style={{
+                  position: 'sticky',
+                  top: 0,
+                  zIndex: 1,
+                  backgroundColor: '#f9fafb',
+                  padding: '6px 12px',
+                  fontSize: 12,
+                  fontWeight: 700,
+                  color: '#6b7280',
+                  borderBottom: '1px solid #f0f0f0',
+                }}
+              >
+                {g.ad} ({g.kalemler.length})
+              </div>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 6, padding: 8 }}>
+                {g.kalemler.map((ik) => (
+                  <button
+                    key={ik}
+                    onClick={() => setIsKalemi(ik)}
+                    style={{
+                      padding: '10px 8px',
+                      backgroundColor: isKalemi === ik ? '#f59e0b' : '#f9fafb',
+                      border: '1px solid',
+                      borderColor: isKalemi === ik ? '#f59e0b' : '#e5e7eb',
+                      borderRadius: 8,
+                      fontSize: 12,
+                      fontWeight: 500,
+                      color: isKalemi === ik ? '#fff' : '#374151',
+                      cursor: 'pointer',
+                    }}
+                  >
+                    {ik}
+                  </button>
+                ))}
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {!editMode && sonOneri && (
+        <div
+          style={{
+            fontSize: 11,
+            color: '#9ca3af',
+            marginTop: 8,
+            padding: '6px 10px',
+            backgroundColor: '#f9fafb',
+            borderRadius: 8,
+          }}
+        >
+          Bu ada + iş kalemi için son rapor: {DURUM_LABELLARI[sonOneri.durum]} (
+          %{sonOneri.ilerleme_yuzde}) — değerler otomatik dolduruldu, değiştirebilirsiniz.
+        </div>
+      )}
+    </div>
+  );
+
+  const blokSecimi = editMode ? null : (
+    <div>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 }}>
+        <SectionTitle>Bloklar</SectionTitle>
+        <div style={{ display: 'flex', gap: 6 }}>
+          <button
+            onClick={toggleAdaGeneli}
+            style={{
+              background: adaGeneli ? '#fef3c7' : 'none',
+              border: adaGeneli ? '1px solid #f59e0b' : '1px solid #e5e7eb',
+              borderRadius: 6,
+              padding: '2px 8px',
+              fontSize: 11,
+              color: adaGeneli ? '#92400e' : '#6b7280',
+              cursor: 'pointer',
+            }}
+            title="Raporu ada geneli (tüm bloklar) olarak kaydet"
+          >
+            {adaGeneli ? '✓ ' : ''}Ada Geneli
+          </button>
+          {!adaGeneli && (
+            <>
+              <button onClick={tumunuSec} style={kucukButon}>Tümünü Seç</button>
+              <button onClick={temizle} style={kucukButon}>Temizle</button>
+            </>
+          )}
+        </div>
+      </div>
+
+      {adaGeneli ? (
+        <div style={{ padding: 14, backgroundColor: '#fef3c7', borderRadius: 10, fontSize: 12, color: '#92400e' }}>
+          Bu iş kalemi için tek bir <strong>ada geneli rapor</strong> kaydedilecek. Tüm bloklar bu veriyi devralır.
+        </div>
+      ) : (
+        <>
+          <div style={{ fontSize: 12, color: '#6b7280', marginBottom: 8 }}>
+            {yetkiliBloklar.length === 0
+              ? 'Bu ada için yetkiniz bulunan blok yok.'
+              : `${seciliBloklar.length}/${yetkiliBloklar.length} blok seçili. Renkli bloklar mevcut raporu gösterir.`}
+          </div>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(52px, 1fr))', gap: 6 }}>
+            {adaData?.bloklar
+              .filter((b) => yetkiliBloklar.includes(b.blok_no))
+              .map((b) => {
+                const bilgi = blokDurumMap[b.blok_no];
+                const isSelected = seciliBloklar.includes(b.blok_no);
+                let bgColor = '#f3f4f6';
+                let textColor = '#4b5563';
+                if (bilgi) {
+                  bgColor = DURUM_RENKLERI[bilgi.durum];
+                  textColor = '#fff';
+                } else if (isSelected) {
+                  bgColor = '#f59e0b';
+                  textColor = '#fff';
+                }
+                const tooltip = bilgi
+                  ? `${DURUM_LABELLARI[bilgi.durum]} (%${bilgi.ilerleme_yuzde})${bilgi.adaGenel ? ' — Ada Geneli' : ''}`
+                  : 'Henüz rapor girilmemiş';
+                return (
+                  <button
+                    key={b.blok_no}
+                    onClick={() => toggleBlok(b.blok_no)}
+                    title={tooltip}
+                    style={{
+                      padding: 8,
+                      backgroundColor: bgColor,
+                      border: bilgi?.adaGenel
+                        ? '2px dashed #fff'
+                        : isSelected
+                          ? '2px solid #fff'
+                          : 'none',
+                      borderRadius: 8,
+                      fontSize: 12,
+                      fontWeight: 600,
+                      color: textColor,
+                      cursor: 'pointer',
+                      boxShadow: isSelected ? '0 0 0 2px #f59e0b' : 'none',
+                    }}
+                  >
+                    {b.blok_no}
+                  </button>
+                );
+              })}
+          </div>
+        </>
+      )}
+    </div>
+  );
+
+  const durumSecimi = (
+    <div>
+      <SectionTitle>Durum</SectionTitle>
+      <div style={{ display: 'flex', gap: 8 }}>
+        {(Object.entries(DURUM_LABELLARI) as [IsDurumu, string][]).map(([key, label]) => (
+          <button
+            key={key}
+            onClick={() => setDurum(key)}
+            style={{
+              flex: 1,
+              padding: '10px 8px',
+              backgroundColor: durum === key ? '#f59e0b' : '#f3f4f6',
+              border: 'none',
+              borderRadius: 10,
+              fontSize: 12,
+              fontWeight: 600,
+              color: durum === key ? '#fff' : '#4b5563',
+              cursor: 'pointer',
+            }}
+          >
+            {label}
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+
+  const ilerlemeSecimi = durum !== 'tamamlandi' && durum !== 'planlandi' && (
+    <div>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>
+        <span style={{ fontSize: 13, fontWeight: 500, color: '#4b5563' }}>İlerleme: %{ilerleme}</span>
+        <div style={{ display: 'flex', gap: 4 }}>
+          {[0, 25, 50, 75, 100].map((p) => (
+            <button
+              key={p}
+              onClick={() => setIlerleme(p)}
+              style={{
+                padding: '2px 8px',
+                backgroundColor: ilerleme === p ? '#fef3c7' : '#f9fafb',
+                border: ilerleme === p ? '1px solid #f59e0b' : '1px solid #e5e7eb',
+                borderRadius: 6,
+                fontSize: 11,
+                color: ilerleme === p ? '#92400e' : '#6b7280',
+                cursor: 'pointer',
+              }}
+            >
+              %{p}
+            </button>
+          ))}
+        </div>
+      </div>
+      <input
+        type="range"
+        min={0}
+        max={100}
+        value={ilerleme}
+        onChange={(e) => setIlerleme(parseInt(e.target.value))}
+        style={{ width: '100%' }}
+      />
+    </div>
+  );
+
+  const detaySecimi = (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+      <div>
+        <label style={{ display: 'block', fontSize: 13, fontWeight: 500, color: '#4b5563', marginBottom: 6 }}>
+          Açıklama
+        </label>
+        <textarea
+          value={aciklama}
+          onChange={(e) => setAciklama(e.target.value)}
+          placeholder="İşin durumu hakkında notlar..."
+          rows={3}
+          style={{
+            width: '100%',
+            padding: '10px 12px',
+            borderRadius: 10,
+            border: '1px solid #e5e7eb',
+            fontSize: 13,
+            fontFamily: 'inherit',
+            resize: 'vertical',
+            boxSizing: 'border-box',
+          }}
+        />
+      </div>
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+        <div>
+          <label style={{ display: 'block', fontSize: 13, fontWeight: 500, color: '#4b5563', marginBottom: 6 }}>
+            Tarih
+          </label>
+          <input
+            type="date"
+            value={tarih}
+            onChange={(e) => setTarih(e.target.value)}
+            style={{
+              width: '100%',
+              padding: '10px 12px',
+              borderRadius: 10,
+              border: '1px solid #e5e7eb',
+              fontSize: 13,
+              boxSizing: 'border-box',
+            }}
+          />
+        </div>
+        <div>
+          <label style={{ display: 'block', fontSize: 13, fontWeight: 500, color: '#4b5563', marginBottom: 6 }}>
+            Raporlayan
+          </label>
+          <input
+            type="text"
+            value={kullaniciAdi}
+            readOnly
+            style={{
+              width: '100%',
+              padding: '10px 12px',
+              borderRadius: 10,
+              border: '1px solid #e5e7eb',
+              fontSize: 13,
+              backgroundColor: '#f9fafb',
+              color: '#374151',
+              boxSizing: 'border-box',
+            }}
+          />
+        </div>
+      </div>
+    </div>
+  );
+
+  const aksiyonlar = (
+    <div style={{ display: 'flex', gap: 10 }}>
+      {editMode && (
+        <button
+          onClick={() => navigate('/raporlar')}
+          style={{
+            flex: 1,
+            padding: 12,
+            backgroundColor: '#f3f4f6',
+            border: 'none',
+            borderRadius: 12,
+            fontSize: 14,
+            fontWeight: 600,
+            color: '#4b5563',
+            cursor: 'pointer',
+          }}
+        >
+          Vazgeç
+        </button>
+      )}
+      {!editMode && (
+        <button
+          onClick={handleKaydetVeYeni}
+          disabled={!canSave}
+          style={{
+            flex: 1,
+            padding: 12,
+            backgroundColor: canSave ? '#dbeafe' : '#f3f4f6',
+            border: 'none',
+            borderRadius: 12,
+            fontSize: 14,
+            fontWeight: 600,
+            color: canSave ? '#1e40af' : '#9ca3af',
+            cursor: canSave ? 'pointer' : 'not-allowed',
+          }}
+        >
+          Kaydet ve Yeni
+        </button>
+      )}
+      <button
+        onClick={handleSubmit}
+        disabled={!canSave}
+        style={{
+          flex: 2,
+          padding: 12,
+          backgroundColor: canSave ? '#f59e0b' : '#e5e7eb',
+          border: 'none',
+          borderRadius: 12,
+          fontSize: 14,
+          fontWeight: 700,
+          color: canSave ? '#fff' : '#9ca3af',
+          cursor: canSave ? 'pointer' : 'not-allowed',
+        }}
+      >
+        {editMode ? 'Güncelle' : kaydetEtiketi}
+      </button>
+    </div>
+  );
+
+  const sola = (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
+      {adaSecimi}
+      {isKalemiSecimi}
+    </div>
+  );
+
+  const saga = (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
+      {blokSecimi}
+      {durumSecimi}
+      {ilerlemeSecimi}
+      {detaySecimi}
+      {aksiyonlar}
+    </div>
+  );
+
   return (
     <div>
       <h1 style={{ fontSize: 20, fontWeight: 700, color: '#1f2937', marginBottom: 4 }}>
         {editMode ? 'Rapor Düzenle' : 'Rapor Ekle'}
       </h1>
       <p style={{ fontSize: 13, color: '#6b7280', margin: 0, marginBottom: 16 }}>
-        {editMode ? 'Mevcut raporu güncelleyin' : 'Blok ilerleme durumunu raporlayın'}
+        {editMode
+          ? 'Mevcut raporu güncelleyin'
+          : 'Bir veya birden çok blok için iş kalemi ilerlemesini raporlayın'}
       </p>
 
-      {renderStepIndicator()}
+      {!editMode && sonRapor && (
+        <button
+          onClick={sonRaporuKopyala}
+          style={{
+            width: '100%',
+            padding: '12px',
+            backgroundColor: '#fff7ed',
+            border: '1px solid #fdba74',
+            borderRadius: 12,
+            fontSize: 13,
+            fontWeight: 600,
+            color: '#c2410c',
+            cursor: 'pointer',
+            marginBottom: 16,
+          }}
+        >
+          📋 Son raporu kopyala ({sonRapor.ada}
+          {sonRapor.blok_no > 0 ? ` · Blok ${sonRapor.blok_no}` : ' · Ada Geneli'} ·{' '}
+          {sonRapor.is_kalemi})
+        </button>
+      )}
 
-      <div
-        style={{
-          backgroundColor: '#fff',
-          borderRadius: 16,
-          padding: 20,
-          boxShadow: '0 1px 3px rgba(0,0,0,0.06)',
-          border: '1px solid #f0f0f0',
-        }}
-      >
-        {/* ADIM 1: Ada Seçimi */}
-        {step === 'ada' && (
-          <div>
-            <h3 style={{ fontSize: 15, fontWeight: 600, color: '#374151', marginBottom: 12 }}>
-              Ada Seçin
-            </h3>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-              {gosterilecekAdalar.map((a) => (
-                <button
-                  key={a.ada}
-                  onClick={() => {
-                    setAda(a.ada);
-                    setStep('blok');
-                  }}
-                  style={{
-                    padding: '14px 16px',
-                    backgroundColor: '#f8fafc',
-                    border: '2px solid #e5e7eb',
-                    borderRadius: 12,
-                    fontSize: 15,
-                    fontWeight: 600,
-                    color: '#1f2937',
-                    cursor: 'pointer',
-                    textAlign: 'left',
-                  }}
-                >
-                  {a.ada} — {a.blok_sayisi} Blok
-                  <div style={{ fontSize: 12, fontWeight: 400, color: '#6b7280', marginTop: 2 }}>
-                    {a.toplam_daire} daire, {a.toplam_kat} kat
-                  </div>
-                </button>
-              ))}
-            </div>
+      {editMode && (
+        <div
+          style={{
+            backgroundColor: '#fff',
+            borderRadius: 12,
+            padding: '12px 16px',
+            marginBottom: 16,
+            border: '1px solid #f0f0f0',
+            fontSize: 13,
+            color: '#374151',
+          }}
+        >
+          <strong>{ada}</strong> - {blokNo === 0 ? 'Ada Geneli' : `Blok ${blokNo}`} — {isKalemi}
+        </div>
+      )}
+
+      <div style={{ ...card, padding: 20 }}>
+        {isDesktop && !editMode ? (
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 24 }}>
+            <div>{sola}</div>
+            <div>{saga}</div>
           </div>
-        )}
-
-        {/* ADIM 2: Blok Seçimi */}
-        {step === 'blok' && (
-          <div>
-            <h3 style={{ fontSize: 15, fontWeight: 600, color: '#374151', marginBottom: 12 }}>
-              {ada} — Blok Seçin
-            </h3>
-            <button
-              onClick={() => {
-                setBlokNo(0);
-                setStep('is_kalemi');
-              }}
-              style={{
-                width: '100%',
-                padding: '12px 16px',
-                marginBottom: 10,
-                backgroundColor: blokNo === 0 ? '#f59e0b' : '#fef3c7',
-                border: blokNo === 0 ? 'none' : '2px solid #f59e0b',
-                borderRadius: 12,
-                fontSize: 14,
-                fontWeight: 600,
-                color: blokNo === 0 ? '#fff' : '#92400e',
-                cursor: 'pointer',
-                textAlign: 'left',
-              }}
-            >
-              Ada Geneli (Tüm Bloklar)
-              <div style={{ fontSize: 12, fontWeight: 400, opacity: 0.85 }}>
-                Tek raporla tüm bloklar için geçerli ilerleme kaydedin
-              </div>
-            </button>
-            <div
-              style={{
-                display: 'grid',
-                gridTemplateColumns: 'repeat(auto-fill, minmax(60px, 1fr))',
-                gap: 8,
-                marginBottom: 16,
-              }}
-            >
-              {adaData?.bloklar
-                .filter((b) => getBlokFiltre().includes(b.blok_no))
-                .map((b) => (
-                  <button
-                    key={b.blok_no}
-                    onClick={() => {
-                      setBlokNo(b.blok_no);
-                      setStep('is_kalemi');
-                    }}
-                    style={{
-                      padding: 10,
-                      backgroundColor: blokNo === b.blok_no ? '#f59e0b' : '#f3f4f6',
-                      border: 'none',
-                      borderRadius: 10,
-                      fontSize: 13,
-                      fontWeight: 600,
-                      color: blokNo === b.blok_no ? '#fff' : '#4b5563',
-                      cursor: 'pointer',
-                    }}
-                  >
-                    {b.blok_no}
-                  </button>
-                ))}
-            </div>
-            <button
-              onClick={() => setStep('ada')}
-              style={{
-                background: 'none',
-                border: 'none',
-                color: '#6b7280',
-                fontSize: 13,
-                cursor: 'pointer',
-              }}
-            >
-              ← Geri
-            </button>
-          </div>
-        )}
-
-        {/* ADIM 3: İş Kalemi Seçimi */}
-        {step === 'is_kalemi' && (
-          <div>
-            <h3 style={{ fontSize: 15, fontWeight: 600, color: '#374151', marginBottom: 8 }}>
-              {ada} - {blokNo === 0 ? 'Ada Geneli' : `Blok ${blokNo}`} — İş Kalemi
-            </h3>
-
-            <div style={{ marginBottom: 12 }}>
-              <input
-                type="text"
-                placeholder="İş kalemi ara..."
-                value={kalemArama}
-                onChange={(e) => setKalemArama(e.target.value)}
-                style={{
-                  width: '100%',
-                  padding: '10px 12px',
-                  borderRadius: 8,
-                  border: '1px solid #e5e7eb',
-                  fontSize: 13,
-                  boxSizing: 'border-box',
-                }}
-              />
-            </div>
-
-            {kalemArama ? (
-              <div style={{ marginBottom: 16 }}>
-                {kalemButonlari(
-                  getAllKalemler(config).filter((ik) =>
-                    ik.toLowerCase().includes(kalemArama.toLowerCase())
-                  )
-                )}
-              </div>
-            ) : (
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginBottom: 16 }}>
-                {config.isKalemleri.gruplar.map((g) => {
-                  const acik = acikGruplar.has(g.id);
-                  return (
-                    <div
-                      key={g.id}
-                      style={{
-                        border: '1px solid #e5e7eb',
-                        borderRadius: 10,
-                        overflow: 'hidden',
-                      }}
-                    >
-                      <button
-                        onClick={() => toggleGrup(g.id)}
-                        style={{
-                          width: '100%',
-                          padding: '10px 12px',
-                          backgroundColor: acik ? '#fef3c7' : '#f9fafb',
-                          border: 'none',
-                          fontSize: 13,
-                          fontWeight: 600,
-                          color: '#374151',
-                          cursor: 'pointer',
-                          textAlign: 'left',
-                          display: 'flex',
-                          justifyContent: 'space-between',
-                          alignItems: 'center',
-                        }}
-                      >
-                        <span>
-                          {g.ad}{' '}
-                          <span style={{ fontWeight: 400, color: '#9ca3af' }}>
-                            ({g.kalemler.length})
-                          </span>
-                        </span>
-                        <span style={{ fontSize: 11, color: '#f59e0b' }}>
-                          {acik ? '▾ Kapat' : '▸ Aç'}
-                        </span>
-                      </button>
-                      {acik && (
-                        <div style={{ padding: 10, backgroundColor: '#fff' }}>
-                          {kalemButonlari(g.kalemler)}
-                        </div>
-                      )}
-                    </div>
-                  );
-                })}
-              </div>
-            )}
-            <button
-              onClick={() => setStep('blok')}
-              style={{
-                background: 'none',
-                border: 'none',
-                color: '#6b7280',
-                fontSize: 13,
-                cursor: 'pointer',
-              }}
-            >
-              ← Geri
-            </button>
-          </div>
-        )}
-
-        {/* ADIM 4: Detay */}
-        {step === 'detay' && (
-          <div>
-            <h3 style={{ fontSize: 15, fontWeight: 600, color: '#374151', marginBottom: 12 }}>
-              {ada} - {blokNo === 0 ? 'Ada Geneli' : `Blok ${blokNo}`} — {isKalemi}
-            </h3>
-
-            <div style={{ marginBottom: 16 }}>
-              <label style={{ display: 'block', fontSize: 13, fontWeight: 500, color: '#4b5563', marginBottom: 6 }}>
-                Durum
-              </label>
-              <div style={{ display: 'flex', gap: 8 }}>
-                {(Object.entries(DURUM_LABELLARI) as [IsDurumu, string][]).map(([key, label]) => (
-                  <button
-                    key={key}
-                    onClick={() => setDurum(key)}
-                    style={{
-                      flex: 1,
-                      padding: '10px 8px',
-                      backgroundColor: durum === key ? '#f59e0b' : '#f3f4f6',
-                      border: 'none',
-                      borderRadius: 10,
-                      fontSize: 12,
-                      fontWeight: 600,
-                      color: durum === key ? '#fff' : '#4b5563',
-                      cursor: 'pointer',
-                    }}
-                  >
-                    {label}
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            {durum !== 'tamamlandi' && durum !== 'planlandi' && (
-              <div style={{ marginBottom: 16 }}>
-                <label style={{ display: 'block', fontSize: 13, fontWeight: 500, color: '#4b5563', marginBottom: 6 }}>
-                  İlerleme: %{ilerleme}
-                </label>
-                <input
-                  type="range"
-                  min={0}
-                  max={100}
-                  value={ilerleme}
-                  onChange={(e) => setIlerleme(parseInt(e.target.value))}
-                  style={{ width: '100%' }}
-                />
-                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 11, color: '#9ca3af' }}>
-                  <span>0%</span>
-                  <span>50%</span>
-                  <span>100%</span>
-                </div>
-              </div>
-            )}
-
-            <div style={{ marginBottom: 16 }}>
-              <label style={{ display: 'block', fontSize: 13, fontWeight: 500, color: '#4b5563', marginBottom: 6 }}>
-                Açıklama
-              </label>
-              <textarea
-                value={aciklama}
-                onChange={(e) => setAciklama(e.target.value)}
-                placeholder="İşin durumu hakkında notlar..."
-                rows={3}
-                style={{
-                  width: '100%',
-                  padding: '10px 12px',
-                  borderRadius: 10,
-                  border: '1px solid #e5e7eb',
-                  fontSize: 13,
-                  fontFamily: 'inherit',
-                  resize: 'vertical',
-                  boxSizing: 'border-box',
-                }}
-              />
-            </div>
-
-            <div style={{ marginBottom: 16 }}>
-              <label style={{ display: 'block', fontSize: 13, fontWeight: 500, color: '#4b5563', marginBottom: 6 }}>
-                Tarih
-              </label>
-              <input
-                type="date"
-                value={tarih}
-                onChange={(e) => setTarih(e.target.value)}
-                style={{
-                  width: '100%',
-                  padding: '10px 12px',
-                  borderRadius: 10,
-                  border: '1px solid #e5e7eb',
-                  fontSize: 13,
-                  boxSizing: 'border-box',
-                }}
-              />
-            </div>
-
-            <div style={{ marginBottom: 16 }}>
-              <label style={{ display: 'block', fontSize: 13, fontWeight: 500, color: '#4b5563', marginBottom: 6 }}>
-                Raporlayan
-              </label>
-              <input
-                type="text"
-                value={kullaniciAdi}
-                readOnly
-                style={{
-                  width: '100%',
-                  padding: '10px 12px',
-                  borderRadius: 10,
-                  border: '1px solid #e5e7eb',
-                  fontSize: 13,
-                  backgroundColor: '#f9fafb',
-                  color: '#374151',
-                  boxSizing: 'border-box',
-                }}
-              />
-            </div>
-
-            <div style={{ display: 'flex', gap: 10 }}>
-              <button
-                onClick={() => setStep('is_kalemi')}
-                style={{
-                  flex: 1,
-                  padding: '12px',
-                  backgroundColor: '#f3f4f6',
-                  border: 'none',
-                  borderRadius: 12,
-                  fontSize: 14,
-                  fontWeight: 600,
-                  color: '#4b5563',
-                  cursor: 'pointer',
-                }}
-              >
-                ← Geri
-              </button>
-              {!editMode && (
-                <button
-                  onClick={handleKaydetVeDevamEt}
-                  style={{
-                    flex: 1,
-                    padding: '12px',
-                    backgroundColor: '#dbeafe',
-                    border: 'none',
-                    borderRadius: 12,
-                    fontSize: 14,
-                    fontWeight: 600,
-                    color: '#1e40af',
-                    cursor: 'pointer',
-                  }}
-                >
-                  Kaydet ve Devam Et
-                </button>
-              )}
-              <button
-                onClick={handleSubmit}
-                style={{
-                  flex: 1,
-                  padding: '12px',
-                  backgroundColor: '#f59e0b',
-                  border: 'none',
-                  borderRadius: 12,
-                  fontSize: 14,
-                  fontWeight: 600,
-                  color: '#fff',
-                  cursor: 'pointer',
-                }}
-              >
-                {editMode ? 'Güncelle' : 'Kaydet'}
-              </button>
-            </div>
+        ) : (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
+            {sola}
+            {saga}
           </div>
         )}
       </div>
     </div>
   );
 }
+
+const kucukButon = {
+  background: 'none',
+  border: '1px solid #e5e7eb',
+  borderRadius: 6,
+  padding: '2px 8px',
+  fontSize: 11,
+  color: '#6b7280',
+  cursor: 'pointer',
+} as const;

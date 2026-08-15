@@ -1,5 +1,5 @@
 import { useNavigate, NavLink } from 'react-router-dom';
-import { getCurrentUser, cikisYap, isProjeMuduruSession, isAdmin } from '../stores/authStore';
+import { getCurrentUser, cikisYap, isProjeMuduruSession } from '../stores/authStore';
 import { useSiteConfig } from '../hooks/useSiteConfig';
 import { useIsDesktop } from '../hooks/useIsDesktop';
 
@@ -10,7 +10,6 @@ const navItems = [
   { to: '/raporlar', label: 'Raporlar', icon: '📋' },
   { to: '/istatistik', label: 'İstatistik', icon: '📈', desktopOnly: true },
   { to: '/personel', label: 'Personel', icon: '👥' },
-  { to: '/toplu-rapor', label: 'Toplu', icon: '📦' },
   { to: '/ayarlar', label: 'Ayarlar', icon: '⚙️' },
 ];
 
@@ -28,7 +27,6 @@ export default function Layout({ children }: Props) {
     if (item.desktopOnly) return isDesktop;
     if (item.to === '/personel') return true;
     if (item.to === '/ayarlar') return isProjeMuduruSession();
-    if (item.to === '/toplu-rapor') return isAdmin();
     return true;
   });
 

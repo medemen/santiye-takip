@@ -6,12 +6,11 @@ import { setSiteConfig, resetSiteConfig, persistConfigToDb } from '../config/sit
 import { CONFIG_VERSION } from '../config/defaultConfig';
 import { getAllKalemler } from '../config/helpers';
 import { configValidate, durumTespitUret } from '../config/editor';
-import type { AdaBlok, ImalatGrubu, Sablon } from '../config/types';
+import type { AdaBlok, ImalatGrubu } from '../config/types';
 import { toastGoster } from '../stores/toastStore';
 import { card, pageTitle, btnGhost } from '../utils/styles';
 import AdaBlokEditor from '../components/config/AdaBlokEditor';
 import KalemGrupEditor from '../components/config/KalemGrupEditor';
-import SablonEditor from '../components/config/SablonEditor';
 
 export default function Settings() {
   const navigate = useNavigate();
@@ -31,9 +30,6 @@ export default function Settings() {
   );
   const [gruplar, setGruplar] = useState<ImalatGrubu[]>(() =>
     JSON.parse(JSON.stringify(config.isKalemleri.gruplar))
-  );
-  const [sablonlar, setSablonlar] = useState<Sablon[]>(() =>
-    JSON.parse(JSON.stringify(config.isKalemleri.sablonlar))
   );
   const [kaydediliyor, setKaydediliyor] = useState(false);
   const [dogrulama, setDogrulama] = useState<string[]>([]);
@@ -74,7 +70,6 @@ export default function Settings() {
       isKalemleri: {
         ...config.isKalemleri,
         gruplar,
-        sablonlar,
       },
       durumTespit: durumTespitUret({ ...config, yapi: yeniYapi }),
     };
@@ -238,17 +233,6 @@ export default function Settings() {
           Gruplar ve kalemler buradan düzenlenebilir; her satıra bir kalem yazın.
         </p>
         <KalemGrupEditor gruplar={gruplar} onChange={setGruplar} />
-      </div>
-
-      <div style={{ ...card, marginBottom: 16 }}>
-        <h3 style={{ fontSize: 14, fontWeight: 600, color: '#374151', margin: 0, marginBottom: 12 }}>
-          Rapor Şablonları
-        </h3>
-        <p style={{ fontSize: 11, color: '#9ca3af', margin: 0, marginBottom: 10 }}>
-          Şablona dahil iş kalemleri ve raporda hazır doldurulacak varsayılan durum / ilerleme /
-          açıklama buradan düzenlenir.
-        </p>
-        <SablonEditor sablonlar={sablonlar} gruplar={gruplar} onChange={setSablonlar} />
       </div>
 
       {dogrulama.length > 0 && (

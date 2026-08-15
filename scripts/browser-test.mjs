@@ -179,15 +179,11 @@ async function main() {
     await gez('/istatistik', ['İstatistikler'], 'İstatistikler');
     await gez('/profil', ['Profil'], 'Profil');
 
-    await adim('Rapor ekleme akışı (sihirbaz + kaydet)', async () => {
+    await adim('Rapor ekleme akışı (tek sayfa + kaydet)', async () => {
       await page.goto(BASE + 'rapor-ekle', { waitUntil: 'load', timeout: 30000 });
       await sayfadaBeklenen(['Rapor Ekle']);
 
       await page.locator('button').filter({ hasText: ILK_ADA }).first().click();
-      await sayfadaBeklenen(['Blok Seçin']);
-
-      await page.getByRole('button', { name: String(ILK_BLOK), exact: true }).click();
-      await sayfadaBeklenen(['İş Kalemi']);
 
       const arama = page.locator('input[placeholder="İş kalemi ara..."]');
       await arama.waitFor({ state: 'visible', timeout: 10000 });
@@ -195,13 +191,40 @@ async function main() {
       await page.getByRole('button', { name: KALEM, exact: true }).click();
       await sayfadaBeklenen(['Durum', 'Açıklama']);
 
+      await page.getByRole('button', { name: String(ILK_BLOK), exact: true }).click();
       await page.locator('textarea').fill(`Otomatik test: ${KALEM} - ${ILK_ADA}`);
-      await page.getByRole('button', { name: 'Kaydet', exact: true }).click();
+      await page.getByRole('button', { name: /Rapor Kaydet/ }).click();
       await page.waitForURL((url) => url.pathname === '/raporlar', { timeout: 15000 });
       await sayfadaBeklenen(['Raporlar', KALEM]);
     });
 
-    await gez('/toplu-rapor', ['Toplu Rapor'], 'Toplu rapor (yönetici erişimi)');
+    await adim('/toplu-rapor → /rapor-ekle yönlendirmesi', async () => {
+      await page.goto(BASE + 'toplu-rapor', { waitUntil: 'load', timeout: 30000 });
+      await page.waitForURL((url) => url.pathname === '/rapor-ekle', { timeout: 15000 });
+      await sayfadaBeklenen(['Rapor Ekle']);
+    });
+
+    await adim('Desktop dashboard (1280px) detay kontrolü', async () => {
+      const dctx = await browser.newContext({ viewport: { width: 1280, height: 800 }, locale: 'tr-TR' });
+      const dpage = await dctx.newPage();
+      const hatalar = [];
+      dpage.on('pageerror', (e) => hatalar.push(String(e)));
+      await dpage.goto(BASE, { waitUntil: 'load', timeout: 30000 });
+      await dpage.locator('select').first().waitFor({ state: 'visible', timeout: 20000 });
+      const secenekler = await dpage.locator('select option').allTextContents();
+      const secenek = secenekler.find((s) => s.includes(USER));
+      if (!secenek) throw new Error(`Desktop giris listesinde "${USER}" bulunamadi`);
+      await dpage.locator('select').first().selectOption({ label: secenek });
+      await dpage.getByRole('button', { name: 'Giriş Yap' }).click();
+      await dpage.waitForURL((url) => url.pathname === '/', { timeout: 30000 });
+      for (const metin of [SANTIYE_ADI, 'Rapor Kapsamı', 'Zaman Trendi', 'İş Kalemi Bazında İlerleme', 'Ada × Blok Matrisi', 'Yaklaşan Hedefler', 'Ada Detay', 'Son Raporlar']) {
+        await dpage.locator('body').getByText(metin, { exact: false }).first().waitFor({ state: 'visible', timeout: 15000 });
+      }
+      const govde = await dpage.evaluate(() => document.body.innerText ?? '');
+      if (govde.includes('Bir hata oluştu')) throw new Error('Desktop dashboardda "Bir hata oluştu" ekrani gorundu');
+      if (hatalar.length) throw new Error('Desktop dashboard JS hatasi: ' + hatalar.join(' | '));
+      await dctx.close();
+    });
 
     await adim('/ayarlar şantiye şefi için yasak (→ / yönlendirme)', async () => {
       await page.goto(BASE + 'ayarlar', { waitUntil: 'load', timeout: 30000 });

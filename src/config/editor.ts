@@ -2,8 +2,6 @@ import type {
   AdaBlok,
   BlokYapisi,
   DurumTespitBilgi,
-  ImalatGrubu,
-  Sablon,
   SantiyeConfig,
 } from './types';
 import { DEFAULT_CONFIG } from './defaultConfig';
@@ -27,7 +25,7 @@ export function bosSantiyeConfig(genel?: Partial<SantiyeConfig['genel']>): Santi
       secilebilirRoller: [...DEFAULT_CONFIG.roller.secilebilirRoller],
     },
     yapi: { adalar: [] },
-    isKalemleri: { gruplar: [], sablonlar: [] },
+    isKalemleri: { gruplar: [] },
     durumTespit: bosDurumTespit(),
   };
 }
@@ -92,18 +90,6 @@ export function benzersizId(ad: string, mevcut: string[]): string {
   return id;
 }
 
-export function sablonlariUret(gruplar: ImalatGrubu[]): Sablon[] {
-  return gruplar.map((g) => ({
-    id: g.id,
-    ad: g.ad,
-    aciklama: '',
-    grup_idleri: [g.id],
-    varsayilan_durum: 'devam_ediyor',
-    varsayilan_ilerleme: 50,
-    varsayilan_aciklama: '',
-  }));
-}
-
 export function configValidate(cfg: SantiyeConfig): string[] {
   const hata: string[] = [];
   if (!cfg.genel.santiyeAdi.trim()) hata.push('Şantiye adı boş olamaz.');
@@ -144,21 +130,6 @@ export function configValidate(cfg: SantiyeConfig): string[] {
   if (new Set(grupIdler).size !== grupIdler.length) {
     hata.push('Grup kimlikleri (id) tekrarlanamaz.');
   }
-
-  cfg.isKalemleri.sablonlar.forEach((s) => {
-    s.grup_idleri.forEach((gid) => {
-      if (!grupIdler.includes(gid)) {
-        hata.push(`'${s.ad}' şablonu bilinmeyen grup '${gid}' referans veriyor.`);
-      }
-    });
-    const ilerleme = s.varsayilan_ilerleme;
-    if (ilerleme !== undefined && (Number.isNaN(ilerleme) || ilerleme < 0 || ilerleme > 100)) {
-      hata.push(`'${s.ad}' şablonunun varsayılan ilerlemesi 0-100 arasında olmalı.`);
-    }
-    if (!s.grup_idleri.length) {
-      hata.push(`'${s.ad}' şablonu hiçbir grubu kapsamıyor.`);
-    }
-  });
 
   return hata;
 }

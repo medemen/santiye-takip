@@ -52,7 +52,6 @@ export interface AdaBlok {
 
 export interface IsKalemleriBilgi {
   gruplar: ImalatGrubu[];
-  sablonlar: Sablon[];
 }
 
 export interface ImalatGrubu {
@@ -60,16 +59,6 @@ export interface ImalatGrubu {
   ad: string;
   kaynak: 'pdf' | 'yeni';
   kalemler: string[];
-}
-
-export interface Sablon {
-  id: string;
-  ad: string;
-  aciklama: string;
-  grup_idleri: string[];
-  varsayilan_durum: IsDurumu;
-  varsayilan_ilerleme?: number;
-  varsayilan_aciklama?: string;
 }
 
 export interface DurumTespitBilgi {

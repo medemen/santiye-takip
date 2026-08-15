@@ -1,19 +1,20 @@
 import { useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { getIstatistikler, getAdaGenelIlerleme } from '../stores/reportStore';
+import { getIstatistikler, getAdaGenelIlerleme, getBlokProgress } from '../stores/reportStore';
 import { useHedefler } from '../hooks/useHedefler';
 import { useRaporlar } from '../hooks/useRaporlar';
-import { getHedefOzeti } from '../data/plan';
+import { getHedefOzeti, hedefKalanGun } from '../data/plan';
 import type { Rapor } from '../types';
 import { useSiteConfig } from '../hooks/useSiteConfig';
 import { useIsDesktop } from '../hooks/useIsDesktop';
 import { getAdaList, getAllKalemler } from '../config/helpers';
 import { DURUM_RENKLERI } from '../config/defaultConfig';
-import { getAllPersonel } from '../stores/kullanicilarStore';
 import DonutChart from '../components/DonutChart';
 import BarChart from '../components/BarChart';
 import ReportCard from '../components/ReportCard';
 import ProgressBar from '../components/ProgressBar';
+import TrendChart from '../components/TrendChart';
+import BlokMatrisi from '../components/BlokMatrisi';
 import { card, btnGhost } from '../utils/styles';
 
 function KpiCard({ label, value, color, progress }: { label: string; value: string | number; color: string; progress?: number }) {
@@ -29,8 +30,6 @@ function KpiCard({ label, value, color, progress }: { label: string; value: stri
     </div>
   );
 }
-
-const grid2 = { display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: 16, marginBottom: 16 };
 
 export default function Dashboard() {
   const navigate = useNavigate();
@@ -49,17 +48,23 @@ export default function Dashboard() {
   const gecikenIsler = useMemo(() => raporlar.filter((r) => r.durum === 'gecikme'), [raporlar]);
 
   const hedefler = useHedefler();
-  const hedefOzeti = useMemo(() => {
-    const sonRaporlarMap = new Map<string, Rapor>();
+
+  const sonRaporlarMap = useMemo(() => {
+    const map = new Map<string, Rapor>();
     for (const r of raporlar) {
       const anahtar = `${r.ada}|${r.blok_no}|${r.is_kalemi}`;
-      const mevcut = sonRaporlarMap.get(anahtar);
+      const mevcut = map.get(anahtar);
       if (!mevcut || new Date(r.olusturma_tarihi).getTime() > new Date(mevcut.olusturma_tarihi).getTime()) {
-        sonRaporlarMap.set(anahtar, r);
+        map.set(anahtar, r);
       }
     }
-    return getHedefOzeti(hedefler, (a, b, ik) => sonRaporlarMap.get(`${a}|${b}|${ik}`) ?? null);
-  }, [hedefler, raporlar]);
+    return map;
+  }, [raporlar]);
+
+  const hedefOzeti = useMemo(
+    () => getHedefOzeti(hedefler, (a, b, ik) => sonRaporlarMap.get(`${a}|${b}|${ik}`) ?? null),
+    [hedefler, sonRaporlarMap]
+  );
 
   const donutData = useMemo(
     () => [
@@ -113,18 +118,87 @@ export default function Dashboard() {
     });
   }, [raporlar, adalar, isKalemleri]);
 
-  const personelRaporSiralamasi = useMemo(() => {
+  const blokVerisi = useMemo(() => {
+    const kalemToplam = new Map<string, number>();
+    const kalemSayac = new Map<string, number>();
+    const adaBlokMap: Record<string, Record<number, number>> = {};
+    let raporluHuc = 0;
+    let toplamHuc = 0;
+    const toplamBlok = adalar.reduce((s, a) => s + a.bloklar.length, 0);
+    for (const a of adalar) {
+      const blokMap: Record<number, number> = {};
+      for (const b of a.bloklar) {
+        const progress = getBlokProgress(a.ada, b.blok_no, isKalemleri);
+        let sum = 0;
+        for (const ik of isKalemleri) {
+          const r = progress[ik];
+          const val = r ? r.ilerleme_yuzde : 0;
+          sum += val;
+          if (r) {
+            raporluHuc++;
+            kalemSayac.set(ik, (kalemSayac.get(ik) ?? 0) + 1);
+          }
+          kalemToplam.set(ik, (kalemToplam.get(ik) ?? 0) + val);
+        }
+        toplamHuc += isKalemleri.length;
+        blokMap[b.blok_no] = Math.round(sum / isKalemleri.length);
+      }
+      adaBlokMap[a.ada] = blokMap;
+    }
+    return {
+      adaBlokMap,
+      kapsam: toplamHuc > 0 ? Math.round((raporluHuc / toplamHuc) * 100) : 0,
+      kalemIlerleme: isKalemleri
+        .map((ik) => ({
+          kalem: ik,
+          ortalama: toplamBlok > 0 ? Math.round((kalemToplam.get(ik) ?? 0) / toplamBlok) : 0,
+          raporluBlok: kalemSayac.get(ik) ?? 0,
+        }))
+        .sort((x, y) => x.ortalama - y.ortalama),
+    };
+  }, [adalar, isKalemleri]);
+
+  const trendData = useMemo(() => {
     const sayilar = new Map<string, number>();
     for (const r of raporlar) {
+      sayilar.set(r.tarih, (sayilar.get(r.tarih) ?? 0) + 1);
+    }
+    const formatter = new Intl.DateTimeFormat('tr-TR', { day: '2-digit', month: '2-digit' });
+    const gunler: { label: string; value: number }[] = [];
+    const bugun = new Date();
+    bugun.setHours(0, 0, 0, 0);
+    for (let i = 13; i >= 0; i--) {
+      const d = new Date(bugun.getTime() - i * 24 * 60 * 60 * 1000);
+      const iso = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+      gunler.push({ label: formatter.format(d), value: sayilar.get(iso) ?? 0 });
+    }
+    return gunler;
+  }, [raporlar]);
+
+  const yaklasanHedefler = useMemo(
+    () =>
+      hedefler
+        .map((h) => {
+          const rapor = sonRaporlarMap.get(`${h.ada}|${h.blok_no}|${h.is_kalemi}`) ?? null;
+          return { ...h, kalanGun: hedefKalanGun(h.hedef_tarih), rapor };
+        })
+        .filter((h) => h.kalanGun >= 0 && h.kalanGun <= 14 && h.rapor?.durum !== 'tamamlandi')
+        .sort((a, b) => a.kalanGun - b.kalanGun)
+        .slice(0, 8),
+    [hedefler, sonRaporlarMap]
+  );
+
+  const personelAktivite7 = useMemo(() => {
+    const sinir = Date.now() - 7 * 24 * 60 * 60 * 1000;
+    const sayilar = new Map<string, number>();
+    for (const r of raporlar) {
+      if (new Date(r.olusturma_tarihi).getTime() < sinir) continue;
       sayilar.set(r.raporlayan, (sayilar.get(r.raporlayan) ?? 0) + 1);
     }
-    return getAllPersonel()
-      .map((p) => ({
-        ad_soyad: p.ad_soyad,
-        raporSayisi: sayilar.get(p.ad_soyad) ?? 0,
-      }))
+    return Array.from(sayilar.entries())
+      .map(([ad_soyad, raporSayisi]) => ({ ad_soyad, raporSayisi }))
       .sort((a, b) => b.raporSayisi - a.raporSayisi)
-      .slice(0, 10);
+      .slice(0, 8);
   }, [raporlar]);
 
   const hedefKartlari = (
@@ -199,13 +273,13 @@ export default function Dashboard() {
     </div>
   );
 
-  const personelSiralamasiKart = personelRaporSiralamasi.length > 0 && (
+  const personelAktiviteKart = personelAktivite7.length > 0 && (
     <div style={{ ...card, marginBottom: 16 }}>
       <h3 style={{ fontSize: 14, fontWeight: 600, color: '#4b5563', margin: 0, marginBottom: 12 }}>
-        En Çok Raporlayan Personel
+        Son 7 Gün Personel Aktivitesi
       </h3>
       <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-        {personelRaporSiralamasi.map((p, i) => (
+        {personelAktivite7.map((p, i) => (
           <div
             key={p.ad_soyad}
             style={{
@@ -221,7 +295,7 @@ export default function Dashboard() {
               {i === 0 && '🥇 '}{i === 1 && '🥈 '}{i === 2 && '🥉 '}
               {p.ad_soyad}
             </div>
-            <div style={{ fontSize: 13, fontWeight: 600, color: '#f59e0b' }}>{p.raporSayisi}</div>
+            <div style={{ fontSize: 13, fontWeight: 600, color: '#f59e0b' }}>{p.raporSayisi} rapor</div>
           </div>
         ))}
       </div>
@@ -250,6 +324,102 @@ export default function Dashboard() {
       )}
     </div>
   );
+
+  const trendKart = (
+    <div style={{ ...card }}>
+      <h3 style={{ fontSize: 14, fontWeight: 600, color: '#4b5563', margin: 0, marginBottom: 8 }}>
+        Zaman Trendi
+      </h3>
+      <div style={{ fontSize: 11, color: '#9ca3af', marginBottom: 4 }}>Son 14 gün rapor hacmi</div>
+      <TrendChart data={trendData} />
+    </div>
+  );
+
+  const kalemIlerlemeKart = (
+    <div style={{ ...card }}>
+      <h3 style={{ fontSize: 14, fontWeight: 600, color: '#4b5563', margin: 0, marginBottom: 4 }}>
+        İş Kalemi Bazında İlerleme
+      </h3>
+      <div style={{ fontSize: 11, color: '#9ca3af', marginBottom: 10 }}>
+        {isKalemleri.length} iş kalemi • proje geneli ortalama, en düşükten yükseğe
+      </div>
+      <div style={{ maxHeight: 340, overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: 8, paddingRight: 4 }}>
+        {blokVerisi.kalemIlerleme.map((k) => (
+          <div key={k.kalem} style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+            <span
+              title={`${k.kalem} — %${k.ortalama} (${k.raporluBlok} blokta rapor)`}
+              style={{
+                flex: 1,
+                minWidth: 0,
+                fontSize: 12,
+                color: '#374151',
+                whiteSpace: 'nowrap',
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+              }}
+            >
+              {k.kalem}
+            </span>
+            <div style={{ width: 120, flexShrink: 0 }}>
+              <ProgressBar value={k.ortalama} height={6} />
+            </div>
+            <span style={{ width: 42, flexShrink: 0, textAlign: 'right', fontSize: 12, fontWeight: 600, color: '#4b5563' }}>
+              %{k.ortalama}
+            </span>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+
+  const yaklasanKart = (
+    <div style={{ ...card, marginBottom: 16 }}>
+      <h3 style={{ fontSize: 14, fontWeight: 600, color: '#4b5563', margin: 0, marginBottom: 10 }}>
+        ⏰ Yaklaşan Hedefler
+      </h3>
+      {yaklasanHedefler.length === 0 ? (
+        <p style={{ fontSize: 12, color: '#9ca3af', margin: 0 }}>Sonraki 14 gün içinde hedef yok. 🎉</p>
+      ) : (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+          {yaklasanHedefler.map((h) => (
+            <div
+              key={`${h.ada}-${h.blok_no}-${h.is_kalemi}`}
+              onClick={() => navigate(h.blok_no === 0 ? `/ada/${h.ada}` : `/ada/${h.ada}/blok/${h.blok_no}`)}
+              style={{
+                display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+                padding: '7px 10px', backgroundColor: '#f9fafb', borderRadius: 8, cursor: 'pointer',
+              }}
+            >
+              <div style={{ minWidth: 0 }}>
+                <div style={{ fontSize: 12, fontWeight: 600, color: '#1f2937', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                  {h.ada} - {h.blok_no === 0 ? 'Ada Geneli' : `Blok ${h.blok_no}`}
+                </div>
+                <div style={{ fontSize: 11, color: '#6b7280', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                  {h.is_kalemi} • {h.hedef_tarih}
+                </div>
+              </div>
+              <span
+                style={{
+                  flexShrink: 0,
+                  marginLeft: 8,
+                  fontSize: 11,
+                  fontWeight: 700,
+                  padding: '2px 8px',
+                  borderRadius: 10,
+                  backgroundColor: h.kalanGun === 0 ? '#fef2f2' : h.kalanGun <= 7 ? '#fef3c7' : '#dbeafe',
+                  color: h.kalanGun === 0 ? '#ef4444' : h.kalanGun <= 7 ? '#92400e' : '#1d4ed8',
+                }}
+              >
+                {h.kalanGun === 0 ? 'Bugün' : `${h.kalanGun} gün`}
+              </span>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+
+  const altKartlar = [hedefKart, yaklasanKart, personelAktiviteKart].filter(Boolean);
 
   if (isDesktop) {
     return (
@@ -295,6 +465,7 @@ export default function Dashboard() {
 
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))', gap: 12, marginBottom: 16 }}>
           <KpiCard label="Genel İlerleme" value={`%${genelIlerleme}`} color={genelIlerleme === 100 ? '#22c55e' : '#f59e0b'} progress={genelIlerleme} />
+          <KpiCard label="Rapor Kapsamı" value={`%${blokVerisi.kapsam}`} color="#6366f1" progress={blokVerisi.kapsam} />
           <KpiCard label="Toplam Rapor" value={stats.toplamRapor} color="#6b7280" />
           <KpiCard label="Tamamlandı" value={stats.tamamlananIsler} color="#22c55e" />
           <KpiCard label="Devam Ediyor" value={stats.devamEdenIsler} color="#3b82f6" />
@@ -302,22 +473,37 @@ export default function Dashboard() {
           <KpiCard label="Gecikme" value={stats.gecikenIsler} color="#ef4444" />
         </div>
 
-        <div style={grid2}>
+        {gecikenIsler.length > 0 && gecikenKart}
+
+        <div style={{ display: 'grid', gridTemplateColumns: '1.6fr 1fr 1fr', gap: 16, marginBottom: 16 }}>
+          {trendKart}
           <div style={{ ...card }}>
             <h3 style={{ fontSize: 14, fontWeight: 600, color: '#4b5563', margin: 0, marginBottom: 8 }}>
               Rapor Dağılımı
             </h3>
-            <DonutChart data={donutData} />
+            <DonutChart data={donutData} height={190} />
           </div>
           <div style={{ ...card }}>
             <h3 style={{ fontSize: 14, fontWeight: 600, color: '#4b5563', margin: 0, marginBottom: 8 }}>
               Ada Bazında İlerleme
             </h3>
-            <BarChart data={adaProgress} height={240} />
+            <BarChart data={adaProgress} height={190} />
           </div>
         </div>
 
-        {gecikenIsler.length > 0 && gecikenKart}
+        <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 1.8fr', gap: 16, marginBottom: 16, alignItems: 'start' }}>
+          {kalemIlerlemeKart}
+          <div style={{ ...card }}>
+            <h3 style={{ fontSize: 14, fontWeight: 600, color: '#4b5563', margin: 0, marginBottom: 8 }}>
+              Ada × Blok Matrisi
+            </h3>
+            <BlokMatrisi
+              adalar={adalar.map((a) => ({ ada: a.ada, bloklar: a.bloklar.map((b) => b.blok_no) }))}
+              ilerleme={blokVerisi.adaBlokMap}
+              onBlokClick={(ada, blokNo) => navigate(`/ada/${ada}/blok/${blokNo}`)}
+            />
+          </div>
+        </div>
 
         <div style={{ ...card, marginBottom: 16 }}>
           <h3 style={{ fontSize: 14, fontWeight: 600, color: '#4b5563', margin: 0, marginBottom: 10 }}>
@@ -364,9 +550,8 @@ export default function Dashboard() {
           </div>
         </div>
 
-        <div style={{ display: 'grid', gridTemplateColumns: `repeat(${([hedefKart, personelSiralamasiKart].filter(Boolean)).length}, minmax(0, 1fr))`, gap: 16, marginBottom: 16 }}>
-          {hedefKart}
-          {personelSiralamasiKart}
+        <div style={{ display: 'grid', gridTemplateColumns: `repeat(${altKartlar.length}, minmax(0, 1fr))`, gap: 16, marginBottom: 16, alignItems: 'start' }}>
+          {altKartlar.map((kart, i) => <div key={i}>{kart}</div>)}
         </div>
 
         <div style={{ ...card }}>
@@ -378,7 +563,7 @@ export default function Dashboard() {
               Tümü
             </button>
           </div>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: 10 }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, minmax(0, 1fr))', gap: 10 }}>
             {sonRaporlar.length === 0 ? (
               <p style={{ fontSize: 13, color: '#9ca3af', textAlign: 'center', padding: 20 }}>
                 Henüz rapor eklenmemiş. İlk raporu eklemek için + butonuna tıklayın.

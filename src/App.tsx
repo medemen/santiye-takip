@@ -4,7 +4,7 @@ import { lazy, Suspense, useEffect, useState, useSyncExternalStore } from 'react
 import Layout from './components/Layout';
 import ErrorBoundary from './components/ErrorBoundary';
 import Toast from './components/Toast';
-import { isLoggedIn, isAdmin, isProjeMuduruSession, supabaseAuthInit, subscribeAuthChanges } from './stores/authStore';
+import { isLoggedIn, isProjeMuduruSession, supabaseAuthInit, subscribeAuthChanges } from './stores/authStore';
 import { supabaseRaporlariYukle, aboneOlRaporGuncellemeleri, realtimeRaporAboneliktenCik } from './stores/reportStore';
 import { supabaseAtamalariYukle, aboneOlAtamaGuncellemeleri, realtimeAtamaAboneliktenCik } from './stores/atamaStore';
 import { supabaseKullanicilariYukle } from './stores/kullanicilarStore';
@@ -20,7 +20,6 @@ const AdaDetail = lazy(() => import('./pages/AdaDetail'));
 const BlokDetail = lazy(() => import('./pages/BlokDetail'));
 const ReportAdd = lazy(() => import('./pages/ReportAdd'));
 const ReportList = lazy(() => import('./pages/ReportList'));
-const BulkReport = lazy(() => import('./pages/BulkReport'));
 const Personnel = lazy(() => import('./pages/Personnel'));
 const Profile = lazy(() => import('./pages/Profile'));
 const Statistics = lazy(() => import('./pages/Statistics'));
@@ -45,16 +44,6 @@ function TitleUpdater() {
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
   if (!isLoggedIn()) {
     return <Navigate to="/login" replace />;
-  }
-  return <>{children}</>;
-}
-
-function AdminRoute({ children }: { children: React.ReactNode }) {
-  if (!isLoggedIn()) {
-    return <Navigate to="/login" replace />;
-  }
-  if (!isAdmin()) {
-    return <Navigate to="/" replace />;
   }
   return <>{children}</>;
 }
@@ -168,7 +157,7 @@ export default function App() {
                         <Route path="/rapor-ekle" element={<ReportAdd />} />
                         <Route path="/raporlar" element={<ReportList />} />
                         <Route path="/personel" element={<Personnel />} />
-                        <Route path="/toplu-rapor" element={<AdminRoute><BulkReport /></AdminRoute>} />
+                        <Route path="/toplu-rapor" element={<Navigate to="/rapor-ekle" replace />} />
                         <Route path="/profil" element={<Profile />} />
                         <Route path="/istatistik" element={<Statistics />} />
                         <Route path="/ayarlar" element={<PmRoute><Settings /></PmRoute>} />

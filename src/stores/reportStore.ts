@@ -166,6 +166,14 @@ export function realtimeRaporAboneliktenCik(): void {
   }
 }
 
+function upsertHataMesajlari(basarisiz: Rapor[]): string {
+  const mesajlar = new Set<string>();
+  for (const r of basarisiz) {
+    if (r.raporlayan) mesajlar.add(r.raporlayan);
+  }
+  return Array.from(mesajlar).join(', ');
+}
+
 export async function supabaseRaporlariYukle(): Promise<void> {
   if (!isSupabaseReady()) return;
   try {
@@ -181,14 +189,30 @@ export async function supabaseRaporlariYukle(): Promise<void> {
     const bekleyen = yerel.filter((r) => !sunucuIdleri.has(r.id));
     const birlestirilmis = [...sunucu, ...bekleyen];
     setRaporlar(birlestirilmis);
-    if (bekleyen.length > 0 && supabaseOturumAktif()) {
+    // Tek tek upsert: tek bir yetkisiz/uyumsuz rapor kalan tum raporlarin
+    // yuklenmesini bloke etmesin. RLS geregi yalnizca kullaniciya ait raporlar
+    // denenir (admin/PM her raporu deneyebilir).
+    const oturum = getCurrentUser();
+    const adaylar = bekleyen.filter((r) => {
+      if (!oturum || !supabaseOturumAktif()) return false;
+      return oturum.admin || oturum.proje_muduru || r.raporlayan === oturum.ad_soyad;
+    });
+    const basarisiz: Rapor[] = [];
+    for (const r of adaylar) {
       const { error: upsertError } = await getSupabase()
         .from('raporlar')
-        .upsert(bekleyen.map(raporToSupabase), { onConflict: 'id' });
-      if (upsertError) {
-        console.warn('Supabase yerel rapor yükleme hatası:', upsertError.message);
-        toastGoster('Yerel raporlar sunucuya yüklenemedi: ' + upsertError.message, 'error');
-      }
+        .upsert(raporToSupabase(r), { onConflict: 'id' });
+      if (upsertError) basarisiz.push(r);
+    }
+    if (basarisiz.length > 0) {
+      const ilk = basarisiz[0];
+      console.warn('Supabase yerel rapor yukleme hatasi,', basarisiz.length, 'rapor:', upsertHataMesajlari(basarisiz));
+      toastGoster(
+        basarisiz.length + ' rapor sunucuya yuklenemedi (' + ilk.raporlayan + ', ' + ilk.ada +
+        (basarisiz.length > 1 ? ' ve ' + (basarisiz.length - 1) + ' daha' : '') +
+        '). Atama/rol izninizi kontrol edin.',
+        'error'
+      );
     }
   } catch {
     /* supabase offline, keep local data */

@@ -7,7 +7,6 @@ import {
   bosSantiyeConfig,
   configValidate,
   durumTespitUret,
-  sablonlariUret,
 } from '../config/editor';
 import { getAllKalemler } from '../config/helpers';
 import type { SantiyeConfig } from '../config/types';
@@ -49,7 +48,6 @@ export default function NewSantiyeWizard() {
   const user = getCurrentUser();
 
   const [adim, setAdim] = useState(0);
-  const [sablonMu, setSablonMu] = useState(true);
   const [draft, setDraft] = useState<SantiyeConfig | null>(null);
   const [adimNotu, setAdimNotu] = useState('');
   const [yayinlaniyor, setYayinlaniyor] = useState(false);
@@ -67,7 +65,6 @@ export default function NewSantiyeWizard() {
   };
 
   const basla = (sablon: boolean) => {
-    setSablonMu(sablon);
     setDraft(
       sablon ? JSON.parse(JSON.stringify(DEFAULT_CONFIG)) : bosSantiyeConfig()
     );
@@ -104,13 +101,6 @@ export default function NewSantiyeWizard() {
       ...draft,
       durumTespit: durumTespitUret(draft),
     };
-    const grupIdler = sonDurum.isKalemleri.gruplar.map((g) => g.id);
-    sonDurum.isKalemleri.sablonlar = sablonMu
-      ? sonDurum.isKalemleri.sablonlar
-          .map((s) => ({ ...s, grup_idleri: s.grup_idleri.filter((id) => grupIdler.includes(id)) }))
-          .filter((s) => s.grup_idleri.length > 0)
-      : sablonlariUret(sonDurum.isKalemleri.gruplar);
-
     const sorunlar = configValidate(sonDurum);
     if (sorunlar.length > 0) {
       setAdimNotu('Doğrulama hatalarını gidermek için özet adımındaki listeyi inceleyin.');
@@ -337,8 +327,7 @@ export default function NewSantiyeWizard() {
           </div>
           <div style={{ fontSize: 12, color: '#6b7280' }}>
             {draft.isKalemleri.gruplar.length} iş kalemi grubu •{' '}
-            {getAllKalemler(draft).length} kalem •{' '}
-            {draft.isKalemleri.sablonlar.length} şablon
+            {getAllKalemler(draft).length} kalem
           </div>
         </div>
 

@@ -2,7 +2,6 @@ import type {
   AdaBlok,
   BlokYapisi,
   ImalatGrubu,
-  Sablon,
   SantiyeConfig,
 } from './types';
 
@@ -43,8 +42,4 @@ export function getAllKalemler(cfg: SantiyeConfig): string[] {
     _kalemCache.set(cfg, liste);
   }
   return liste;
-}
-
-export function getSablonKalemleri(cfg: SantiyeConfig, sablon: Sablon): string[] {
-  return sablon.grup_idleri.flatMap((id) => getGrupById(cfg, id)?.kalemler ?? []);
 }

@@ -80,7 +80,6 @@ const sablon = {
     },
     isKalemleri: {
       gruplar: [],
-      sablonlar: [],
     },
   },
   'adalar_bloklar.json': { adalar: [] },

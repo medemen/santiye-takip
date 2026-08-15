@@ -10,8 +10,6 @@ import { dirname, join } from 'node:path';
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const pathArg = process.argv[2] ?? join(__dirname, '..', 'data', 'santiye.config.json');
 
-const DURUMLAR = ['planlandi', 'devam_ediyor', 'tamamlandi', 'gecikme'];
-
 let cfg;
 try {
   cfg = JSON.parse(readFileSync(pathArg, 'utf8'));
@@ -94,16 +92,6 @@ for (const g of cfg.isKalemleri?.gruplar ?? []) {
   }
 }
 
-// --- sablonlar ---
-for (const s of cfg.isKalemleri?.sablonlar ?? []) {
-  if (!str(s.id)) hata('sablon: id eksik');
-  if (!arr(s.grup_idleri) || s.grup_idleri.length === 0) hata(s.id + ': grup_idleri bos');
-  for (const gid of s.grup_idleri ?? []) {
-    if (!grupIdleri.has(gid)) hata(s.id + ': bilinmeyen grup id "' + gid + '"');
-  }
-  if (!DURUMLAR.includes(s.varsayilan_durum)) hata(s.id + ': gecersiz varsayilan_durum "' + s.varsayilan_durum + '"');
-}
-
 // --- durumTespit ---
 const dt = cfg.durumTespit;
 if (dt) {
@@ -147,7 +135,7 @@ if (dt) {
 console.log('Config: ' + pathArg);
 console.log('  genel.santiyeAdi: ' + (cfg.genel?.santiyeAdi ?? '-' ));
 console.log('  yapi: ' + adaIsimleri.size + ' ada, ' + toplamBlok + ' blok');
-console.log('  isKalemleri: ' + grupIdleri.size + ' grup, ' + tumKalemler.size + ' kalem, ' + (cfg.isKalemleri?.sablonlar?.length ?? 0) + ' sablon');
+console.log('  isKalemleri: ' + grupIdleri.size + ' grup, ' + tumKalemler.size + ' kalem');
 console.log('  durumTespit: ' + (dt?.satirlar?.length ?? 0) + ' satir, ' + (dt?.tahmin?.length ?? 0) + ' tahmin kurali');
 
 if (uyarilar.length) {
