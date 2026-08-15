@@ -183,7 +183,7 @@ async function main() {
       await page.goto(BASE + 'rapor-ekle', { waitUntil: 'load', timeout: 30000 });
       await sayfadaBeklenen(['Rapor Ekle']);
 
-      await page.locator('button').filter({ hasText: ILK_ADA }).first().click();
+      await page.locator(`button[data-ada="${ILK_ADA}"]`).first().click();
 
       const arama = page.locator('input[placeholder="İş kalemi ara..."]');
       await arama.waitFor({ state: 'visible', timeout: 10000 });
