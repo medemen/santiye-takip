@@ -127,6 +127,7 @@ async function configiDbdenYukle(): Promise<SantiyeConfig> {
 export async function persistConfigToDb(cfg: SantiyeConfig): Promise<void> {
   const { getSupabase, isSupabaseReady } = await import('../lib/supabase');
   if (!isSupabaseReady()) return;
+  // authStore site.ts'ten import ettigi icin donguyu kirmak amaciyla dinamik (INEFFECTIVE_DYNAMIC_IMPORT uyarisi normaldir)
   const { supabaseOturumAktif } = await import('../stores/authStore');
   if (!supabaseOturumAktif()) return;
   const { error } = await getSupabase()
