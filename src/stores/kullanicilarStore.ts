@@ -125,14 +125,7 @@ export function getSantiyeSefi(ada: string): string {
 }
 
 export function getBlokSorumlulari(ada: string): string[] {
-  const sef = getKullanicilar().find(
-    (k) => k.admin && k.yetkili_adalar.includes(ada)
-  );
-  if (!sef) return [];
-  const sefAdalar = new Set(sef.yetkili_adalar);
-  return getKullanicilar()
-    .filter((k) => k.atanan_ada && sefAdalar.has(k.atanan_ada))
-    .map((k) => k.ad_soyad);
+  return getAdaPersonelleri(ada).map((k) => k.ad_soyad);
 }
 
 export function getAdaPersonelleri(ada: string): Kullanici[] {
