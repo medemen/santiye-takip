@@ -79,15 +79,14 @@ export default function Dashboard() {
   const isKalemleri = useMemo(() => getAllKalemler(config), [config]);
   const adalar = useMemo(() => getAdaList(config), [config]);
 
-  const adaProgress = useMemo(
-    () =>
-      adalar.map((a) => ({
-        name: a.ada,
-        value: getAdaGenelIlerleme(a.ada, a.bloklar, isKalemleri),
-        color: '#f59e0b',
-      })),
-    [adalar, isKalemleri]
-  );
+  const adaProgress = useMemo(() => {
+    void raporlar;
+    return adalar.map((a) => ({
+      name: a.ada,
+      value: getAdaGenelIlerleme(a.ada, a.bloklar, isKalemleri),
+      color: '#f59e0b',
+    }));
+  }, [raporlar, adalar, isKalemleri]);
 
   const genelIlerleme =
     adaProgress.length > 0
@@ -119,6 +118,7 @@ export default function Dashboard() {
   }, [raporlar, adalar, isKalemleri]);
 
   const blokVerisi = useMemo(() => {
+    void raporlar;
     const kalemToplam = new Map<string, number>();
     const kalemSayac = new Map<string, number>();
     const adaBlokMap: Record<string, Record<number, number>> = {};
@@ -156,7 +156,7 @@ export default function Dashboard() {
         }))
         .sort((x, y) => x.ortalama - y.ortalama),
     };
-  }, [adalar, isKalemleri]);
+  }, [raporlar, adalar, isKalemleri]);
 
   const trendData = useMemo(() => {
     const sayilar = new Map<string, number>();
