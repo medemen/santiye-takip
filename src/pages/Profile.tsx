@@ -53,11 +53,11 @@ export default function Profile() {
 
   return (
     <div>
-      <h1 style={{ fontSize: 20, fontWeight: 700, color: '#1f2937', marginBottom: 4 }}>Profil</h1>
+      <h1 style={{ fontSize: 20, fontWeight: 700, color: 'var(--text-primary)', marginBottom: 4 }}>Profil</h1>
 
       <div
         style={{
-          backgroundColor: '#fff',
+          backgroundColor: 'var(--bg-card)',
           borderRadius: 16,
           padding: 20,
           marginBottom: 16,
@@ -66,8 +66,8 @@ export default function Profile() {
         }}
       >
         <div style={{ fontSize: 48, marginBottom: 8 }}>👤</div>
-        <div style={{ fontSize: 18, fontWeight: 700, color: '#1f2937' }}>{user.ad_soyad}</div>
-        <div style={{ fontSize: 13, color: '#6b7280', marginTop: 4 }}>
+        <div style={{ fontSize: 18, fontWeight: 700, color: 'var(--text-primary)' }}>{user.ad_soyad}</div>
+        <div style={{ fontSize: 13, color: 'var(--text-faint)', marginTop: 4 }}>
           {user.rol}
           {user.admin && (
             <span style={{ color: '#f59e0b', fontWeight: 600 }}> • Yönetici</span>
@@ -77,37 +77,37 @@ export default function Profile() {
 
       <div
         style={{
-          backgroundColor: '#fff',
+          backgroundColor: 'var(--bg-card)',
           borderRadius: 16,
           padding: 16,
           marginBottom: 16,
           border: '1px solid #f0f0f0',
         }}
       >
-        <h3 style={{ fontSize: 14, fontWeight: 600, color: '#4b5563', margin: 0, marginBottom: 12 }}>
+        <h3 style={{ fontSize: 14, fontWeight: 600, color: 'var(--text-muted)', margin: 0, marginBottom: 12 }}>
           Hesap Bilgileri
         </h3>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 13 }}>
-            <span style={{ color: '#6b7280' }}>Rol</span>
-            <span style={{ color: '#1f2937', fontWeight: 500 }}>{user.rol}</span>
+            <span style={{ color: 'var(--text-faint)' }}>Rol</span>
+            <span style={{ color: 'var(--text-primary)', fontWeight: 500 }}>{user.rol}</span>
           </div>
           {sefAdalar.length > 0 && (
             <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 13 }}>
-              <span style={{ color: '#6b7280' }}>Yetkili Adalar</span>
-              <span style={{ color: '#1f2937', fontWeight: 500 }}>{sefAdalar.join(', ')}</span>
+              <span style={{ color: 'var(--text-faint)' }}>Yetkili Adalar</span>
+              <span style={{ color: 'var(--text-primary)', fontWeight: 500 }}>{sefAdalar.join(', ')}</span>
             </div>
           )}
           {atananAda && (
             <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 13 }}>
-              <span style={{ color: '#6b7280' }}>Atanan Ada</span>
-              <span style={{ color: '#1f2937', fontWeight: 500 }}>{atananAda}</span>
+              <span style={{ color: 'var(--text-faint)' }}>Atanan Ada</span>
+              <span style={{ color: 'var(--text-primary)', fontWeight: 500 }}>{atananAda}</span>
             </div>
           )}
           {atananAda && (
             <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 13 }}>
-              <span style={{ color: '#6b7280' }}>Atanan Bloklar</span>
-              <span style={{ color: '#1f2937', fontWeight: 500 }}>
+              <span style={{ color: 'var(--text-faint)' }}>Atanan Bloklar</span>
+              <span style={{ color: 'var(--text-primary)', fontWeight: 500 }}>
                 {(() => {
                   const bloklar = getKullaniciBloklari(user.ad_soyad, atananAda);
                   return bloklar.length > 0
@@ -119,17 +119,17 @@ export default function Profile() {
           )}
           {kisi?.atanan_ada && !atananAda && (
             <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 13 }}>
-              <span style={{ color: '#6b7280' }}>Varsayılan Ada</span>
-              <span style={{ color: '#1f2937', fontWeight: 500 }}>{kisi.atanan_ada}</span>
+              <span style={{ color: 'var(--text-faint)' }}>Varsayılan Ada</span>
+              <span style={{ color: 'var(--text-primary)', fontWeight: 500 }}>{kisi.atanan_ada}</span>
             </div>
           )}
           <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 13 }}>
-            <span style={{ color: '#6b7280' }}>Toplam Rapor</span>
-            <span style={{ color: '#1f2937', fontWeight: 500 }}>{raporSayisi}</span>
+            <span style={{ color: 'var(--text-faint)' }}>Toplam Rapor</span>
+            <span style={{ color: 'var(--text-primary)', fontWeight: 500 }}>{raporSayisi}</span>
           </div>
           <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 13 }}>
-            <span style={{ color: '#6b7280' }}>Giriş Zamanı</span>
-            <span style={{ color: '#1f2937', fontWeight: 500 }}>
+            <span style={{ color: 'var(--text-faint)' }}>Giriş Zamanı</span>
+            <span style={{ color: 'var(--text-primary)', fontWeight: 500 }}>
               {new Date(user.giris_tarihi).toLocaleString('tr-TR')}
             </span>
           </div>
@@ -138,22 +138,22 @@ export default function Profile() {
 
       <div
         style={{
-          backgroundColor: '#fff',
+          backgroundColor: 'var(--bg-card)',
           borderRadius: 16,
           padding: 16,
           marginBottom: 16,
           border: '1px solid #f0f0f0',
         }}
       >
-        <h3 style={{ fontSize: 14, fontWeight: 600, color: '#4b5563', margin: 0, marginBottom: 4 }}>
+        <h3 style={{ fontSize: 14, fontWeight: 600, color: 'var(--text-muted)', margin: 0, marginBottom: 4 }}>
           🔔 Bildirimler
         </h3>
-        <p style={{ fontSize: 12, color: '#9ca3af', margin: 0, marginBottom: 12 }}>
+        <p style={{ fontSize: 12, color: 'var(--text-subtle)', margin: 0, marginBottom: 12 }}>
           Geciken işler ve bugünkü hedefler için uyarı alın.
         </p>
 
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10 }}>
-          <span style={{ fontSize: 13, color: '#4b5563' }}>
+          <span style={{ fontSize: 13, color: 'var(--text-muted)' }}>
             İzin Durumu:{' '}
             <span style={{ fontWeight: 600, color: izinDurumu === 'granted' ? '#16a34a' : izinDurumu === 'denied' ? '#ef4444' : '#f59e0b' }}>
               {izinDurumu === 'granted' ? 'Verildi ✓' : izinDurumu === 'denied' ? 'Reddedildi' : izinDurumu === 'unsupported' ? 'Desteklenmiyor' : 'İstenmedi'}
@@ -172,7 +172,7 @@ export default function Profile() {
                 }
               }}
               style={{
-                padding: '6px 12px', backgroundColor: '#1f2937', border: 'none',
+                padding: '6px 12px', backgroundColor: 'var(--text-primary)', border: 'none',
                 borderRadius: 8, fontSize: 12, fontWeight: 600, color: '#fff', cursor: 'pointer',
               }}
             >
@@ -183,8 +183,8 @@ export default function Profile() {
 
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '8px 0', borderTop: '1px solid #f3f4f6' }}>
           <div>
-            <div style={{ fontSize: 13, color: '#374151', fontWeight: 500 }}>Hedef / geciken iş uyarıları</div>
-            <div style={{ fontSize: 11, color: '#9ca3af' }}>Uygulama açıkken günde bir kez bildirilir</div>
+            <div style={{ fontSize: 13, color: 'var(--text-secondary)', fontWeight: 500 }}>Hedef / geciken iş uyarıları</div>
+            <div style={{ fontSize: 11, color: 'var(--text-subtle)' }}>Uygulama açıkken günde bir kez bildirilir</div>
           </div>
           <input
             type="checkbox"
@@ -198,8 +198,8 @@ export default function Profile() {
           <div style={{ padding: '8px 0', borderTop: '1px solid #f3f4f6' }}>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
               <div>
-                <div style={{ fontSize: 13, color: '#374151', fontWeight: 500 }}>Günlük özet bildirimi</div>
-                <div style={{ fontSize: 11, color: '#9ca3af' }}>Uygulama kapalıyken de gönderilir</div>
+                <div style={{ fontSize: 13, color: 'var(--text-secondary)', fontWeight: 500 }}>Günlük özet bildirimi</div>
+                <div style={{ fontSize: 11, color: 'var(--text-subtle)' }}>Uygulama kapalıyken de gönderilir</div>
               </div>
               <input
                 type="checkbox"
@@ -210,7 +210,7 @@ export default function Profile() {
             </div>
             {ayarlar.gunlukOzet && (
               <div style={{ marginTop: 8 }}>
-                <label style={{ fontSize: 12, color: '#6b7280', marginRight: 8 }}>Saat</label>
+                <label style={{ fontSize: 12, color: 'var(--text-faint)', marginRight: 8 }}>Saat</label>
                 <input
                   type="time"
                   value={ayarlar.gunlukSaat}
@@ -232,8 +232,8 @@ export default function Profile() {
           }}
           style={{
             marginTop: 8, width: '100%', padding: '10px',
-            backgroundColor: '#f3f4f6', border: 'none', borderRadius: 10,
-            fontSize: 13, fontWeight: 600, color: '#4b5563', cursor: 'pointer',
+            backgroundColor: 'var(--bg-subtle)', border: 'none', borderRadius: 10,
+            fontSize: 13, fontWeight: 600, color: 'var(--text-muted)', cursor: 'pointer',
           }}
         >
           📨 Test bildirimi gönder
@@ -242,14 +242,14 @@ export default function Profile() {
 
       <div
         style={{
-          backgroundColor: '#fff',
+          backgroundColor: 'var(--bg-card)',
           borderRadius: 16,
           padding: 16,
           marginBottom: 16,
           border: '1px solid #f0f0f0',
         }}
       >
-        <h3 style={{ fontSize: 14, fontWeight: 600, color: '#4b5563', margin: 0, marginBottom: 12 }}>
+        <h3 style={{ fontSize: 14, fontWeight: 600, color: 'var(--text-muted)', margin: 0, marginBottom: 12 }}>
           Hızlı Erişim
         </h3>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
@@ -257,12 +257,12 @@ export default function Profile() {
             onClick={() => navigate('/rapor-ekle')}
             style={{
               padding: '12px 16px',
-              backgroundColor: '#fef3c7',
+              backgroundColor: 'var(--bg-accent)',
               border: 'none',
               borderRadius: 10,
               fontSize: 13,
               fontWeight: 600,
-              color: '#92400e',
+              color: 'var(--accent-dark)',
               cursor: 'pointer',
               textAlign: 'left',
             }}
@@ -273,12 +273,12 @@ export default function Profile() {
             onClick={() => navigate('/raporlar')}
             style={{
               padding: '12px 16px',
-              backgroundColor: '#f3f4f6',
+              backgroundColor: 'var(--bg-subtle)',
               border: 'none',
               borderRadius: 10,
               fontSize: 13,
               fontWeight: 600,
-              color: '#4b5563',
+              color: 'var(--text-muted)',
               cursor: 'pointer',
               textAlign: 'left',
             }}
@@ -290,7 +290,7 @@ export default function Profile() {
               onClick={() => navigate('/personel')}
               style={{
                 padding: '12px 16px',
-                backgroundColor: '#dbeafe',
+                backgroundColor: 'var(--bg-info)',
                 border: 'none',
                 borderRadius: 10,
                 fontSize: 13,
@@ -311,7 +311,7 @@ export default function Profile() {
         style={{
           width: '100%',
           padding: 14,
-          backgroundColor: '#fef2f2',
+          backgroundColor: 'var(--bg-danger)',
           border: 'none',
           borderRadius: 12,
           fontSize: 14,

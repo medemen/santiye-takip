@@ -16,7 +16,7 @@ export default function DetaySecimi({
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
       <div>
-        <label style={{ display: 'block', fontSize: 13, fontWeight: 500, color: '#4b5563', marginBottom: 6 }}>
+        <label style={{ display: 'block', fontSize: 13, fontWeight: 500, color: 'var(--text-muted)', marginBottom: 6 }}>
           Açıklama
         </label>
         <textarea
@@ -38,7 +38,7 @@ export default function DetaySecimi({
       </div>
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
         <div>
-          <label style={{ display: 'block', fontSize: 13, fontWeight: 500, color: '#4b5563', marginBottom: 6 }}>
+          <label style={{ display: 'block', fontSize: 13, fontWeight: 500, color: 'var(--text-muted)', marginBottom: 6 }}>
             Tarih
           </label>
           <input
@@ -56,7 +56,7 @@ export default function DetaySecimi({
           />
         </div>
         <div>
-          <label style={{ display: 'block', fontSize: 13, fontWeight: 500, color: '#4b5563', marginBottom: 6 }}>
+          <label style={{ display: 'block', fontSize: 13, fontWeight: 500, color: 'var(--text-muted)', marginBottom: 6 }}>
             Raporlayan
           </label>
           <input
@@ -69,8 +69,8 @@ export default function DetaySecimi({
               borderRadius: 10,
               border: '1px solid #e5e7eb',
               fontSize: 13,
-              backgroundColor: '#f9fafb',
-              color: '#374151',
+              backgroundColor: 'var(--bg-hover)',
+              color: 'var(--text-secondary)',
               boxSizing: 'border-box',
             }}
           />

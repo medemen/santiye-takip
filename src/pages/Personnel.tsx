@@ -154,7 +154,7 @@ export default function Personnel() {
   return (
     <div>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
-        <h1 style={{ fontSize: 20, fontWeight: 700, color: '#1f2937', margin: 0 }}>
+        <h1 style={{ fontSize: 20, fontWeight: 700, color: 'var(--text-primary)', margin: 0 }}>
           Personel
         </h1>
         <div style={{ display: 'flex', gap: 6 }}>
@@ -264,7 +264,7 @@ export default function Personnel() {
               style={{
                 fontSize: 15,
                 fontWeight: 600,
-                color: '#374151',
+                color: 'var(--text-secondary)',
                 marginBottom: 8,
                 paddingBottom: 6,
                 borderBottom: '2px solid #f59e0b',
@@ -272,14 +272,14 @@ export default function Personnel() {
             >
               {ada}
               {sef && (
-                <span style={{ fontSize: 12, fontWeight: 400, color: '#6b7280', marginLeft: 8 }}>
+                <span style={{ fontSize: 12, fontWeight: 400, color: 'var(--text-faint)', marginLeft: 8 }}>
                   👷 {sef.ad_soyad}
                 </span>
               )}
             </h2>
 
             {personel.length === 0 ? (
-              <div style={{ fontSize: 12, color: '#9ca3af', padding: '8px 0' }}>
+              <div style={{ fontSize: 12, color: 'var(--text-subtle)', padding: '8px 0' }}>
                 Bu adaya atanmış personel yok
               </div>
             ) : (

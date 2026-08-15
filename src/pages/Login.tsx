@@ -51,24 +51,24 @@ export default function Login() {
     >
       <div style={{ textAlign: 'center', marginBottom: 32 }}>
         <div style={{ fontSize: 48, marginBottom: 8 }}>🏗️</div>
-        <h1 style={{ fontSize: 22, fontWeight: 700, color: '#1f2937', margin: 0 }}>
+        <h1 style={{ fontSize: 22, fontWeight: 700, color: 'var(--text-primary)', margin: 0 }}>
           {config.genel.santiyeAdi}
         </h1>
-        <p style={{ fontSize: 13, color: '#6b7280', marginTop: 4 }}>
+        <p style={{ fontSize: 13, color: 'var(--text-faint)', marginTop: 4 }}>
           Rapor Takip Sistemi
         </p>
       </div>
 
       <div
         style={{
-          backgroundColor: '#fff',
+          backgroundColor: 'var(--bg-card)',
           borderRadius: 16,
           padding: 24,
           boxShadow: '0 1px 3px rgba(0,0,0,0.06)',
           border: '1px solid #f0f0f0',
         }}
       >
-        <label style={{ display: 'block', fontSize: 13, fontWeight: 500, color: '#4b5563', marginBottom: 8 }}>
+        <label style={{ display: 'block', fontSize: 13, fontWeight: 500, color: 'var(--text-muted)', marginBottom: 8 }}>
           Kullanıcı Adı
         </label>
         <select
@@ -77,7 +77,7 @@ export default function Login() {
           disabled={yukleniyor}
           style={{
             width: '100%', padding: '12px 14px', borderRadius: 12,
-            border: '2px solid #e5e7eb', fontSize: 14, backgroundColor: '#fff',
+            border: '2px solid #e5e7eb', fontSize: 14, backgroundColor: 'var(--bg-card)',
             boxSizing: 'border-box', marginBottom: 16,
           }}
         >
@@ -103,9 +103,9 @@ export default function Login() {
           disabled={!selected || yukleniyor}
           style={{
             width: '100%', padding: '14px',
-            backgroundColor: selected && !yukleniyor ? '#f59e0b' : '#e5e7eb',
+            backgroundColor: selected && !yukleniyor ? '#f59e0b' : 'var(--border)',
             border: 'none', borderRadius: 12, fontSize: 15, fontWeight: 700,
-            color: selected && !yukleniyor ? '#fff' : '#9ca3af',
+            color: selected && !yukleniyor ? '#fff' : 'var(--text-subtle)',
             cursor: selected && !yukleniyor ? 'pointer' : 'not-allowed',
           }}
         >

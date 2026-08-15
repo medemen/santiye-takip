@@ -8,7 +8,7 @@ export default function GenelIlerlemeKart({ ilerleme }: Props) {
   return (
     <div style={{ ...card, padding: 18, marginBottom: 16 }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
-        <span style={{ fontSize: 14, fontWeight: 600, color: '#4b5563' }}>Genel İlerleme</span>
+        <span style={{ fontSize: 14, fontWeight: 600, color: 'var(--text-muted)' }}>Genel İlerleme</span>
         <span style={{ fontSize: 28, fontWeight: 700, color: ilerleme === 100 ? '#22c55e' : '#f59e0b' }}>
           %{ilerleme}
         </span>
@@ -17,7 +17,7 @@ export default function GenelIlerlemeKart({ ilerleme }: Props) {
         style={{
           height: 10,
           borderRadius: 5,
-          backgroundColor: '#e5e7eb',
+          backgroundColor: 'var(--border)',
           overflow: 'hidden',
         }}
       >

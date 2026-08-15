@@ -287,12 +287,12 @@ export default function ReportAdd() {
   if (gosterilecekAdalar.length === 0) {
     return (
       <div>
-        <h1 style={{ fontSize: 20, fontWeight: 700, color: '#1f2937', marginBottom: 4 }}>
+        <h1 style={{ fontSize: 20, fontWeight: 700, color: 'var(--text-primary)', marginBottom: 4 }}>
           Rapor Ekle
         </h1>
         <div
           style={{
-            backgroundColor: '#fff',
+            backgroundColor: 'var(--bg-card)',
             borderRadius: 16,
             padding: 40,
             textAlign: 'center',
@@ -300,7 +300,7 @@ export default function ReportAdd() {
           }}
         >
           <div style={{ fontSize: 40, marginBottom: 12 }}>🔒</div>
-          <p style={{ fontSize: 14, color: '#6b7280', margin: 0 }}>
+          <p style={{ fontSize: 14, color: 'var(--text-faint)', margin: 0 }}>
             Size atanmış bir ada bulunmuyor.
             {isAdmin ? ' Personel sayfasından atama yapabilirsiniz.' : ''}
           </p>
@@ -365,12 +365,12 @@ export default function ReportAdd() {
             style={{
               flex: 1,
               padding: 12,
-              backgroundColor: '#f3f4f6',
+              backgroundColor: 'var(--bg-subtle)',
               border: 'none',
               borderRadius: 12,
               fontSize: 14,
               fontWeight: 600,
-              color: '#4b5563',
+              color: 'var(--text-muted)',
               cursor: 'pointer',
             }}
           >
@@ -384,12 +384,12 @@ export default function ReportAdd() {
             style={{
               flex: 1,
               padding: 12,
-              backgroundColor: canSave ? '#dbeafe' : '#f3f4f6',
+              backgroundColor: canSave ? 'var(--bg-info)' : 'var(--bg-subtle)',
               border: 'none',
               borderRadius: 12,
               fontSize: 14,
               fontWeight: 600,
-              color: canSave ? '#1e40af' : '#9ca3af',
+              color: canSave ? '#1e40af' : 'var(--text-subtle)',
               cursor: canSave ? 'pointer' : 'not-allowed',
             }}
           >
@@ -402,12 +402,12 @@ export default function ReportAdd() {
           style={{
             flex: 2,
             padding: 12,
-            backgroundColor: canSave ? '#f59e0b' : '#e5e7eb',
+            backgroundColor: canSave ? '#f59e0b' : 'var(--border)',
             border: 'none',
             borderRadius: 12,
             fontSize: 14,
             fontWeight: 700,
-            color: canSave ? '#fff' : '#9ca3af',
+            color: canSave ? '#fff' : 'var(--text-subtle)',
             cursor: canSave ? 'pointer' : 'not-allowed',
           }}
         >
@@ -419,10 +419,10 @@ export default function ReportAdd() {
 
   return (
     <div>
-      <h1 style={{ fontSize: 20, fontWeight: 700, color: '#1f2937', marginBottom: 4 }}>
+      <h1 style={{ fontSize: 20, fontWeight: 700, color: 'var(--text-primary)', marginBottom: 4 }}>
         {editMode ? 'Rapor Düzenle' : 'Rapor Ekle'}
       </h1>
-      <p style={{ fontSize: 13, color: '#6b7280', margin: 0, marginBottom: 16 }}>
+      <p style={{ fontSize: 13, color: 'var(--text-faint)', margin: 0, marginBottom: 16 }}>
         {editMode
           ? 'Mevcut raporu güncelleyin'
           : 'Bir veya birden çok blok için iş kalemi ilerlemesini raporlayın'}
@@ -434,7 +434,7 @@ export default function ReportAdd() {
           style={{
             width: '100%',
             padding: '12px',
-            backgroundColor: '#fff7ed',
+            backgroundColor: 'var(--bg-accent-soft)',
             border: '1px solid #fdba74',
             borderRadius: 12,
             fontSize: 13,
@@ -453,13 +453,13 @@ export default function ReportAdd() {
       {editMode && (
         <div
           style={{
-            backgroundColor: '#fff',
+            backgroundColor: 'var(--bg-card)',
             borderRadius: 12,
             padding: '12px 16px',
             marginBottom: 16,
             border: '1px solid #f0f0f0',
             fontSize: 13,
-            color: '#374151',
+            color: 'var(--text-secondary)',
           }}
         >
           <strong>{ada}</strong> - {blokNo === 0 ? 'Ada Geneli' : `Blok ${blokNo}`} — {isKalemi}

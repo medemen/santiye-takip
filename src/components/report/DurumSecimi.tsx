@@ -19,12 +19,12 @@ export default function DurumSecimi({ durum, onChange }: Props) {
             style={{
               flex: 1,
               padding: '10px 8px',
-              backgroundColor: durum === key ? '#f59e0b' : '#f3f4f6',
+              backgroundColor: durum === key ? '#f59e0b' : 'var(--bg-subtle)',
               border: 'none',
               borderRadius: 10,
               fontSize: 12,
               fontWeight: 600,
-              color: durum === key ? '#fff' : '#4b5563',
+              color: durum === key ? '#fff' : 'var(--text-muted)',
               cursor: 'pointer',
             }}
           >

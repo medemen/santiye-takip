@@ -14,7 +14,7 @@ interface Props {
 const BarChart = memo(function BarChart({ data, height = 200 }: Props) {
   if (data.length === 0) {
     return (
-      <div style={{ height, display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#9ca3af', fontSize: 14 }}>
+      <div style={{ height, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--text-subtle)', fontSize: 14 }}>
         Henüz veri yok
       </div>
     );
@@ -61,7 +61,7 @@ const BarChart = memo(function BarChart({ data, height = 200 }: Props) {
               flex: 1,
               textAlign: 'center',
               fontSize: 11,
-              color: '#6b7280',
+              color: 'var(--text-faint)',
               overflow: 'hidden',
               textOverflow: 'ellipsis',
               whiteSpace: 'nowrap',

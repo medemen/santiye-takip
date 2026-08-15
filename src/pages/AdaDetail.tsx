@@ -35,7 +35,7 @@ export default function AdaDetail() {
   );
 
   if (!adaData) {
-    return <div style={{ padding: 40, textAlign: 'center', color: '#9ca3af' }}>Ada bulunamadı</div>;
+    return <div style={{ padding: 40, textAlign: 'center', color: 'var(--text-subtle)' }}>Ada bulunamadı</div>;
   }
 
   const santiyeSefi = getSantiyeSefi(ada!);
@@ -66,10 +66,10 @@ export default function AdaDetail() {
         ← Adalara Dön
       </button>
 
-      <h1 style={{ fontSize: 22, fontWeight: 700, color: '#1f2937', margin: 0, marginBottom: 4 }}>
+      <h1 style={{ fontSize: 22, fontWeight: 700, color: 'var(--text-primary)', margin: 0, marginBottom: 4 }}>
         {ada}
       </h1>
-      <p style={{ fontSize: 13, color: '#6b7280', margin: 0, marginBottom: 12 }}>
+      <p style={{ fontSize: 13, color: 'var(--text-faint)', margin: 0, marginBottom: 12 }}>
         Şantiye Şefi: {santiyeSefi} | {bloklar.length} Blok, {adaData.toplam_daire} Daire, {adaData.toplam_kat} Kat
       </p>
 

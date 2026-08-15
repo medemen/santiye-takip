@@ -27,17 +27,17 @@ export default function PersonelDetay({ ad_soyad, raporlar, adaAtamasi, onGeri }
         ← Personele Dön
       </button>
 
-      <h1 style={{ fontSize: 20, fontWeight: 700, color: '#1f2937', marginBottom: 4 }}>
+      <h1 style={{ fontSize: 20, fontWeight: 700, color: 'var(--text-primary)', marginBottom: 4 }}>
         {ad_soyad}
       </h1>
-      <p style={{ fontSize: 13, color: '#6b7280', marginBottom: 16 }}>
+      <p style={{ fontSize: 13, color: 'var(--text-faint)', marginBottom: 16 }}>
         {adaAtamasi
           ? `${adaAtamasi} — Toplam ${raporlar.length} rapor`
           : `Atanmamış — Toplam ${raporlar.length} rapor`}
       </p>
 
       {raporlar.length === 0 ? (
-        <div style={{ textAlign: 'center', padding: 40, color: '#9ca3af', fontSize: 14 }}>
+        <div style={{ textAlign: 'center', padding: 40, color: 'var(--text-subtle)', fontSize: 14 }}>
           Henüz rapor bulunmuyor
         </div>
       ) : (

@@ -2,6 +2,10 @@ import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import './index.css'
 import App from './App.tsx'
+import { getTemaSecim, temaSeciminiUygula } from './stores/themeStore'
+
+getTemaSecim()
+temaSeciminiUygula()
 
 function hataGoster(msg: string) {
   const root = document.getElementById('root')

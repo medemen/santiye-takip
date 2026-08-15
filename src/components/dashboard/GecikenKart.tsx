@@ -9,7 +9,7 @@ export default function GecikenKart({ isler, onNavigate }: Props) {
   return (
     <div
       style={{
-        backgroundColor: '#fef2f2',
+        backgroundColor: 'var(--bg-danger)',
         borderRadius: 16,
         padding: 14,
         marginBottom: 16,
@@ -29,7 +29,7 @@ export default function GecikenKart({ isler, onNavigate }: Props) {
             onClick={() => onNavigate(r.ada, r.blok_no)}
             style={{
               display: 'flex', justifyContent: 'space-between',
-              padding: '6px 10px', backgroundColor: '#fff',
+              padding: '6px 10px', backgroundColor: 'var(--bg-card)',
               borderRadius: 8, cursor: 'pointer', fontSize: 12,
             }}
           >

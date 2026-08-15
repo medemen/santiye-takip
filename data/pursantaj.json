@@ -1,0 +1,331 @@
+{
+  "kaynak": "güneyşehir 9 nolu hakediş.xlsx",
+  "hakedisNo": 9,
+  "toplam": 100,
+  "gruplar": {
+    "ins-kazi": {
+      "ad": "Kazı Dolgu Subasman Altı İmalatları",
+      "disiplin": "İNŞ",
+      "sira": 1
+    },
+    "ins-betonarme": {
+      "ad": "Betonarme Kalıp İskele Sistemi",
+      "disiplin": "İNŞ",
+      "sira": 2
+    },
+    "ins-doseme": {
+      "ad": "Döşeme İmalatları",
+      "disiplin": "İNŞ",
+      "sira": 3
+    },
+    "ins-duvar": {
+      "ad": "Duvar İmalatları",
+      "disiplin": "İNŞ",
+      "sira": 4
+    },
+    "ins-tavan": {
+      "ad": "Tavan İmalatları",
+      "disiplin": "İNŞ",
+      "sira": 5
+    },
+    "ins-pencere": {
+      "ad": "Pencere İmalatları",
+      "disiplin": "İNŞ",
+      "sira": 6
+    },
+    "ins-kapi": {
+      "ad": "Kapı, Ahşap İmalatları",
+      "disiplin": "İNŞ",
+      "sira": 7
+    },
+    "ins-dis-cephe": {
+      "ad": "Dış Cephe İmalatları",
+      "disiplin": "İNŞ",
+      "sira": 8
+    },
+    "ins-cati": {
+      "ad": "Çatı İmalatları",
+      "disiplin": "İNŞ",
+      "sira": 9
+    },
+    "ins-altyapi": {
+      "ad": "Altyapı İmalatları",
+      "disiplin": "İNŞ",
+      "sira": 10
+    },
+    "ins-merdiven": {
+      "ad": "Merdivenler,Giriş Holü ve Kat Holü",
+      "disiplin": "İNŞ",
+      "sira": 11
+    },
+    "ins-cevre": {
+      "ad": "Çevre Düzenleme ve İstinatlar",
+      "disiplin": "İNŞ",
+      "sira": 12
+    },
+    "ins-cocuk": {
+      "ad": "Çocuk Oyun Gurupları ve Çöp Kovaları",
+      "disiplin": "İNŞ",
+      "sira": 13
+    },
+    "mek-dogalgaz": {
+      "ad": "Doğalgaz Tesisatı",
+      "disiplin": "MEK",
+      "sira": 1
+    },
+    "mek-havalandirma": {
+      "ad": "Havalandırma Tesisatı",
+      "disiplin": "MEK",
+      "sira": 2
+    },
+    "mek-sihhi": {
+      "ad": "Sıhhi Tesisat",
+      "disiplin": "MEK",
+      "sira": 3
+    },
+    "mek-kalorifer": {
+      "ad": "Kalorifer Tesisatı",
+      "disiplin": "MEK",
+      "sira": 4
+    },
+    "mek-yangin": {
+      "ad": "Yangın Teisatı Tüm Adalar",
+      "disiplin": "MEK",
+      "sira": 5
+    },
+    "elk-linye": {
+      "ad": "Linye ve Sorti",
+      "disiplin": "ELK",
+      "sira": 1
+    },
+    "elk-diyafon": {
+      "ad": "Diyafon",
+      "disiplin": "ELK",
+      "sira": 2
+    },
+    "elk-topraklama": {
+      "ad": "Topraklama",
+      "disiplin": "ELK",
+      "sira": 3
+    },
+    "elk-cevre-ayd": {
+      "ad": "Çevre Aydınlatma",
+      "disiplin": "ELK",
+      "sira": 4
+    },
+    "elk-jenerator": {
+      "ad": "Jeneratör",
+      "disiplin": "ELK",
+      "sira": 5
+    },
+    "elk-solar": {
+      "ad": "Solar Enerji",
+      "disiplin": "ELK",
+      "sira": 6
+    },
+    "elk-kolon": {
+      "ad": "Kolon",
+      "disiplin": "ELK",
+      "sira": 7
+    },
+    "elk-pano": {
+      "ad": "Pano",
+      "disiplin": "ELK",
+      "sira": 8
+    },
+    "elk-asansor": {
+      "ad": "Asansör",
+      "disiplin": "ELK",
+      "sira": 9
+    }
+  },
+  "adalar": {
+    "ADA-1": {
+      "genel": 8.9282,
+      "gruplar": {
+        "ins-kazi": 0.3019,
+        "ins-betonarme": 2.7751,
+        "ins-doseme": 0.4721,
+        "ins-duvar": 0.9977,
+        "ins-tavan": 0.1458,
+        "ins-pencere": 0.2271,
+        "ins-kapi": 1.0131,
+        "ins-dis-cephe": 0.6491,
+        "ins-cati": 0.2372,
+        "ins-altyapi": 0.0173,
+        "ins-merdiven": 0.3257,
+        "ins-cevre": 0.2182,
+        "ins-cocuk": 0.0331,
+        "mek-dogalgaz": 0.132,
+        "mek-havalandirma": 0.0422,
+        "mek-sihhi": 0.3792,
+        "mek-kalorifer": 0.175,
+        "elk-linye": 0.3655,
+        "elk-diyafon": 0.0292,
+        "elk-topraklama": 0.004,
+        "elk-cevre-ayd": 0.01,
+        "elk-jenerator": 0.009,
+        "elk-solar": 0.0288,
+        "elk-kolon": 0.0466,
+        "elk-pano": 0.0661,
+        "elk-asansor": 0.2272
+      }
+    },
+    "ADA-2": {
+      "genel": 13.312999999999999,
+      "gruplar": {
+        "ins-kazi": 0.4213,
+        "ins-betonarme": 4.0345,
+        "ins-doseme": 0.691,
+        "ins-duvar": 1.469,
+        "ins-tavan": 0.214,
+        "ins-pencere": 0.3293,
+        "ins-kapi": 1.4652,
+        "ins-dis-cephe": 0.9443,
+        "ins-cati": 0.3285,
+        "ins-altyapi": 0.0281,
+        "ins-merdiven": 0.4669,
+        "ins-cevre": 0.6891,
+        "ins-cocuk": 0.0524,
+        "mek-dogalgaz": 0.1885,
+        "mek-havalandirma": 0.0585,
+        "mek-sihhi": 0.552,
+        "mek-kalorifer": 0.254,
+        "elk-linye": 0.5324,
+        "elk-diyafon": 0.0424,
+        "elk-topraklama": 0.0055,
+        "elk-cevre-ayd": 0.014,
+        "elk-jenerator": 0.0124,
+        "elk-solar": 0.0399,
+        "elk-kolon": 0.0644,
+        "elk-pano": 0.0947,
+        "elk-asansor": 0.3207
+      }
+    },
+    "ADA-3": {
+      "genel": 14.601799999999999,
+      "gruplar": {
+        "ins-kazi": 0.4882,
+        "ins-betonarme": 4.4573,
+        "ins-doseme": 0.7659,
+        "ins-duvar": 1.7233,
+        "ins-tavan": 0.2382,
+        "ins-pencere": 0.3629,
+        "ins-kapi": 1.6278,
+        "ins-dis-cephe": 1.0398,
+        "ins-cati": 0.365,
+        "ins-altyapi": 0.0308,
+        "ins-merdiven": 0.5236,
+        "ins-cevre": 0.5462,
+        "ins-cocuk": 0.0367,
+        "mek-dogalgaz": 0.208,
+        "mek-havalandirma": 0.0649,
+        "mek-sihhi": 0.6003,
+        "mek-kalorifer": 0.2793,
+        "elk-linye": 0.5852,
+        "elk-diyafon": 0.0466,
+        "elk-topraklama": 0.0061,
+        "elk-cevre-ayd": 0.0156,
+        "elk-jenerator": 0.0138,
+        "elk-solar": 0.0443,
+        "elk-kolon": 0.0717,
+        "elk-pano": 0.1047,
+        "elk-asansor": 0.3556
+      }
+    },
+    "ADA-4": {
+      "genel": 22.8311,
+      "gruplar": {
+        "ins-kazi": 0.7957,
+        "ins-betonarme": 7.0628,
+        "ins-doseme": 1.1719,
+        "ins-duvar": 2.4616,
+        "ins-tavan": 0.3595,
+        "ins-pencere": 0.5457,
+        "ins-kapi": 2.4497,
+        "ins-dis-cephe": 1.5718,
+        "ins-cati": 0.5657,
+        "ins-altyapi": 0.0546,
+        "ins-merdiven": 0.845,
+        "ins-cevre": 1.2303,
+        "ins-cocuk": 0.0769,
+        "mek-dogalgaz": 0.3158,
+        "mek-havalandirma": 0.1007,
+        "mek-sihhi": 0.908,
+        "mek-kalorifer": 0.4195,
+        "elk-linye": 0.879,
+        "elk-diyafon": 0.0701,
+        "elk-topraklama": 0.0095,
+        "elk-cevre-ayd": 0.0243,
+        "elk-jenerator": 0.0214,
+        "elk-solar": 0.0686,
+        "elk-kolon": 0.1084,
+        "elk-pano": 0.1588,
+        "elk-asansor": 0.5558
+      }
+    },
+    "ADA-5": {
+      "genel": 24.720900000000004,
+      "gruplar": {
+        "ins-kazi": 0.7074,
+        "ins-betonarme": 7.4121,
+        "ins-doseme": 1.2617,
+        "ins-duvar": 2.747,
+        "ins-tavan": 0.4085,
+        "ins-pencere": 0.6244,
+        "ins-kapi": 2.765,
+        "ins-dis-cephe": 1.7841,
+        "ins-cati": 0.6022,
+        "ins-altyapi": 0.0564,
+        "ins-merdiven": 0.8373,
+        "ins-cevre": 1.3315,
+        "ins-cocuk": 0.0667,
+        "mek-dogalgaz": 0.3482,
+        "mek-havalandirma": 0.1079,
+        "mek-sihhi": 1.0168,
+        "mek-kalorifer": 0.4718,
+        "mek-yangin": 0.059,
+        "elk-linye": 1.0261,
+        "elk-diyafon": 0.0795,
+        "elk-topraklama": 0.0101,
+        "elk-cevre-ayd": 0.0255,
+        "elk-jenerator": 0.0228,
+        "elk-solar": 0.073,
+        "elk-kolon": 0.1187,
+        "elk-pano": 0.1677,
+        "elk-asansor": 0.5895
+      }
+    },
+    "ADA-6": {
+      "genel": 15.604999999999999,
+      "gruplar": {
+        "ins-kazi": 0.4461,
+        "ins-betonarme": 4.7168,
+        "ins-doseme": 0.8029,
+        "ins-duvar": 1.748,
+        "ins-tavan": 0.26,
+        "ins-pencere": 0.3974,
+        "ins-kapi": 1.7595,
+        "ins-dis-cephe": 1.1353,
+        "ins-cati": 0.3832,
+        "ins-altyapi": 0.0332,
+        "ins-merdiven": 0.5322,
+        "ins-cevre": 0.7342,
+        "ins-cocuk": 0.0626,
+        "mek-dogalgaz": 0.2198,
+        "mek-havalandirma": 0.0687,
+        "mek-sihhi": 0.6388,
+        "mek-kalorifer": 0.3003,
+        "elk-linye": 0.6744,
+        "elk-diyafon": 0.0506,
+        "elk-topraklama": 0.0064,
+        "elk-cevre-ayd": 0.0161,
+        "elk-jenerator": 0.0145,
+        "elk-solar": 0.0465,
+        "elk-kolon": 0.0756,
+        "elk-pano": 0.1067,
+        "elk-asansor": 0.3752
+      }
+    }
+  }
+}

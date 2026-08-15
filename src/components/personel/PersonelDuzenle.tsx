@@ -45,19 +45,19 @@ export default function PersonelDuzenle({
           marginBottom: 16,
         }}
       >
-        <h1 style={{ fontSize: 20, fontWeight: 700, color: '#1f2937', margin: 0 }}>
+        <h1 style={{ fontSize: 20, fontWeight: 700, color: 'var(--text-primary)', margin: 0 }}>
           Personel Düzenle
         </h1>
         <div style={{ display: 'flex', gap: 8 }}>
           <button onClick={onIptal}
             style={{
               padding: '8px 16px',
-              backgroundColor: '#f3f4f6',
+              backgroundColor: 'var(--bg-subtle)',
               border: 'none',
               borderRadius: 10,
               fontSize: 13,
               fontWeight: 600,
-              color: '#4b5563',
+              color: 'var(--text-muted)',
               cursor: 'pointer',
             }}
           >
@@ -82,14 +82,14 @@ export default function PersonelDuzenle({
 
       <div
         style={{
-          backgroundColor: '#fff',
+          backgroundColor: 'var(--bg-card)',
           borderRadius: 12,
           padding: 14,
           marginBottom: 16,
           border: '1px solid #f0f0f0',
         }}
       >
-        <div style={{ fontSize: 15, fontWeight: 600, color: '#1f2937' }}>{editPerson}</div>
+        <div style={{ fontSize: 15, fontWeight: 600, color: 'var(--text-primary)' }}>{editPerson}</div>
         {person && (
           <span
             style={{
@@ -97,8 +97,8 @@ export default function PersonelDuzenle({
               fontSize: 11,
               padding: '1px 8px',
               borderRadius: 8,
-              backgroundColor: ROL_RENKLERI[person.rol] || '#f3f4f6',
-              color: ROL_YAZI_RENKLERI[person.rol] || '#4b5563',
+              backgroundColor: ROL_RENKLERI[person.rol] || 'var(--bg-subtle)',
+              color: ROL_YAZI_RENKLERI[person.rol] || 'var(--text-muted)',
               marginTop: 4,
             }}
           >
@@ -108,7 +108,7 @@ export default function PersonelDuzenle({
       </div>
 
       <div style={{ marginBottom: 16 }}>
-        <label style={{ display: 'block', fontSize: 13, fontWeight: 500, color: '#4b5563', marginBottom: 6 }}>
+        <label style={{ display: 'block', fontSize: 13, fontWeight: 500, color: 'var(--text-muted)', marginBottom: 6 }}>
           Atanacağı Ada
         </label>
         <select
@@ -120,7 +120,7 @@ export default function PersonelDuzenle({
             borderRadius: 12,
             border: '2px solid #e5e7eb',
             fontSize: 14,
-            backgroundColor: '#fff',
+            backgroundColor: 'var(--bg-card)',
             boxSizing: 'border-box',
           }}
         >
@@ -134,7 +134,7 @@ export default function PersonelDuzenle({
       {editAda && (
         <div>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
-            <h3 style={{ fontSize: 14, fontWeight: 600, color: '#374151', margin: 0 }}>
+            <h3 style={{ fontSize: 14, fontWeight: 600, color: 'var(--text-secondary)', margin: 0 }}>
               Blok Atamaları ({editAda})
             </h3>
             <button
@@ -148,7 +148,7 @@ export default function PersonelDuzenle({
                 borderRadius: 6,
                 padding: '2px 8px',
                 fontSize: 11,
-                color: '#6b7280',
+                color: 'var(--text-faint)',
                 cursor: 'pointer',
               }}
             >
@@ -171,12 +171,12 @@ export default function PersonelDuzenle({
                   onClick={() => onBlokToggle(editAda, b.blok_no)}
                   style={{
                     padding: 8,
-                    backgroundColor: active ? '#f59e0b' : '#f3f4f6',
+                    backgroundColor: active ? '#f59e0b' : 'var(--bg-subtle)',
                     border: 'none',
                     borderRadius: 8,
                     fontSize: 12,
                     fontWeight: 600,
-                    color: active ? '#fff' : '#4b5563',
+                    color: active ? '#fff' : 'var(--text-muted)',
                     cursor: 'pointer',
                   }}
                 >
@@ -185,7 +185,7 @@ export default function PersonelDuzenle({
               );
             })}
           </div>
-          <p style={{ fontSize: 11, color: '#9ca3af', marginTop: 6 }}>
+          <p style={{ fontSize: 11, color: 'var(--text-subtle)', marginTop: 6 }}>
             Hiç blok seçilmezse tüm bloklara erişebilir
           </p>
         </div>

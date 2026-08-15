@@ -23,7 +23,7 @@ export function getIlerlemeDurumu(
   }
   if (rapor?.durum === 'devam_ediyor') return { label: 'Devam Ediyor', renk: '#3b82f6' };
   if (rapor?.durum === 'planlandi') return { label: 'Planlandı', renk: '#f59e0b' };
-  return { label: 'Rapor Yok', renk: '#9ca3af' };
+  return { label: 'Rapor Yok', renk: 'var(--text-subtle)' };
 }
 
 export interface HedefOzetItem {

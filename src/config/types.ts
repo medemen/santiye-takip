@@ -8,6 +8,41 @@ export interface SantiyeConfig {
   yapi: YapiBilgi;
   isKalemleri: IsKalemleriBilgi;
   durumTespit: DurumTespitBilgi;
+  hakedis?: HakedisBilgi;
+}
+
+export interface HakedisBilgi {
+  hakedisNo: number;
+  kaynak: string;
+  gruplar: Record<string, HakedisGrupMeta>;
+  adalar: Record<string, { genel: number; gruplar: Record<string, number> }>;
+  toplam: number;
+  ilerlemeIcmal: {
+    adalar: Record<string, Record<string, DisiplinIlerleme>>;
+    toplam: { hk9: number; kum: number } | null;
+  };
+  grupIlerleme?: Record<string, Record<string, HakedisGrupIlerleme>>;
+  kalemEslesme: Record<string, string>;
+}
+
+export interface HakedisGrupIlerleme {
+  pursantaj: number;
+  gerceklesen: number;
+  imalat_yuzde: number;
+}
+
+export interface HakedisGrupMeta {
+  ad: string;
+  disiplin: 'İNŞ' | 'MEK' | 'ELK';
+  sira: number;
+}
+
+export interface DisiplinIlerleme {
+  imalat: number | null;
+  adaBazli: number | null;
+  hk9: number | null;
+  kum: number | null;
+  kumToplam: number | null;
 }
 
 export interface GenelBilgi {

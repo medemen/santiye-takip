@@ -18,7 +18,7 @@ export default function TopluAtamaPaneli({
   return (
     <div
       style={{
-        backgroundColor: '#fef3c7',
+        backgroundColor: 'var(--bg-accent)',
         borderRadius: 12,
         padding: 14,
         marginBottom: 16,
@@ -26,13 +26,13 @@ export default function TopluAtamaPaneli({
       }}
     >
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 }}>
-        <span style={{ fontSize: 13, fontWeight: 600, color: '#92400e' }}>
+        <span style={{ fontSize: 13, fontWeight: 600, color: 'var(--accent-dark)' }}>
           Toplu Atama ({seciliAdet} kişi seçili)
         </span>
         <button
           onClick={onIptal}
           style={{
-            background: 'none', border: 'none', fontSize: 12, color: '#92400e',
+            background: 'none', border: 'none', fontSize: 12, color: 'var(--accent-dark)',
             fontWeight: 600, cursor: 'pointer',
           }}
         >
@@ -44,7 +44,7 @@ export default function TopluAtamaPaneli({
         onChange={(e) => onBulkAdaChange(e.target.value)}
         style={{
           width: '100%', padding: '10px 12px', borderRadius: 8,
-          border: '1px solid #f59e0b', fontSize: 13, backgroundColor: '#fff',
+          border: '1px solid #f59e0b', fontSize: 13, backgroundColor: 'var(--bg-card)',
           marginBottom: 10, boxSizing: 'border-box',
         }}
       >
@@ -58,9 +58,9 @@ export default function TopluAtamaPaneli({
         disabled={!bulkAda || seciliAdet === 0}
         style={{
           width: '100%', padding: 10,
-          backgroundColor: bulkAda && seciliAdet > 0 ? '#f59e0b' : '#e5e7eb',
+          backgroundColor: bulkAda && seciliAdet > 0 ? '#f59e0b' : 'var(--border)',
           border: 'none', borderRadius: 8, fontSize: 13, fontWeight: 600,
-          color: bulkAda && seciliAdet > 0 ? '#fff' : '#9ca3af',
+          color: bulkAda && seciliAdet > 0 ? '#fff' : 'var(--text-subtle)',
           cursor: bulkAda && seciliAdet > 0 ? 'pointer' : 'not-allowed',
         }}
       >

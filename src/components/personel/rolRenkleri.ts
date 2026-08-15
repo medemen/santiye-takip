@@ -2,7 +2,7 @@ export const ROL_RENKLERI: Record<string, string> = {
   'İnşaat Mühendisi': '#dbeafe',
   'Mimar': '#ede9fe',
   'Tekniker': '#d1fae5',
-  'Formen': '#fef3c7',
+  'Formen': 'var(--bg-accent)',
   'Makine Mühendisi': '#cffafe',
   'Elektrik Mühendisi': '#fce7f3',
 };

@@ -48,7 +48,7 @@ export default function IsKalemiSecimi({
           style={{
             padding: 24,
             textAlign: 'center',
-            color: '#9ca3af',
+            color: 'var(--text-subtle)',
             fontSize: 13,
             border: '1px dashed #e5e7eb',
             borderRadius: 10,
@@ -72,11 +72,11 @@ export default function IsKalemiSecimi({
                   position: 'sticky',
                   top: 0,
                   zIndex: 1,
-                  backgroundColor: '#f9fafb',
+                  backgroundColor: 'var(--bg-hover)',
                   padding: '6px 12px',
                   fontSize: 12,
                   fontWeight: 700,
-                  color: '#6b7280',
+                  color: 'var(--text-faint)',
                   borderBottom: '1px solid #f0f0f0',
                 }}
               >
@@ -89,13 +89,13 @@ export default function IsKalemiSecimi({
                     onClick={() => onSelect(ik)}
                     style={{
                       padding: '10px 8px',
-                      backgroundColor: secili === ik ? '#f59e0b' : '#f9fafb',
+                      backgroundColor: secili === ik ? '#f59e0b' : 'var(--bg-hover)',
                       border: '1px solid',
-                      borderColor: secili === ik ? '#f59e0b' : '#e5e7eb',
+                      borderColor: secili === ik ? '#f59e0b' : 'var(--border)',
                       borderRadius: 8,
                       fontSize: 12,
                       fontWeight: 500,
-                      color: secili === ik ? '#fff' : '#374151',
+                      color: secili === ik ? '#fff' : 'var(--text-secondary)',
                       cursor: 'pointer',
                     }}
                   >
@@ -112,10 +112,10 @@ export default function IsKalemiSecimi({
         <div
           style={{
             fontSize: 11,
-            color: '#9ca3af',
+            color: 'var(--text-subtle)',
             marginTop: 8,
             padding: '6px 10px',
-            backgroundColor: '#f9fafb',
+            backgroundColor: 'var(--bg-hover)',
             borderRadius: 8,
           }}
         >

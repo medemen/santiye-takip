@@ -8,7 +8,7 @@
  *
  * Kullanım: node scripts/build-config.mjs
  */
-import { readFileSync, writeFileSync } from 'node:fs';
+import { existsSync, readFileSync, writeFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { dirname, join } from 'node:path';
 
@@ -18,6 +18,27 @@ const dataDir = join(__dirname, '..', 'data');
 const basics = JSON.parse(readFileSync(join(dataDir, 'config-basics.json'), 'utf8'));
 const yapiSrc = JSON.parse(readFileSync(join(dataDir, 'adalar_bloklar.json'), 'utf8'));
 const durumSrc = JSON.parse(readFileSync(join(dataDir, 'durum_tespit.json'), 'utf8'));
+
+// Hakediş verileri (yoksa config'e dahil edilmez)
+let hakedis = null;
+const hakedisKaynaklariVar = ['pursantaj.json', 'hakedis.json', 'kalem_grup_eslesme.json'].every((src) =>
+  existsSync(join(dataDir, src))
+);
+if (hakedisKaynaklariVar) {
+  const pursantaj = JSON.parse(readFileSync(join(dataDir, 'pursantaj.json'), 'utf8'));
+  const hakedisJson = JSON.parse(readFileSync(join(dataDir, 'hakedis.json'), 'utf8'));
+  const eslesme = JSON.parse(readFileSync(join(dataDir, 'kalem_grup_eslesme.json'), 'utf8'));
+  hakedis = {
+    hakedisNo: pursantaj.hakedisNo,
+    kaynak: pursantaj.kaynak,
+    gruplar: pursantaj.gruplar,
+    adalar: pursantaj.adalar,
+    toplam: pursantaj.toplam,
+    ilerlemeIcmal: hakedisJson.ilerlemeIcmal,
+    grupIlerleme: hakedisJson.gruplar,
+    kalemEslesme: eslesme.eslesme,
+  };
+}
 
 const adalar = yapiSrc.adalar.map((a) => ({
   ada: a.ada,
@@ -43,6 +64,7 @@ const config = {
   yapi: { adalar },
   isKalemleri: basics.isKalemleri,
   durumTespit,
+  ...(hakedis ? { hakedis } : {}),
 };
 
 const outPath = join(dataDir, 'santiye.config.json');

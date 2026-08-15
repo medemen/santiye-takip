@@ -55,7 +55,7 @@ export default function IsKalemleriDurumu({ ada, blokNum, gruplar, kalemIlerleme
   return (
     <div
       style={{
-        backgroundColor: '#fff',
+        backgroundColor: 'var(--bg-card)',
         borderRadius: 16,
         padding: 16,
         marginBottom: 16,
@@ -63,7 +63,7 @@ export default function IsKalemleriDurumu({ ada, blokNum, gruplar, kalemIlerleme
         border: '1px solid #f0f0f0',
       }}
     >
-      <h3 style={{ fontSize: 14, fontWeight: 600, color: '#4b5563', margin: 0, marginBottom: 12 }}>
+      <h3 style={{ fontSize: 14, fontWeight: 600, color: 'var(--text-muted)', margin: 0, marginBottom: 12 }}>
         İş Kalemleri Durumu
       </h3>
       <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
@@ -78,11 +78,11 @@ export default function IsKalemleriDurumu({ ada, blokNum, gruplar, kalemIlerleme
                 style={{
                   width: '100%',
                   padding: '10px 12px',
-                  backgroundColor: acik ? '#fef3c7' : '#f9fafb',
+                  backgroundColor: acik ? 'var(--bg-accent)' : 'var(--bg-hover)',
                   border: 'none',
                   fontSize: 13,
                   fontWeight: 600,
-                  color: '#374151',
+                  color: 'var(--text-secondary)',
                   cursor: 'pointer',
                   textAlign: 'left',
                   display: 'flex',
@@ -92,7 +92,7 @@ export default function IsKalemleriDurumu({ ada, blokNum, gruplar, kalemIlerleme
               >
                 <span>
                   {g.ad}{' '}
-                  <span style={{ fontWeight: 400, color: '#9ca3af' }}>
+                  <span style={{ fontWeight: 400, color: 'var(--text-subtle)' }}>
                     ({grupTamam}/{g.kalemler.length})
                   </span>
                 </span>
@@ -117,10 +117,10 @@ export default function IsKalemleriDurumu({ ada, blokNum, gruplar, kalemIlerleme
                           gap: 10,
                           padding: '8px 10px',
                           borderRadius: 10,
-                          backgroundColor: rapor?.durum === 'gecikme' ? '#fef2f2' : '#f9fafb',
+                          backgroundColor: rapor?.durum === 'gecikme' ? 'var(--bg-danger)' : 'var(--bg-hover)',
                         }}
                       >
-                        <div style={{ width: 120, fontSize: 12, fontWeight: 500, color: '#374151', flexShrink: 0 }}>
+                        <div style={{ width: 120, fontSize: 12, fontWeight: 500, color: 'var(--text-secondary)', flexShrink: 0 }}>
                           {isKalemi}
                         </div>
                         <div style={{ flex: 1 }}>
@@ -141,8 +141,8 @@ export default function IsKalemleriDurumu({ ada, blokNum, gruplar, kalemIlerleme
                                     padding: '3px 6px',
                                     borderRadius: 8,
                                     border: '1px solid #e5e7eb',
-                                    backgroundColor: '#fff',
-                                    color: '#1f2937',
+                                    backgroundColor: 'var(--bg-card)',
+                                    color: 'var(--text-primary)',
                                   }}
                                 />
                                 <button
@@ -170,8 +170,8 @@ export default function IsKalemleriDurumu({ ada, blokNum, gruplar, kalemIlerleme
                                     padding: '3px 8px',
                                     borderRadius: 8,
                                     border: '1px solid #e5e7eb',
-                                    backgroundColor: '#fff',
-                                    color: '#6b7280',
+                                    backgroundColor: 'var(--bg-card)',
+                                    color: 'var(--text-faint)',
                                     cursor: 'pointer',
                                   }}
                                 >
@@ -183,7 +183,7 @@ export default function IsKalemleriDurumu({ ada, blokNum, gruplar, kalemIlerleme
                                 <span style={{ fontSize: 11, fontWeight: 600, color: ilerlemeDurumu.renk }}>
                                   🎯 {ilerlemeDurumu.label}
                                 </span>
-                                <span style={{ fontSize: 11, color: '#9ca3af' }}>
+                                <span style={{ fontSize: 11, color: 'var(--text-subtle)' }}>
                                   Hedef: {formatTarih(hedef.hedef_tarih)}
                                 </span>
                                 {hedefDuzenleyebilir && (
@@ -197,8 +197,8 @@ export default function IsKalemleriDurumu({ ada, blokNum, gruplar, kalemIlerleme
                                       padding: '2px 8px',
                                       borderRadius: 8,
                                       border: '1px solid #e5e7eb',
-                                      backgroundColor: '#fff',
-                                      color: '#6b7280',
+                                      backgroundColor: 'var(--bg-card)',
+                                      color: 'var(--text-faint)',
                                       cursor: 'pointer',
                                     }}
                                   >
@@ -217,8 +217,8 @@ export default function IsKalemleriDurumu({ ada, blokNum, gruplar, kalemIlerleme
                                   padding: '3px 10px',
                                   borderRadius: 8,
                                   border: '1px dashed #d1d5db',
-                                  backgroundColor: '#fff',
-                                  color: '#9ca3af',
+                                  backgroundColor: 'var(--bg-card)',
+                                  color: 'var(--text-subtle)',
                                   cursor: 'pointer',
                                 }}
                               >
@@ -234,8 +234,8 @@ export default function IsKalemleriDurumu({ ada, blokNum, gruplar, kalemIlerleme
                                 <span
                                   style={{
                                     fontSize: 9,
-                                    backgroundColor: '#fef3c7',
-                                    color: '#92400e',
+                                    backgroundColor: 'var(--bg-accent)',
+                                    color: 'var(--accent-dark)',
                                     padding: '1px 6px',
                                     borderRadius: 8,
                                     whiteSpace: 'nowrap',
@@ -248,7 +248,7 @@ export default function IsKalemleriDurumu({ ada, blokNum, gruplar, kalemIlerleme
                               <StatusBadge durum={rapor.durum as IsDurumu} size="sm" />
                             </div>
                           ) : (
-                            <span style={{ fontSize: 11, color: '#9ca3af' }}>—</span>
+                            <span style={{ fontSize: 11, color: 'var(--text-subtle)' }}>—</span>
                           )}
                         </div>
                       </div>

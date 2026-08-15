@@ -22,7 +22,7 @@ const plotH = H - PT - PB;
 const TrendChart = memo(function TrendChart({ data, height = H }: Props) {
   if (data.length === 0) {
     return (
-      <div style={{ height, display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#9ca3af', fontSize: 14 }}>
+      <div style={{ height, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--text-subtle)', fontSize: 14 }}>
         Henüz veri yok
       </div>
     );
@@ -64,7 +64,7 @@ const TrendChart = memo(function TrendChart({ data, height = H }: Props) {
               flex: 1,
               textAlign: 'center',
               fontSize: 9,
-              color: '#9ca3af',
+              color: 'var(--text-subtle)',
               whiteSpace: 'nowrap',
               overflow: 'hidden',
               textOverflow: 'ellipsis',

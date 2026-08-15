@@ -15,7 +15,7 @@ export default function HedefTakvimPdf({ santiyeAdi, ayAdi, yil, seciliAda, ayHe
       <div style={{ fontSize: 22, fontWeight: 700, marginBottom: 4 }}>
         {santiyeAdi} - Hedef Takvimi
       </div>
-      <div style={{ fontSize: 13, color: '#374151', marginBottom: 12 }}>
+      <div style={{ fontSize: 13, color: '#4b5563', marginBottom: 12 }}>
         {ayAdi} {yil}
         {seciliAda ? ` • ${seciliAda}` : ' • Tüm Adalar'}
       </div>

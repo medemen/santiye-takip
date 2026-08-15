@@ -23,13 +23,14 @@ const ReportList = lazy(() => import('./pages/ReportList'));
 const Personnel = lazy(() => import('./pages/Personnel'));
 const Profile = lazy(() => import('./pages/Profile'));
 const Statistics = lazy(() => import('./pages/Statistics'));
+const Hakedis = lazy(() => import('./pages/Hakedis'));
 const Settings = lazy(() => import('./pages/Settings'));
 const NewSantiyeWizard = lazy(() => import('./pages/NewSantiyeWizard'));
 const Login = lazy(() => import('./pages/Login'));
 
 function PageLoader() {
   return (
-    <div style={{ padding: 24, color: '#6b7280', fontSize: 14 }}>Yükleniyor...</div>
+    <div style={{ padding: 24, color: 'var(--text-faint)', fontSize: 14 }}>Yükleniyor...</div>
   );
 }
 
@@ -160,6 +161,7 @@ export default function App() {
                         <Route path="/toplu-rapor" element={<Navigate to="/rapor-ekle" replace />} />
                         <Route path="/profil" element={<Profile />} />
                         <Route path="/istatistik" element={<Statistics />} />
+                        <Route path="/hakedis" element={<Hakedis />} />
                         <Route path="/ayarlar" element={<PmRoute><Settings /></PmRoute>} />
                         <Route path="/yeni-santiye" element={<PmRoute><NewSantiyeWizard /></PmRoute>} />
                       </Routes>

@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { getIstatistikler, getAdaGenelIlerleme, getBlokProgress } from '../stores/reportStore';
+import { getIstatistikler, getAdaGenelIlerleme, getBlokProgress, getGrupAgirlikliAdaIlerleme, getProjeAgirlikliIlerleme } from '../stores/reportStore';
 import { useHedefler } from '../hooks/useHedefler';
 import { useRaporlar } from '../hooks/useRaporlar';
 import { getHedefOzeti, hedefKalanGun } from '../data/plan';
@@ -22,6 +22,7 @@ import KalemIlerlemeKart from '../components/dashboard/KalemIlerlemeKart';
 import TrendKart from '../components/dashboard/TrendKart';
 import AdaDetayTablo from '../components/dashboard/AdaDetayTablo';
 import SonRaporlarKart from '../components/dashboard/SonRaporlarKart';
+import HakedisKarsilastirmaKart from '../components/dashboard/HakedisKarsilastirmaKart';
 import { card, btnGhost } from '../utils/styles';
 
 export default function Dashboard() {
@@ -151,6 +152,27 @@ export default function Dashboard() {
     };
   }, [raporlar, adalar, isKalemleri]);
 
+  const hakedisVerisi = useMemo(() => {
+    const hk = config.hakedis;
+    if (!hk) return null;
+    const satirlar = adalar.map((a) => ({
+      ada: a.ada,
+      uygulama: getGrupAgirlikliAdaIlerleme(a.ada, a.bloklar),
+      resmi: hk.grupIlerleme?.[a.ada]
+        ? Object.values(hk.grupIlerleme[a.ada]).reduce((s, g) => s + g.gerceklesen, 0)
+        : null,
+      pursantaj: hk.adalar[a.ada]?.genel ?? 0,
+    }));
+    return {
+      satirlar,
+      ozet: {
+        uygulama: getProjeAgirlikliIlerleme(adalar.map((a) => ({ ada: a.ada, bloklar: a.bloklar }))),
+        resmi: hk.ilerlemeIcmal.toplam?.kum ?? null,
+      },
+      hakedisNo: hk.hakedisNo,
+    };
+  }, [adalar, config]);
+
   const trendData = useMemo(() => {
     const sayilar = new Map<string, number>();
     for (const r of raporlar) {
@@ -218,10 +240,10 @@ export default function Dashboard() {
       <div>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: 20, gap: 12, flexWrap: 'wrap' }}>
           <div>
-            <h1 style={{ fontSize: 22, fontWeight: 700, color: '#1f2937', margin: 0, marginBottom: 4 }}>
+            <h1 style={{ fontSize: 22, fontWeight: 700, color: 'var(--text-primary)', margin: 0, marginBottom: 4 }}>
               {config.genel.santiyeAdi}
             </h1>
-            <p style={{ fontSize: 13, color: '#6b7280', margin: 0 }}>
+            <p style={{ fontSize: 13, color: 'var(--text-faint)', margin: 0 }}>
               {config.genel.projeAdi}
             </p>
           </div>
@@ -267,16 +289,26 @@ export default function Dashboard() {
 
         {gecikenIsler.length > 0 && <GecikenKart isler={gecikenIsler} onNavigate={blokNavigate} />}
 
+        {hakedisVerisi && (
+          <div style={{ marginBottom: 16 }}>
+            <HakedisKarsilastirmaKart
+              satirlar={hakedisVerisi.satirlar}
+              ozet={hakedisVerisi.ozet}
+              hakedisNo={hakedisVerisi.hakedisNo}
+            />
+          </div>
+        )}
+
         <div style={{ display: 'grid', gridTemplateColumns: '1.6fr 1fr 1fr', gap: 16, marginBottom: 16 }}>
           <TrendKart veri={trendData} />
           <div style={{ ...card }}>
-            <h3 style={{ fontSize: 14, fontWeight: 600, color: '#4b5563', margin: 0, marginBottom: 8 }}>
+            <h3 style={{ fontSize: 14, fontWeight: 600, color: 'var(--text-muted)', margin: 0, marginBottom: 8 }}>
               Rapor Dağılımı
             </h3>
             <DonutChart data={donutData} height={190} />
           </div>
           <div style={{ ...card }}>
-            <h3 style={{ fontSize: 14, fontWeight: 600, color: '#4b5563', margin: 0, marginBottom: 8 }}>
+            <h3 style={{ fontSize: 14, fontWeight: 600, color: 'var(--text-muted)', margin: 0, marginBottom: 8 }}>
               Ada Bazında İlerleme
             </h3>
             <BarChart data={adaProgress} height={190} />
@@ -286,7 +318,7 @@ export default function Dashboard() {
         <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 1.8fr', gap: 16, marginBottom: 16, alignItems: 'start' }}>
           <KalemIlerlemeKart kalemler={blokVerisi.kalemIlerleme} toplamKalem={isKalemleri.length} />
           <div style={{ ...card }}>
-            <h3 style={{ fontSize: 14, fontWeight: 600, color: '#4b5563', margin: 0, marginBottom: 8 }}>
+            <h3 style={{ fontSize: 14, fontWeight: 600, color: 'var(--text-muted)', margin: 0, marginBottom: 8 }}>
               Ada × Blok Matrisi
             </h3>
             <BlokMatrisi
@@ -311,10 +343,10 @@ export default function Dashboard() {
   return (
     <div>
       <div style={{ marginBottom: 20 }}>
-        <h1 style={{ fontSize: 22, fontWeight: 700, color: '#1f2937', margin: 0, marginBottom: 4 }}>
+        <h1 style={{ fontSize: 22, fontWeight: 700, color: 'var(--text-primary)', margin: 0, marginBottom: 4 }}>
           {config.genel.santiyeAdi}
         </h1>
-        <p style={{ fontSize: 13, color: '#6b7280', margin: 0 }}>
+        <p style={{ fontSize: 13, color: 'var(--text-faint)', margin: 0 }}>
           {config.genel.projeAdi}
         </p>
       </div>
@@ -323,18 +355,18 @@ export default function Dashboard() {
         onClick={() => navigate('/hedef-takvim')}
         style={{
           display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-          width: '100%', background: '#fff', border: '1px solid #e5e7eb',
+          width: '100%', background: 'var(--bg-card)', border: '1px solid #e5e7eb',
           borderRadius: 12, padding: '14px 16px', marginBottom: 16, cursor: 'pointer',
           boxShadow: '0 1px 3px rgba(0,0,0,0.05)',
         }}
       >
-        <span style={{ fontSize: 14, fontWeight: 600, color: '#4b5563' }}>📅 Hedef Takvimi</span>
+        <span style={{ fontSize: 14, fontWeight: 600, color: 'var(--text-muted)' }}>📅 Hedef Takvimi</span>
         <span style={{ fontSize: 11, color: '#f59e0b', fontWeight: 700 }}>→</span>
       </button>
 
       <div style={{ ...card, padding: 18, marginBottom: 16 }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
-          <span style={{ fontSize: 14, fontWeight: 600, color: '#4b5563' }}>Genel İlerleme</span>
+          <span style={{ fontSize: 14, fontWeight: 600, color: 'var(--text-muted)' }}>Genel İlerleme</span>
           <span style={{ fontSize: 24, fontWeight: 700, color: genelIlerleme === 100 ? '#22c55e' : '#f59e0b' }}>
             %{genelIlerleme}
           </span>
@@ -344,7 +376,7 @@ export default function Dashboard() {
 
       <div style={{ ...card, marginBottom: 16 }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
-          <h3 style={{ fontSize: 14, fontWeight: 600, color: '#4b5563', margin: 0 }}>
+          <h3 style={{ fontSize: 14, fontWeight: 600, color: 'var(--text-muted)', margin: 0 }}>
             Rapor Dağılımı
           </h3>
           <button onClick={() => navigate('/istatistik')} style={btnGhost}>
@@ -355,13 +387,23 @@ export default function Dashboard() {
       </div>
 
       <div style={{ ...card, marginBottom: 16 }}>
-        <h3 style={{ fontSize: 14, fontWeight: 600, color: '#4b5563', margin: 0, marginBottom: 8 }}>
+        <h3 style={{ fontSize: 14, fontWeight: 600, color: 'var(--text-muted)', margin: 0, marginBottom: 8 }}>
           Ada Bazında İlerleme
         </h3>
         <BarChart data={adaProgress} />
       </div>
 
       {gecikenIsler.length > 0 && <GecikenKart isler={gecikenIsler} onNavigate={blokNavigate} />}
+
+      {hakedisVerisi && (
+        <div style={{ marginBottom: 16 }}>
+          <HakedisKarsilastirmaKart
+            satirlar={hakedisVerisi.satirlar}
+            ozet={hakedisVerisi.ozet}
+            hakedisNo={hakedisVerisi.hakedisNo}
+          />
+        </div>
+      )}
 
       {hedefKart}
 

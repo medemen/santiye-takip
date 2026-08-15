@@ -7,12 +7,12 @@ export default function AdaGeneliRaporUyari({ gorunur }: Props) {
   return (
     <div
       style={{
-        backgroundColor: '#fef3c7',
+        backgroundColor: 'var(--bg-accent)',
         borderRadius: 10,
         padding: '10px 14px',
         marginBottom: 16,
         fontSize: 12,
-        color: '#92400e',
+        color: 'var(--accent-dark)',
         border: '1px solid #fde68a',
       }}
     >

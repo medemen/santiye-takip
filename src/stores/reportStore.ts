@@ -341,6 +341,84 @@ export function getBlokGenelIlerleme(
   return Math.round(toplam / values.length);
 }
 
+function raporYuzde(r: Rapor | null | undefined): number | null {
+  if (!r) return null;
+  if (r.durum === 'tamamlandi') return 100;
+  return r.ilerleme_yuzde;
+}
+
+export function getKalemAdaIlerleme(
+  ada: string,
+  blokList: { blok_no: number }[],
+  kalem: string
+): number | null {
+  getRaporlar();
+  const adaGenel = _sonRaporHaritasi.get(`${ada}|0|${kalem}`);
+  const genelYuzde = raporYuzde(adaGenel);
+  if (genelYuzde !== null) return genelYuzde;
+  const blokYuzdeleri: number[] = [];
+  for (const b of blokList) {
+    const v = raporYuzde(_sonRaporHaritasi.get(`${ada}|${b.blok_no}|${kalem}`));
+    if (v !== null) blokYuzdeleri.push(v);
+  }
+  if (blokYuzdeleri.length === 0) return null;
+  return blokYuzdeleri.reduce((s, v) => s + v, 0) / blokYuzdeleri.length;
+}
+
+export function getGrupUygulamaIlerleme(
+  ada: string,
+  blokList: { blok_no: number }[],
+  grupId: string
+): number | null {
+  const hk = getSiteConfig().hakedis;
+  if (!hk) return null;
+  const kalemler = Object.keys(hk.kalemEslesme).filter((k) => hk.kalemEslesme[k] === grupId);
+  const yuzdeler: number[] = [];
+  for (const kalem of kalemler) {
+    const v = getKalemAdaIlerleme(ada, blokList, kalem);
+    if (v !== null) yuzdeler.push(v);
+  }
+  if (yuzdeler.length === 0) return null;
+  return yuzdeler.reduce((s, v) => s + v, 0) / yuzdeler.length;
+}
+
+export function getGrupAgirlikliAdaIlerleme(
+  ada: string,
+  blokList: { blok_no: number }[]
+): number | null {
+  const hk = getSiteConfig().hakedis;
+  const adaPur = hk?.adalar?.[ada];
+  if (!hk || !adaPur) return null;
+  let agirlikliToplam = 0;
+  let pursantajToplam = 0;
+  for (const [grupId, pur] of Object.entries(adaPur.gruplar)) {
+    const uygulama = getGrupUygulamaIlerleme(ada, blokList, grupId);
+    if (uygulama === null) continue;
+    agirlikliToplam += pur * uygulama;
+    pursantajToplam += pur;
+  }
+  if (pursantajToplam === 0) return null;
+  return agirlikliToplam / pursantajToplam;
+}
+
+export function getProjeAgirlikliIlerleme(
+  blokYapilari: { ada: string; bloklar: { blok_no: number }[] }[]
+): number | null {
+  const hk = getSiteConfig().hakedis;
+  if (!hk) return null;
+  let agirlikliToplam = 0;
+  let pursantajToplam = 0;
+  for (const a of blokYapilari) {
+    const adaPur = hk.adalar[a.ada];
+    const adaIlerleme = adaPur ? getGrupAgirlikliAdaIlerleme(a.ada, a.bloklar) : null;
+    if (adaIlerleme === null || !adaPur) continue;
+    agirlikliToplam += adaIlerleme * adaPur.genel;
+    pursantajToplam += adaPur.genel;
+  }
+  if (pursantajToplam === 0) return null;
+  return agirlikliToplam / pursantajToplam;
+}
+
 export function getAdaGenelIlerleme(
   ada: string,
   blokList: { blok_no: number }[],

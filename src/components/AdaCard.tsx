@@ -29,7 +29,7 @@ const AdaCard = memo(function AdaCard({ ada, blokSayisi, toplamDaire, toplamKat,
     <div
       onClick={onClick}
       style={{
-        backgroundColor: '#fff',
+        backgroundColor: 'var(--bg-card)',
         borderRadius: 16,
         padding: 18,
         cursor: onClick ? 'pointer' : 'default',
@@ -55,25 +55,25 @@ const AdaCard = memo(function AdaCard({ ada, blokSayisi, toplamDaire, toplamKat,
           left: 0,
           right: 0,
           height: 4,
-          backgroundColor: ilerleme === 100 ? '#22c55e' : ilerleme > 50 ? '#3b82f6' : ilerleme > 0 ? '#f59e0b' : '#e5e7eb',
+          backgroundColor: ilerleme === 100 ? '#22c55e' : ilerleme > 50 ? '#3b82f6' : ilerleme > 0 ? '#f59e0b' : 'var(--border)',
         }}
       />
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 10 }}>
         <div>
-          <div style={{ fontSize: 18, fontWeight: 700, color: '#1f2937' }}>{ada}</div>
-          <div style={{ fontSize: 13, color: '#6b7280', marginTop: 2 }}>Şef: {santiyeSefi}</div>
+          <div style={{ fontSize: 18, fontWeight: 700, color: 'var(--text-primary)' }}>{ada}</div>
+          <div style={{ fontSize: 13, color: 'var(--text-faint)', marginTop: 2 }}>Şef: {santiyeSefi}</div>
         </div>
         <div
           style={{
             fontSize: 24,
             fontWeight: 700,
-            color: ilerleme === 100 ? '#22c55e' : ilerleme > 50 ? '#3b82f6' : '#6b7280',
+            color: ilerleme === 100 ? '#22c55e' : ilerleme > 50 ? '#3b82f6' : 'var(--text-faint)',
           }}
         >
           %{ilerleme}
         </div>
       </div>
-      <div style={{ display: 'flex', gap: 16, marginBottom: 12, fontSize: 13, color: '#4b5563' }}>
+      <div style={{ display: 'flex', gap: 16, marginBottom: 12, fontSize: 13, color: 'var(--text-muted)' }}>
         <span>🏗️ {blokSayisi} Blok</span>
         <span>🏠 {toplamDaire} Daire</span>
         <span>📐 {toplamKat} Kat</span>

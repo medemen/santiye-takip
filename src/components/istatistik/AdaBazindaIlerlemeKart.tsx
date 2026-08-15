@@ -9,7 +9,7 @@ interface Props {
 export default function AdaBazindaIlerlemeKart({ data }: Props) {
   return (
     <div style={{ ...card, marginBottom: 16 }}>
-      <h3 style={{ fontSize: 14, fontWeight: 600, color: '#4b5563', margin: 0, marginBottom: 8 }}>
+      <h3 style={{ fontSize: 14, fontWeight: 600, color: 'var(--text-muted)', margin: 0, marginBottom: 8 }}>
         Ada Bazında İlerleme
       </h3>
       <BarChart data={data} />

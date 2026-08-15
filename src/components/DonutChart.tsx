@@ -15,7 +15,7 @@ const DonutChart = memo(function DonutChart({ data, height = 220 }: Props) {
   const filtered = data.filter((d) => d.value > 0);
   if (filtered.length === 0) {
     return (
-      <div style={{ height, display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#9ca3af', fontSize: 14 }}>
+      <div style={{ height, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--text-subtle)', fontSize: 14 }}>
         Henüz veri yok
       </div>
     );
@@ -66,7 +66,7 @@ const DonutChart = memo(function DonutChart({ data, height = 220 }: Props) {
       </svg>
       <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px 12px', marginTop: 8, justifyContent: 'center' }}>
         {filtered.map((d) => (
-          <span key={d.name} style={{ display: 'flex', alignItems: 'center', gap: 4, fontSize: 12, color: '#4b5563' }}>
+          <span key={d.name} style={{ display: 'flex', alignItems: 'center', gap: 4, fontSize: 12, color: 'var(--text-muted)' }}>
             <span style={{ width: 10, height: 10, borderRadius: 2, backgroundColor: d.color }} />
             {d.name} ({d.value})
           </span>

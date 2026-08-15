@@ -19,13 +19,13 @@ export default function AdaSecimi({ adalar, secili, onSelect }: Props) {
             onClick={() => onSelect(a.ada)}
             style={{
               padding: '12px 14px',
-              backgroundColor: secili === a.ada ? '#f59e0b' : '#f9fafb',
+              backgroundColor: secili === a.ada ? '#f59e0b' : 'var(--bg-hover)',
               border: '1px solid',
-              borderColor: secili === a.ada ? '#f59e0b' : '#e5e7eb',
+              borderColor: secili === a.ada ? '#f59e0b' : 'var(--border)',
               borderRadius: 10,
               fontSize: 13,
               fontWeight: 600,
-              color: secili === a.ada ? '#fff' : '#374151',
+              color: secili === a.ada ? '#fff' : 'var(--text-secondary)',
               cursor: 'pointer',
               textAlign: 'left',
             }}

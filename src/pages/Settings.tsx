@@ -37,7 +37,7 @@ export default function Settings() {
 
   if (!user?.proje_muduru) {
     return (
-      <div style={{ padding: 40, textAlign: 'center', color: '#9ca3af' }}>
+      <div style={{ padding: 40, textAlign: 'center', color: 'var(--text-subtle)' }}>
         Bu sayfaya yalnızca proje müdürü erişebilir.
       </div>
     );
@@ -113,15 +113,15 @@ export default function Settings() {
     border: '1px solid #e5e7eb',
     fontSize: 13,
     boxSizing: 'border-box',
-    backgroundColor: '#fff',
-    color: '#1f2937',
+    backgroundColor: 'var(--bg-card)',
+    color: 'var(--text-primary)',
   };
 
   const labelStyle: React.CSSProperties = {
     display: 'block',
     fontSize: 12,
     fontWeight: 500,
-    color: '#4b5563',
+    color: 'var(--text-muted)',
     marginBottom: 4,
   };
 
@@ -134,7 +134,7 @@ export default function Settings() {
             onClick={() => navigate('/yeni-santiye')}
             style={{
               padding: '8px 14px',
-              backgroundColor: '#1f2937',
+              backgroundColor: 'var(--text-primary)',
               border: 'none',
               borderRadius: 10,
               fontSize: 12,
@@ -152,7 +152,7 @@ export default function Settings() {
         </div>
       </div>
 
-      <div style={{ ...card, padding: 14, marginBottom: 16, fontSize: 12, color: '#6b7280' }}>
+      <div style={{ ...card, padding: 14, marginBottom: 16, fontSize: 12, color: 'var(--text-faint)' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', gap: 8 }}>
           <span>Konfigürasyon v{CONFIG_VERSION}</span>
           <span>{config.yapi.adalar.length} ada • {getAllKalemler(config).length} iş kalemi • {config.durumTespit.satirlar.length} durum tespit satırı</span>
@@ -160,7 +160,7 @@ export default function Settings() {
       </div>
 
       <div style={{ ...card, marginBottom: 16 }}>
-        <h3 style={{ fontSize: 14, fontWeight: 600, color: '#374151', margin: 0, marginBottom: 12 }}>
+        <h3 style={{ fontSize: 14, fontWeight: 600, color: 'var(--text-secondary)', margin: 0, marginBottom: 12 }}>
           Genel Bilgiler
         </h3>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
@@ -184,7 +184,7 @@ export default function Settings() {
       </div>
 
       <div style={{ ...card, marginBottom: 16 }}>
-        <h3 style={{ fontSize: 14, fontWeight: 600, color: '#374151', margin: 0, marginBottom: 12 }}>
+        <h3 style={{ fontSize: 14, fontWeight: 600, color: 'var(--text-secondary)', margin: 0, marginBottom: 12 }}>
           Uygulama Markası
         </h3>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
@@ -204,22 +204,22 @@ export default function Settings() {
       </div>
 
       <div style={{ ...card, marginBottom: 16 }}>
-        <h3 style={{ fontSize: 14, fontWeight: 600, color: '#374151', margin: 0, marginBottom: 12 }}>
+        <h3 style={{ fontSize: 14, fontWeight: 600, color: 'var(--text-secondary)', margin: 0, marginBottom: 12 }}>
           Roller
         </h3>
         <div>
           <label style={labelStyle}>
-            Saha Personeli Rolleri <span style={{ fontWeight: 400, color: '#9ca3af' }}>(virgülle ayırın)</span>
+            Saha Personeli Rolleri <span style={{ fontWeight: 400, color: 'var(--text-subtle)' }}>(virgülle ayırın)</span>
           </label>
           <input style={inputStyle} value={sahaRolleri} onChange={(e) => setSahaRolleri(e.target.value)} />
         </div>
       </div>
 
       <div style={{ ...card, marginBottom: 16 }}>
-        <h3 style={{ fontSize: 14, fontWeight: 600, color: '#374151', margin: 0, marginBottom: 12 }}>
+        <h3 style={{ fontSize: 14, fontWeight: 600, color: 'var(--text-secondary)', margin: 0, marginBottom: 12 }}>
           Adalar & Bloklar
         </h3>
-        <p style={{ fontSize: 11, color: '#9ca3af', margin: 0, marginBottom: 10 }}>
+        <p style={{ fontSize: 11, color: 'var(--text-subtle)', margin: 0, marginBottom: 10 }}>
           Blok düzenlemeleri sonrası daire/kat toplamları otomatik hesaplanır. Kaydedince durum
           tespit referans toplamları da yeniden üretilir.
         </p>
@@ -227,10 +227,10 @@ export default function Settings() {
       </div>
 
       <div style={{ ...card, marginBottom: 16 }}>
-        <h3 style={{ fontSize: 14, fontWeight: 600, color: '#374151', margin: 0, marginBottom: 12 }}>
+        <h3 style={{ fontSize: 14, fontWeight: 600, color: 'var(--text-secondary)', margin: 0, marginBottom: 12 }}>
           İş Kalemleri
         </h3>
-        <p style={{ fontSize: 11, color: '#9ca3af', margin: 0, marginBottom: 10 }}>
+        <p style={{ fontSize: 11, color: 'var(--text-subtle)', margin: 0, marginBottom: 10 }}>
           Gruplar ve kalemler buradan düzenlenebilir; her satıra bir kalem yazın.
         </p>
         <KalemGrupEditor gruplar={gruplar} onChange={setGruplar} />
@@ -239,7 +239,7 @@ export default function Settings() {
       {dogrulama.length > 0 && (
         <div
           style={{
-            backgroundColor: '#fef2f2',
+            backgroundColor: 'var(--bg-danger)',
             borderRadius: 10,
             padding: '10px 14px',
             marginBottom: 16,
@@ -281,7 +281,7 @@ export default function Settings() {
           style={{
             flex: 1,
             padding: '12px',
-            backgroundColor: '#fef2f2',
+            backgroundColor: 'var(--bg-danger)',
             border: 'none',
             borderRadius: 12,
             fontSize: 14,

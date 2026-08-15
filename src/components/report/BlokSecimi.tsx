@@ -39,12 +39,12 @@ export default function BlokSecimi({
           <button
             onClick={onToggleAdaGeneli}
             style={{
-              background: adaGeneli ? '#fef3c7' : 'none',
+              background: adaGeneli ? 'var(--bg-accent)' : 'none',
               border: adaGeneli ? '1px solid #f59e0b' : '1px solid #e5e7eb',
               borderRadius: 6,
               padding: '2px 8px',
               fontSize: 11,
-              color: adaGeneli ? '#92400e' : '#6b7280',
+              color: adaGeneli ? 'var(--accent-dark)' : 'var(--text-faint)',
               cursor: 'pointer',
             }}
             title="Raporu ada geneli (tüm bloklar) olarak kaydet"
@@ -61,12 +61,12 @@ export default function BlokSecimi({
       </div>
 
       {adaGeneli ? (
-        <div style={{ padding: 14, backgroundColor: '#fef3c7', borderRadius: 10, fontSize: 12, color: '#92400e' }}>
+        <div style={{ padding: 14, backgroundColor: 'var(--bg-accent)', borderRadius: 10, fontSize: 12, color: 'var(--accent-dark)' }}>
           Bu iş kalemi için tek bir <strong>ada geneli rapor</strong> kaydedilecek. Tüm bloklar bu veriyi devralır.
         </div>
       ) : (
         <>
-          <div style={{ fontSize: 12, color: '#6b7280', marginBottom: 8 }}>
+          <div style={{ fontSize: 12, color: 'var(--text-faint)', marginBottom: 8 }}>
             {yetkiliBloklar.length === 0
               ? 'Bu ada için yetkiniz bulunan blok yok.'
               : `${seciliBloklar.length}/${yetkiliBloklar.length} blok seçili. Renkli bloklar mevcut raporu gösterir.`}
@@ -75,8 +75,8 @@ export default function BlokSecimi({
             {bloklar.map((b) => {
               const bilgi = blokDurumMap[b];
               const isSelected = seciliBloklar.includes(b);
-              let bgColor = '#f3f4f6';
-              let textColor = '#4b5563';
+              let bgColor = 'var(--bg-subtle)';
+              let textColor = 'var(--text-muted)';
               if (bilgi) {
                 bgColor = DURUM_RENKLERI[bilgi.durum];
                 textColor = '#fff';
@@ -125,6 +125,6 @@ const kucukButon = {
   borderRadius: 6,
   padding: '2px 8px',
   fontSize: 11,
-  color: '#6b7280',
+  color: 'var(--text-faint)',
   cursor: 'pointer',
 } as const;

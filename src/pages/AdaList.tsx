@@ -9,7 +9,7 @@ export default function AdaList() {
 
   return (
     <div>
-      <h1 style={{ fontSize: 20, fontWeight: 700, color: '#1f2937', marginBottom: 16 }}>
+      <h1 style={{ fontSize: 20, fontWeight: 700, color: 'var(--text-primary)', marginBottom: 16 }}>
         Adalar
       </h1>
       <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>

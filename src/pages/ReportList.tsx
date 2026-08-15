@@ -95,12 +95,12 @@ export default function ReportList() {
   return (
     <div>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
-        <h1 style={{ fontSize: 20, fontWeight: 700, color: '#1f2937', margin: 0 }}>Raporlar</h1>
+        <h1 style={{ fontSize: 20, fontWeight: 700, color: 'var(--text-primary)', margin: 0 }}>Raporlar</h1>
         <button
           onClick={async () => { await raporlarXlsxExport(filtered, 'raporlar.xlsx', getHedef); toastGoster(`${filtered.length} rapor Excel olarak indiriliyor`, 'success'); }}
           style={{
             background: 'none', border: '1px solid #e5e7eb', borderRadius: 8,
-            padding: '4px 10px', fontSize: 11, color: '#6b7280', cursor: 'pointer',
+            padding: '4px 10px', fontSize: 11, color: 'var(--text-faint)', cursor: 'pointer',
           }}
           title="Excel Aktar"
         >
@@ -110,7 +110,7 @@ export default function ReportList() {
 
       <div
         style={{
-          backgroundColor: '#fff',
+          backgroundColor: 'var(--bg-card)',
           borderRadius: 12,
           padding: 14,
           marginBottom: 16,
@@ -144,8 +144,8 @@ export default function ReportList() {
               fontSize: 12,
               fontWeight: 600,
               cursor: 'pointer',
-              backgroundColor: !sadeceBenim ? '#f59e0b' : '#f3f4f6',
-              color: !sadeceBenim ? '#fff' : '#4b5563',
+              backgroundColor: !sadeceBenim ? '#f59e0b' : 'var(--bg-subtle)',
+              color: !sadeceBenim ? '#fff' : 'var(--text-muted)',
             }}
           >
             Tüm Raporlar
@@ -160,15 +160,15 @@ export default function ReportList() {
               fontSize: 12,
               fontWeight: 600,
               cursor: 'pointer',
-              backgroundColor: sadeceBenim ? '#f59e0b' : '#f3f4f6',
-              color: sadeceBenim ? '#fff' : '#4b5563',
+              backgroundColor: sadeceBenim ? '#f59e0b' : 'var(--bg-subtle)',
+              color: sadeceBenim ? '#fff' : 'var(--text-muted)',
             }}
           >
             Raporlarım
           </button>
         </div>
 
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8, fontSize: 12, color: '#6b7280' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8, fontSize: 12, color: 'var(--text-faint)' }}>
           <label style={{ display: 'flex', alignItems: 'center', gap: 6, cursor: 'pointer' }}>
             <input
               type="checkbox"
@@ -191,7 +191,7 @@ export default function ReportList() {
               borderRadius: 8,
               border: '1px solid #e5e7eb',
               fontSize: 12,
-              backgroundColor: '#fff',
+              backgroundColor: 'var(--bg-card)',
             }}
           >
             <option value="">Tüm Adalar</option>
@@ -210,7 +210,7 @@ export default function ReportList() {
               borderRadius: 8,
               border: '1px solid #e5e7eb',
               fontSize: 12,
-              backgroundColor: '#fff',
+              backgroundColor: 'var(--bg-card)',
             }}
           >
             <option value="">Tüm Bloklar</option>
@@ -234,7 +234,7 @@ export default function ReportList() {
               borderRadius: 8,
               border: '1px solid #e5e7eb',
               fontSize: 12,
-              backgroundColor: '#fff',
+              backgroundColor: 'var(--bg-card)',
             }}
           >
             <option value="">Tüm Durumlar</option>
@@ -251,8 +251,8 @@ export default function ReportList() {
             style={{
               textAlign: 'center',
               padding: 40,
-              color: '#9ca3af',
-              backgroundColor: '#fff',
+              color: 'var(--text-subtle)',
+              backgroundColor: 'var(--bg-card)',
               borderRadius: 12,
               border: '1px solid #f0f0f0',
             }}
@@ -284,7 +284,7 @@ export default function ReportList() {
                   <button
                     onClick={(e) => { e.stopPropagation(); handleDelete(r.id); }}
                     style={{
-                      background: '#fef2f2',
+                      background: 'var(--bg-danger)',
                       border: 'none',
                       borderRadius: 6,
                       padding: '2px 6px',
@@ -315,13 +315,13 @@ export default function ReportList() {
               borderRadius: 8,
               padding: '6px 12px',
               fontSize: 12,
-              color: gecerliSayfa === 1 ? '#d1d5db' : '#6b7280',
+              color: gecerliSayfa === 1 ? 'var(--border)' : 'var(--text-faint)',
               cursor: gecerliSayfa === 1 ? 'not-allowed' : 'pointer',
             }}
           >
             ‹ Önceki
           </button>
-          <span style={{ fontSize: 12, color: '#6b7280' }}>
+          <span style={{ fontSize: 12, color: 'var(--text-faint)' }}>
             Sayfa {gecerliSayfa} / {toplamSayfa}
           </span>
           <button
@@ -333,7 +333,7 @@ export default function ReportList() {
               borderRadius: 8,
               padding: '6px 12px',
               fontSize: 12,
-              color: gecerliSayfa === toplamSayfa ? '#d1d5db' : '#6b7280',
+              color: gecerliSayfa === toplamSayfa ? 'var(--border)' : 'var(--text-faint)',
               cursor: gecerliSayfa === toplamSayfa ? 'not-allowed' : 'pointer',
             }}
           >
@@ -342,7 +342,7 @@ export default function ReportList() {
         </div>
       )}
 
-      <div style={{ marginTop: 12, fontSize: 12, color: '#9ca3af', textAlign: 'center' }}>
+      <div style={{ marginTop: 12, fontSize: 12, color: 'var(--text-subtle)', textAlign: 'center' }}>
         Toplam {filtered.length} rapor
       </div>
     </div>

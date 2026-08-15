@@ -8,7 +8,7 @@ interface Props {
 }
 
 const ProgressBar = memo(function ProgressBar({ value, height = 8, label, color }: Props) {
-  const barColor = color || (value === 100 ? '#22c55e' : value > 50 ? '#3b82f6' : value > 0 ? '#f59e0b' : '#e5e7eb');
+  const barColor = color || (value === 100 ? '#22c55e' : value > 50 ? '#3b82f6' : value > 0 ? '#f59e0b' : 'var(--border)');
   return (
     <div style={{ width: '100%' }}>
       {label && (
@@ -21,7 +21,7 @@ const ProgressBar = memo(function ProgressBar({ value, height = 8, label, color 
         style={{
           width: '100%',
           height,
-          backgroundColor: '#e5e7eb',
+          backgroundColor: 'var(--border)',
           borderRadius: 4,
           overflow: 'hidden',
         }}

@@ -14,7 +14,7 @@ export default function BlokBilgiKart({ ada, blok, santiyeSefi, tamamlanan, deva
   return (
     <div
       style={{
-        backgroundColor: '#fff',
+        backgroundColor: 'var(--bg-card)',
         borderRadius: 16,
         padding: 18,
         marginBottom: 16,
@@ -23,11 +23,11 @@ export default function BlokBilgiKart({ ada, blok, santiyeSefi, tamamlanan, deva
       }}
     >
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 }}>
-        <h1 style={{ fontSize: 22, fontWeight: 700, color: '#1f2937', margin: 0 }}>
+        <h1 style={{ fontSize: 22, fontWeight: 700, color: 'var(--text-primary)', margin: 0 }}>
           {ada} - Blok {blok.blok_no}
         </h1>
       </div>
-      <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginBottom: 6, fontSize: 13, color: '#6b7280' }}>
+      <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginBottom: 6, fontSize: 13, color: 'var(--text-faint)' }}>
         <span style={{ fontWeight: 600 }}>{blok.tip}</span>
         <span>|</span>
         <span>{blok.daire_sayisi} Daire</span>
@@ -36,7 +36,7 @@ export default function BlokBilgiKart({ ada, blok, santiyeSefi, tamamlanan, deva
         <span>|</span>
         <span>{blok.yapi_konfigurasyonu}</span>
       </div>
-      <div style={{ fontSize: 13, color: '#6b7280', marginBottom: 12 }}>
+      <div style={{ fontSize: 13, color: 'var(--text-faint)', marginBottom: 12 }}>
         Şantiye Şefi: {santiyeSefi}
       </div>
       <div
@@ -44,7 +44,7 @@ export default function BlokBilgiKart({ ada, blok, santiyeSefi, tamamlanan, deva
           display: 'flex',
           gap: 12,
           padding: 10,
-          backgroundColor: '#f8fafc',
+          backgroundColor: 'var(--bg-page)',
           borderRadius: 10,
           fontSize: 12,
         }}

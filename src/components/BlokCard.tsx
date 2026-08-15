@@ -53,7 +53,7 @@ const BlokCard = memo(function BlokCard({ ada, blok, onClick }: Props) {
     <div
       onClick={onClick ? () => onClick(blok.blok_no) : undefined}
       style={{
-        backgroundColor: '#fff',
+        backgroundColor: 'var(--bg-card)',
         borderRadius: 12,
         padding: 14,
         cursor: onClick ? 'pointer' : 'default',
@@ -72,15 +72,15 @@ const BlokCard = memo(function BlokCard({ ada, blok, onClick }: Props) {
     >
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
         <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
-          <div style={{ fontSize: 16, fontWeight: 700, color: '#1f2937' }}>
+          <div style={{ fontSize: 16, fontWeight: 700, color: 'var(--text-primary)' }}>
             Blok {blok.blok_no}
           </div>
           {adaGenelinden && (
             <span
               style={{
                 fontSize: 9,
-                backgroundColor: '#fef3c7',
-                color: '#92400e',
+                backgroundColor: 'var(--bg-accent)',
+                color: 'var(--accent-dark)',
                 padding: '1px 6px',
                 borderRadius: 8,
                 whiteSpace: 'nowrap',
@@ -93,10 +93,10 @@ const BlokCard = memo(function BlokCard({ ada, blok, onClick }: Props) {
         </div>
         {sonDurum && <StatusBadge durum={sonDurum} size="sm" />}
       </div>
-      <div style={{ fontSize: 12, color: '#6b7280', marginBottom: 4 }}>
+      <div style={{ fontSize: 12, color: 'var(--text-faint)', marginBottom: 4 }}>
         {blok.tip} | {blok.daire_sayisi} Daire | {blok.kat_sayisi} Kat
       </div>
-      <div style={{ fontSize: 12, color: '#6b7280', marginBottom: 10 }}>
+      <div style={{ fontSize: 12, color: 'var(--text-faint)', marginBottom: 10 }}>
         {blok.yapi_konfigurasyonu}
       </div>
       <ProgressBar value={genelIlerleme} height={6} label={`${tamamlanan}/${isKalemleri.length} iş kalemi`} />

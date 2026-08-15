@@ -34,10 +34,10 @@ export default class ErrorBoundary extends Component<Props, State> {
           }}
         >
           <div style={{ fontSize: 48, marginBottom: 12 }}>⚠️</div>
-          <h2 style={{ fontSize: 18, fontWeight: 700, color: '#1f2937', marginBottom: 8 }}>
+          <h2 style={{ fontSize: 18, fontWeight: 700, color: 'var(--text-primary)', marginBottom: 8 }}>
             Bir hata oluştu
           </h2>
-          <p style={{ fontSize: 13, color: '#6b7280', marginBottom: 16, maxWidth: 320 }}>
+          <p style={{ fontSize: 13, color: 'var(--text-faint)', marginBottom: 16, maxWidth: 320 }}>
             {this.state.error?.message || 'Beklenmeyen bir hata meydana geldi.'}
           </p>
           <button

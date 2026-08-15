@@ -84,11 +84,11 @@ export default function HedefTakvim() {
   return (
     <div>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
-        <h1 style={{ fontSize: 22, fontWeight: 700, color: '#1f2937', margin: 0 }}>📅 Hedef Takvimi</h1>
+        <h1 style={{ fontSize: 22, fontWeight: 700, color: 'var(--text-primary)', margin: 0 }}>📅 Hedef Takvimi</h1>
         <div style={{ display: 'flex', gap: 6 }}>
           <button
             onClick={buguneGit}
-            style={{ background: 'none', border: '1px solid #e5e7eb', borderRadius: 8, padding: '4px 10px', fontSize: 12, color: '#4b5563', cursor: 'pointer' }}
+            style={{ background: 'none', border: '1px solid #e5e7eb', borderRadius: 8, padding: '4px 10px', fontSize: 12, color: 'var(--text-muted)', cursor: 'pointer' }}
           >
             Bugün
           </button>
@@ -101,7 +101,7 @@ export default function HedefTakvim() {
               );
               toastGoster(`${gorunenHedefler.length} hedef Excel olarak indiriliyor`, 'success');
             }}
-            style={{ background: 'none', border: '1px solid #e5e7eb', borderRadius: 8, padding: '4px 10px', fontSize: 12, color: '#6b7280', cursor: 'pointer' }}
+            style={{ background: 'none', border: '1px solid #e5e7eb', borderRadius: 8, padding: '4px 10px', fontSize: 12, color: 'var(--text-faint)', cursor: 'pointer' }}
             title="Excel Aktar"
           >
             📥
@@ -113,7 +113,7 @@ export default function HedefTakvim() {
                 toastGoster('Hedef takvimi PDF olarak indiriliyor', 'success');
               }
             }}
-            style={{ background: 'none', border: '1px solid #e5e7eb', borderRadius: 8, padding: '4px 10px', fontSize: 12, color: '#6b7280', cursor: 'pointer' }}
+            style={{ background: 'none', border: '1px solid #e5e7eb', borderRadius: 8, padding: '4px 10px', fontSize: 12, color: 'var(--text-faint)', cursor: 'pointer' }}
             title="PDF Aktar"
           >
             📄
@@ -122,18 +122,18 @@ export default function HedefTakvim() {
       </div>
 
       <div style={{ display: 'flex', gap: 8, alignItems: 'center', marginBottom: 12 }}>
-        <button onClick={ayOnce} style={{ background: 'none', border: '1px solid #e5e7eb', borderRadius: 8, width: 32, height: 32, cursor: 'pointer', fontSize: 14, color: '#4b5563' }}>◀</button>
-        <div style={{ flex: 1, textAlign: 'center', fontSize: 15, fontWeight: 600, color: '#374151' }}>
+        <button onClick={ayOnce} style={{ background: 'none', border: '1px solid #e5e7eb', borderRadius: 8, width: 32, height: 32, cursor: 'pointer', fontSize: 14, color: 'var(--text-muted)' }}>◀</button>
+        <div style={{ flex: 1, textAlign: 'center', fontSize: 15, fontWeight: 600, color: 'var(--text-secondary)' }}>
           {AY_ADLARI[gorunenAy.getMonth()]} {gorunenAy.getFullYear()}
         </div>
-        <button onClick={aySonra} style={{ background: 'none', border: '1px solid #e5e7eb', borderRadius: 8, width: 32, height: 32, cursor: 'pointer', fontSize: 14, color: '#4b5563' }}>▶</button>
+        <button onClick={aySonra} style={{ background: 'none', border: '1px solid #e5e7eb', borderRadius: 8, width: 32, height: 32, cursor: 'pointer', fontSize: 14, color: 'var(--text-muted)' }}>▶</button>
       </div>
 
       {adalar.length > 1 && (
         <select
           value={seciliAda}
           onChange={(e) => setSeciliAda(e.target.value)}
-          style={{ width: '100%', padding: '8px 10px', borderRadius: 8, border: '1px solid #d1d5db', fontSize: 13, marginBottom: 12, backgroundColor: '#fff' }}
+          style={{ width: '100%', padding: '8px 10px', borderRadius: 8, border: '1px solid var(--border)', fontSize: 13, marginBottom: 12, backgroundColor: 'var(--bg-card)' }}
         >
           <option value="">Tüm Adalar</option>
           {adalar.map((a) => (
@@ -169,7 +169,7 @@ export default function HedefTakvim() {
           left: -10000,
           top: 0,
           width: 820,
-          backgroundColor: '#fff',
+          backgroundColor: '#ffffff',
           padding: 24,
           color: '#111827',
           fontFamily: 'Helvetica, Arial, sans-serif',

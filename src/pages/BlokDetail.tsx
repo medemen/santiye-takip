@@ -56,7 +56,7 @@ export default function BlokDetail() {
   const devamEden = kalemIlerlemeleri.filter((p) => p.rapor?.durum === 'devam_ediyor').length;
 
   if (!blok) {
-    return <div style={{ padding: 40, textAlign: 'center', color: '#9ca3af' }}>Blok bulunamadı</div>;
+    return <div style={{ padding: 40, textAlign: 'center', color: 'var(--text-subtle)' }}>Blok bulunamadı</div>;
   }
 
   return (

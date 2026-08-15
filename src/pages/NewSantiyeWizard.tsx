@@ -22,15 +22,15 @@ const inputStyle: React.CSSProperties = {
   border: '1px solid #e5e7eb',
   fontSize: 13,
   boxSizing: 'border-box',
-  backgroundColor: '#fff',
-  color: '#1f2937',
+  backgroundColor: 'var(--bg-card)',
+  color: 'var(--text-primary)',
 };
 
 const labelStyle: React.CSSProperties = {
   display: 'block',
   fontSize: 12,
   fontWeight: 500,
-  color: '#4b5563',
+  color: 'var(--text-muted)',
   marginBottom: 4,
 };
 
@@ -54,7 +54,7 @@ export default function NewSantiyeWizard() {
 
   if (!user?.proje_muduru) {
     return (
-      <div style={{ padding: 40, textAlign: 'center', color: '#9ca3af' }}>
+      <div style={{ padding: 40, textAlign: 'center', color: 'var(--text-subtle)' }}>
         Bu sayfaya yalnızca proje müdürü erişebilir.
       </div>
     );
@@ -125,7 +125,7 @@ export default function NewSantiyeWizard() {
     if (!draft) {
       return (
         <div>
-          <p style={{ fontSize: 13, color: '#6b7280', marginBottom: 16 }}>
+          <p style={{ fontSize: 13, color: 'var(--text-faint)', marginBottom: 16 }}>
             Yeni bir şantiye yapısı kurmak için bir başlangıç seçin. Kurulum sonunda yapı
             sunucuya yayınlanır ve tüm cihazlar bu yapıyı kullanmaya başlar.
           </p>
@@ -135,16 +135,16 @@ export default function NewSantiyeWizard() {
               style={{
                 textAlign: 'left',
                 padding: 16,
-                backgroundColor: '#fff',
+                backgroundColor: 'var(--bg-card)',
                 border: '2px solid #f59e0b',
                 borderRadius: 14,
                 cursor: 'pointer',
               }}
             >
-              <div style={{ fontSize: 15, fontWeight: 700, color: '#1f2937', marginBottom: 4 }}>
+              <div style={{ fontSize: 15, fontWeight: 700, color: 'var(--text-primary)', marginBottom: 4 }}>
                 Güneyşehir Şablonuyla Başla
               </div>
-              <div style={{ fontSize: 12, color: '#6b7280' }}>
+              <div style={{ fontSize: 12, color: 'var(--text-faint)' }}>
                 Hazır ada/blok (6 ada, 136 blok) ve iş kalemi (19 grup, 200+ kalem) yapısıyla
                 gelir; dilediğiniz gibi düzenlersiniz.
               </div>
@@ -154,16 +154,16 @@ export default function NewSantiyeWizard() {
               style={{
                 textAlign: 'left',
                 padding: 16,
-                backgroundColor: '#fff',
+                backgroundColor: 'var(--bg-card)',
                 border: '2px solid #e5e7eb',
                 borderRadius: 14,
                 cursor: 'pointer',
               }}
             >
-              <div style={{ fontSize: 15, fontWeight: 700, color: '#1f2937', marginBottom: 4 }}>
+              <div style={{ fontSize: 15, fontWeight: 700, color: 'var(--text-primary)', marginBottom: 4 }}>
                 Boştan Başla
               </div>
-              <div style={{ fontSize: 12, color: '#6b7280' }}>
+              <div style={{ fontSize: 12, color: 'var(--text-faint)' }}>
                 Ada ve iş kalemi yapısını sıfırdan tanımlayın.
               </div>
             </button>
@@ -256,7 +256,7 @@ export default function NewSantiyeWizard() {
           <div>
             <label style={labelStyle}>
               Saha Personeli Rolleri{' '}
-              <span style={{ fontWeight: 400, color: '#9ca3af' }}>(virgülle ayırın)</span>
+              <span style={{ fontWeight: 400, color: 'var(--text-subtle)' }}>(virgülle ayırın)</span>
             </label>
             <input
               style={inputStyle}
@@ -275,7 +275,7 @@ export default function NewSantiyeWizard() {
           <div>
             <label style={labelStyle}>
               Seçilebilir Roller{' '}
-              <span style={{ fontWeight: 400, color: '#9ca3af' }}>(virgülle ayırın)</span>
+              <span style={{ fontWeight: 400, color: 'var(--text-subtle)' }}>(virgülle ayırın)</span>
             </label>
             <input
               style={inputStyle}
@@ -304,13 +304,13 @@ export default function NewSantiyeWizard() {
       <div>
         <div
           style={{
-            backgroundColor: '#fff',
+            backgroundColor: 'var(--bg-card)',
             borderRadius: 10,
             padding: 12,
             marginBottom: 12,
             border: '1px solid #f0f0f0',
             fontSize: 13,
-            color: '#374151',
+            color: 'var(--text-secondary)',
             display: 'flex',
             flexDirection: 'column',
             gap: 6,
@@ -318,14 +318,14 @@ export default function NewSantiyeWizard() {
         >
           <div>
             <strong>{draft.genel.santiyeAdi || '(Adı yok)'}</strong>
-            {draft.genel.projeAdi && <span style={{ color: '#6b7280' }}> — {draft.genel.projeAdi}</span>}
+            {draft.genel.projeAdi && <span style={{ color: 'var(--text-faint)' }}> — {draft.genel.projeAdi}</span>}
           </div>
-          <div style={{ fontSize: 12, color: '#6b7280' }}>
+          <div style={{ fontSize: 12, color: 'var(--text-faint)' }}>
             {draft.yapi.adalar.length} ada •{' '}
             {draft.yapi.adalar.reduce((s, a) => s + a.blok_sayisi, 0)} blok •{' '}
             {draft.yapi.adalar.reduce((s, a) => s + a.toplam_daire, 0)} daire
           </div>
-          <div style={{ fontSize: 12, color: '#6b7280' }}>
+          <div style={{ fontSize: 12, color: 'var(--text-faint)' }}>
             {draft.isKalemleri.gruplar.length} iş kalemi grubu •{' '}
             {getAllKalemler(draft).length} kalem
           </div>
@@ -333,12 +333,12 @@ export default function NewSantiyeWizard() {
 
         <div
           style={{
-            backgroundColor: '#fef3c7',
+            backgroundColor: 'var(--bg-accent)',
             borderRadius: 10,
             padding: '10px 14px',
             marginBottom: 12,
             fontSize: 12,
-            color: '#92400e',
+            color: 'var(--accent-dark)',
             border: '1px solid #fde68a',
           }}
         >
@@ -350,7 +350,7 @@ export default function NewSantiyeWizard() {
         {sorunlar.length > 0 && (
           <div
             style={{
-              backgroundColor: '#fef2f2',
+              backgroundColor: 'var(--bg-danger)',
               borderRadius: 10,
               padding: '10px 14px',
               marginBottom: 12,
@@ -374,12 +374,12 @@ export default function NewSantiyeWizard() {
           style={{
             width: '100%',
             padding: 14,
-            backgroundColor: sorunlar.length === 0 && !yayinlaniyor ? '#f59e0b' : '#e5e7eb',
+            backgroundColor: sorunlar.length === 0 && !yayinlaniyor ? '#f59e0b' : 'var(--border)',
             border: 'none',
             borderRadius: 12,
             fontSize: 14,
             fontWeight: 700,
-            color: sorunlar.length === 0 && !yayinlaniyor ? '#fff' : '#9ca3af',
+            color: sorunlar.length === 0 && !yayinlaniyor ? '#fff' : 'var(--text-subtle)',
             cursor: sorunlar.length === 0 && !yayinlaniyor ? 'pointer' : 'not-allowed',
           }}
         >
@@ -401,7 +401,7 @@ export default function NewSantiyeWizard() {
             borderRadius: 8,
             padding: '6px 12px',
             fontSize: 12,
-            color: '#6b7280',
+            color: 'var(--text-faint)',
             cursor: 'pointer',
           }}
         >
@@ -419,8 +419,8 @@ export default function NewSantiyeWizard() {
                 fontWeight: 600,
                 padding: '4px 10px',
                 borderRadius: 12,
-                backgroundColor: i === adim ? '#f59e0b' : i < adim ? '#fef3c7' : '#f3f4f6',
-                color: i === adim ? '#fff' : i < adim ? '#92400e' : '#9ca3af',
+                backgroundColor: i === adim ? '#f59e0b' : i < adim ? 'var(--bg-accent)' : 'var(--bg-subtle)',
+                color: i === adim ? '#fff' : i < adim ? 'var(--accent-dark)' : 'var(--text-subtle)',
               }}
             >
               {i + 1}. {b}
@@ -438,12 +438,12 @@ export default function NewSantiyeWizard() {
             style={{
               flex: 1,
               padding: 12,
-              backgroundColor: '#f3f4f6',
+              backgroundColor: 'var(--bg-subtle)',
               border: 'none',
               borderRadius: 12,
               fontSize: 14,
               fontWeight: 600,
-              color: '#4b5563',
+              color: 'var(--text-muted)',
               cursor: 'pointer',
             }}
           >

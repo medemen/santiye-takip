@@ -27,8 +27,8 @@ export default function BlokEylemler({ onRaporEkle, onRaporlariGor }: Props) {
         style={{
           flex: 1,
           padding: '12px 20px',
-          backgroundColor: '#f3f4f6',
-          color: '#4b5563',
+          backgroundColor: 'var(--bg-subtle)',
+          color: 'var(--text-muted)',
           border: 'none',
           borderRadius: 12,
           fontSize: 14,

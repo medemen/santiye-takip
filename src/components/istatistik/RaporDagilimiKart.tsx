@@ -18,7 +18,7 @@ interface Props {
 export default function RaporDagilimiKart({ donutData, tamamlanan, devam, plan, gecikme }: Props) {
   return (
     <div style={{ ...card, marginBottom: 16 }}>
-      <h3 style={{ fontSize: 14, fontWeight: 600, color: '#4b5563', margin: 0, marginBottom: 8 }}>
+      <h3 style={{ fontSize: 14, fontWeight: 600, color: 'var(--text-muted)', margin: 0, marginBottom: 8 }}>
         Rapor Dağılımı
       </h3>
       <DonutChart data={donutData} />
@@ -30,21 +30,21 @@ export default function RaporDagilimiKart({ donutData, tamamlanan, devam, plan, 
           marginTop: 12,
         }}
       >
-        <div style={{ backgroundColor: '#f0fdf4', borderRadius: 8, padding: 10, textAlign: 'center' }}>
+        <div style={{ backgroundColor: 'var(--bg-success)', borderRadius: 8, padding: 10, textAlign: 'center' }}>
           <div style={{ fontSize: 20, fontWeight: 700, color: '#22c55e' }}>{tamamlanan}</div>
-          <div style={{ fontSize: 11, color: '#6b7280' }}>Tamamlandı</div>
+          <div style={{ fontSize: 11, color: 'var(--text-faint)' }}>Tamamlandı</div>
         </div>
-        <div style={{ backgroundColor: '#eff6ff', borderRadius: 8, padding: 10, textAlign: 'center' }}>
+        <div style={{ backgroundColor: 'var(--bg-info)', borderRadius: 8, padding: 10, textAlign: 'center' }}>
           <div style={{ fontSize: 20, fontWeight: 700, color: '#3b82f6' }}>{devam}</div>
-          <div style={{ fontSize: 11, color: '#6b7280' }}>Devam Ediyor</div>
+          <div style={{ fontSize: 11, color: 'var(--text-faint)' }}>Devam Ediyor</div>
         </div>
-        <div style={{ backgroundColor: '#fefce8', borderRadius: 8, padding: 10, textAlign: 'center' }}>
+        <div style={{ backgroundColor: 'var(--bg-accent)', borderRadius: 8, padding: 10, textAlign: 'center' }}>
           <div style={{ fontSize: 20, fontWeight: 700, color: '#f59e0b' }}>{plan}</div>
-          <div style={{ fontSize: 11, color: '#6b7280' }}>Planlandı</div>
+          <div style={{ fontSize: 11, color: 'var(--text-faint)' }}>Planlandı</div>
         </div>
-        <div style={{ backgroundColor: '#fef2f2', borderRadius: 8, padding: 10, textAlign: 'center' }}>
+        <div style={{ backgroundColor: 'var(--bg-danger)', borderRadius: 8, padding: 10, textAlign: 'center' }}>
           <div style={{ fontSize: 20, fontWeight: 700, color: '#ef4444' }}>{gecikme}</div>
-          <div style={{ fontSize: 11, color: '#6b7280' }}>Gecikme</div>
+          <div style={{ fontSize: 11, color: 'var(--text-faint)' }}>Gecikme</div>
         </div>
       </div>
     </div>

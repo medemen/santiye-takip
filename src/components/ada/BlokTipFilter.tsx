@@ -17,8 +17,8 @@ export default function BlokTipFilter({ bloklar, seciliTip, onTipSec }: Props) {
     fontSize: 12,
     fontWeight: 600,
     cursor: 'pointer',
-    backgroundColor: aktif ? '#f59e0b' : '#f3f4f6',
-    color: aktif ? '#fff' : '#4b5563',
+    backgroundColor: aktif ? '#f59e0b' : 'var(--bg-subtle)',
+    color: aktif ? '#fff' : 'var(--text-muted)',
     whiteSpace: 'nowrap',
   });
 

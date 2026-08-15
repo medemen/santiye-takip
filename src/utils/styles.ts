@@ -1,21 +1,21 @@
 export const card = {
-  backgroundColor: '#fff',
+  backgroundColor: 'var(--bg-card)',
   borderRadius: 16,
   padding: 16,
-  border: '1px solid #f0f0f0',
-  boxShadow: '0 1px 3px rgba(0,0,0,0.06)',
+  border: '1px solid var(--border-soft)',
+  boxShadow: 'var(--shadow-card)',
 };
 
 export const cardSm = {
-  backgroundColor: '#fff',
+  backgroundColor: 'var(--bg-card)',
   borderRadius: 12,
   padding: 14,
-  border: '1px solid #f0f0f0',
+  border: '1px solid var(--border-soft)',
 };
 
 export const btnPrimary = {
   padding: '12px 20px',
-  backgroundColor: '#f59e0b',
+  backgroundColor: 'var(--accent)',
   color: '#fff',
   border: 'none',
   borderRadius: 12,
@@ -27,7 +27,7 @@ export const btnPrimary = {
 export const btnGhost = {
   background: 'none',
   border: 'none',
-  color: '#f59e0b',
+  color: 'var(--accent)',
   fontSize: 13,
   fontWeight: 600,
   cursor: 'pointer',
@@ -44,23 +44,25 @@ export const input = {
   width: '100%',
   padding: '10px 12px',
   borderRadius: 10,
-  border: '1px solid #e5e7eb',
+  border: '1px solid var(--border)',
   fontSize: 13,
   boxSizing: 'border-box',
+  backgroundColor: 'var(--bg-card)',
+  color: 'var(--text-primary)',
 };
 
 export const label = {
   display: 'block',
   fontSize: 13,
   fontWeight: 500,
-  color: '#4b5563',
+  color: 'var(--text-muted)',
   marginBottom: 6,
 };
 
 export const pageTitle = {
   fontSize: 20,
   fontWeight: 700,
-  color: '#1f2937',
+  color: 'var(--text-primary)',
   margin: 0,
   marginBottom: 16,
 };
@@ -68,8 +70,8 @@ export const pageTitle = {
 export const emptyState = {
   textAlign: 'center' as const,
   padding: 40,
-  color: '#9ca3af',
-  backgroundColor: '#fff',
+  color: 'var(--text-subtle)',
+  backgroundColor: 'var(--bg-card)',
   borderRadius: 12,
-  border: '1px solid #f0f0f0',
+  border: '1px solid var(--border-soft)',
 };

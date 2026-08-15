@@ -32,7 +32,7 @@ export default function TakvimIzgarasi({ gorunenAy, tarihHedefleri, seciliAda, o
     <div style={{ ...card, marginBottom: 16, padding: 8 }}>
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', textAlign: 'center', marginBottom: 4 }}>
         {['Pt', 'Sa', 'Ça', 'Pe', 'Cu', 'Ct', 'Pz'].map((g) => (
-          <div key={g} style={{ fontSize: 10, fontWeight: 600, color: '#9ca3af', padding: '2px 0' }}>{g}</div>
+          <div key={g} style={{ fontSize: 10, fontWeight: 600, color: 'var(--text-subtle)', padding: '2px 0' }}>{g}</div>
         ))}
       </div>
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: 2 }}>
@@ -47,7 +47,7 @@ export default function TakvimIzgarasi({ gorunenAy, tarihHedefleri, seciliAda, o
               key={tarih}
               style={{
                 minHeight: 46,
-                backgroundColor: bugunMu ? '#fffbeb' : '#fff',
+                backgroundColor: bugunMu ? 'var(--bg-accent)' : 'var(--bg-card)',
                 border: bugunMu ? '1px solid #f59e0b' : '1px solid #f3f4f6',
                 borderRadius: 6,
                 padding: 2,
@@ -58,7 +58,7 @@ export default function TakvimIzgarasi({ gorunenAy, tarihHedefleri, seciliAda, o
                 style={{
                   fontSize: 10,
                   fontWeight: bugunMu ? 700 : 500,
-                  color: bugunMu ? '#f59e0b' : '#6b7280',
+                  color: bugunMu ? '#f59e0b' : 'var(--text-faint)',
                   textAlign: 'center',
                   padding: '1px 0',
                 }}
@@ -89,7 +89,7 @@ export default function TakvimIzgarasi({ gorunenAy, tarihHedefleri, seciliAda, o
                   </button>
                 ))}
                 {gunHedefleri.length > 3 && (
-                  <div style={{ fontSize: 7, color: '#9ca3af', paddingLeft: 2 }}>+{gunHedefleri.length - 3}</div>
+                  <div style={{ fontSize: 7, color: 'var(--text-subtle)', paddingLeft: 2 }}>+{gunHedefleri.length - 3}</div>
                 )}
               </div>
             </div>
@@ -97,16 +97,16 @@ export default function TakvimIzgarasi({ gorunenAy, tarihHedefleri, seciliAda, o
         })}
       </div>
       <div style={{ display: 'flex', gap: 10, justifyContent: 'center', marginTop: 6, flexWrap: 'wrap' }}>
-        <span style={{ display: 'flex', alignItems: 'center', gap: 4, fontSize: 9, color: '#6b7280' }}>
+        <span style={{ display: 'flex', alignItems: 'center', gap: 4, fontSize: 9, color: 'var(--text-faint)' }}>
           <span style={{ width: 8, height: 8, borderRadius: 2, backgroundColor: '#ef4444', display: 'inline-block' }} /> Geçmiş
         </span>
-        <span style={{ display: 'flex', alignItems: 'center', gap: 4, fontSize: 9, color: '#6b7280' }}>
+        <span style={{ display: 'flex', alignItems: 'center', gap: 4, fontSize: 9, color: 'var(--text-faint)' }}>
           <span style={{ width: 8, height: 8, borderRadius: 2, backgroundColor: '#f59e0b', display: 'inline-block' }} /> Bugün / ≤7 gün
         </span>
-        <span style={{ display: 'flex', alignItems: 'center', gap: 4, fontSize: 9, color: '#6b7280' }}>
+        <span style={{ display: 'flex', alignItems: 'center', gap: 4, fontSize: 9, color: 'var(--text-faint)' }}>
           <span style={{ width: 8, height: 8, borderRadius: 2, backgroundColor: '#3b82f6', display: 'inline-block' }} /> Yakında
         </span>
-        <span style={{ display: 'flex', alignItems: 'center', gap: 4, fontSize: 9, color: '#6b7280' }}>
+        <span style={{ display: 'flex', alignItems: 'center', gap: 4, fontSize: 9, color: 'var(--text-faint)' }}>
           <span style={{ width: 8, height: 8, borderRadius: 2, backgroundColor: '#22c55e', display: 'inline-block' }} /> Tamamlandı
         </span>
       </div>

@@ -15,10 +15,10 @@ interface Props {
 export default function KalemIlerlemeKart({ kalemler, toplamKalem }: Props) {
   return (
     <div style={{ ...card }}>
-      <h3 style={{ fontSize: 14, fontWeight: 600, color: '#4b5563', margin: 0, marginBottom: 4 }}>
+      <h3 style={{ fontSize: 14, fontWeight: 600, color: 'var(--text-muted)', margin: 0, marginBottom: 4 }}>
         İş Kalemi Bazında İlerleme
       </h3>
-      <div style={{ fontSize: 11, color: '#9ca3af', marginBottom: 10 }}>
+      <div style={{ fontSize: 11, color: 'var(--text-subtle)', marginBottom: 10 }}>
         {toplamKalem} iş kalemi • proje geneli ortalama, en düşükten yükseğe
       </div>
       <div style={{ maxHeight: 340, overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: 8, paddingRight: 4 }}>
@@ -30,7 +30,7 @@ export default function KalemIlerlemeKart({ kalemler, toplamKalem }: Props) {
                 flex: 1,
                 minWidth: 0,
                 fontSize: 12,
-                color: '#374151',
+                color: 'var(--text-secondary)',
                 whiteSpace: 'nowrap',
                 overflow: 'hidden',
                 textOverflow: 'ellipsis',
@@ -41,7 +41,7 @@ export default function KalemIlerlemeKart({ kalemler, toplamKalem }: Props) {
             <div style={{ width: 120, flexShrink: 0 }}>
               <ProgressBar value={k.ortalama} height={6} />
             </div>
-            <span style={{ width: 42, flexShrink: 0, textAlign: 'right', fontSize: 12, fontWeight: 600, color: '#4b5563' }}>
+            <span style={{ width: 42, flexShrink: 0, textAlign: 'right', fontSize: 12, fontWeight: 600, color: 'var(--text-muted)' }}>
               %{k.ortalama}
             </span>
           </div>

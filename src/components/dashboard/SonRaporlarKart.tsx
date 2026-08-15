@@ -12,7 +12,7 @@ export default function SonRaporlarKart({ raporlar, grid, onTumu }: Props) {
   return (
     <div style={{ ...card }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
-        <h3 style={{ fontSize: 14, fontWeight: 600, color: '#4b5563', margin: 0 }}>
+        <h3 style={{ fontSize: 14, fontWeight: 600, color: 'var(--text-muted)', margin: 0 }}>
           Son Raporlar
         </h3>
         <button onClick={onTumu} style={btnGhost}>
@@ -20,7 +20,7 @@ export default function SonRaporlarKart({ raporlar, grid, onTumu }: Props) {
         </button>
       </div>
       {raporlar.length === 0 ? (
-        <p style={{ fontSize: 13, color: '#9ca3af', textAlign: 'center', padding: 20 }}>
+        <p style={{ fontSize: 13, color: 'var(--text-subtle)', textAlign: 'center', padding: 20 }}>
           Henüz rapor eklenmemiş. İlk raporu eklemek için + butonuna tıklayın.
         </p>
       ) : grid ? (

@@ -17,7 +17,7 @@ function hucreRengi(v: number): string {
   if (v >= 50) return '#fde047';
   if (v >= 25) return '#fdba74';
   if (v > 0) return '#fca5a5';
-  return '#f3f4f6';
+  return 'var(--bg-subtle)';
 }
 
 const hucreStil = {
@@ -39,7 +39,7 @@ const BlokMatrisi = memo(function BlokMatrisi({ adalar, ilerleme, onBlokClick }:
 
   if (adalar.length === 0 || bloklar.length === 0) {
     return (
-      <div style={{ padding: 20, textAlign: 'center', color: '#9ca3af', fontSize: 13 }}>
+      <div style={{ padding: 20, textAlign: 'center', color: 'var(--text-subtle)', fontSize: 13 }}>
         Blok verisi yok
       </div>
     );
@@ -59,7 +59,7 @@ const BlokMatrisi = memo(function BlokMatrisi({ adalar, ilerleme, onBlokClick }:
         {bloklar.map((b) => (
           <div
             key={b}
-            style={{ textAlign: 'center', fontSize: 10, color: '#6b7280', fontWeight: 600, lineHeight: '20px' }}
+            style={{ textAlign: 'center', fontSize: 10, color: 'var(--text-faint)', fontWeight: 600, lineHeight: '20px' }}
           >
             {b}
           </div>
@@ -71,12 +71,12 @@ const BlokMatrisi = memo(function BlokMatrisi({ adalar, ilerleme, onBlokClick }:
                 position: 'sticky',
                 left: 0,
                 zIndex: 1,
-                backgroundColor: '#fff',
+                backgroundColor: 'var(--bg-card)',
                 display: 'flex',
                 alignItems: 'center',
                 fontSize: 11,
                 fontWeight: 600,
-                color: '#1f2937',
+                color: 'var(--text-primary)',
                 whiteSpace: 'nowrap',
               }}
             >
@@ -95,7 +95,7 @@ const BlokMatrisi = memo(function BlokMatrisi({ adalar, ilerleme, onBlokClick }:
                   style={{
                     ...hucreStil,
                     backgroundColor: hucreRengi(v),
-                    color: v > 25 ? '#1f2937' : '#6b7280',
+                    color: v > 25 ? 'var(--text-primary)' : 'var(--text-faint)',
                     border: 'none',
                     cursor: 'pointer',
                   }}
@@ -107,7 +107,7 @@ const BlokMatrisi = memo(function BlokMatrisi({ adalar, ilerleme, onBlokClick }:
           </Fragment>
         ))}
       </div>
-      <div style={{ display: 'flex', gap: 12, marginTop: 10, fontSize: 10, color: '#6b7280', alignItems: 'center', flexWrap: 'wrap' }}>
+      <div style={{ display: 'flex', gap: 12, marginTop: 10, fontSize: 10, color: 'var(--text-faint)', alignItems: 'center', flexWrap: 'wrap' }}>
         <span>0%</span>
         {['#fca5a5', '#fdba74', '#fde047', '#86efac', '#22c55e'].map((c) => (
           <span key={c} style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
