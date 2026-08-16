@@ -80,7 +80,8 @@ function TrailingSlashDuzenle() {
   useEffect(() => {
     if (isNative) return;
     const base = resolveAppBasename();
-    if (base && base !== '/' && location.pathname === base) {
+    const kok = window.location.pathname;
+    if (base && base !== '/' && kok === base) {
       window.history.replaceState(null, '', base + '/');
     }
   }, [location.pathname]);
