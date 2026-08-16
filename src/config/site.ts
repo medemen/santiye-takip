@@ -101,6 +101,11 @@ async function configiDbdenYukle(): Promise<SantiyeConfig> {
   const { getSupabase, isSupabaseReady } = await import('../lib/supabase');
   let dbBasarili = false;
   if (isSupabaseReady()) {
+    const { supabaseOturumAktif } = await import('../stores/authStore');
+    if (!supabaseOturumAktif()) {
+      if (merged) setSiteConfig(merged);
+      return current;
+    }
     try {
       const { data, error } = await getSupabase()
         .from('santiye_config')

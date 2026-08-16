@@ -28,7 +28,9 @@ const USER = arg('--user', 'Mehmet Orhan Edemen');
 const PM = flag('--pm');
 const OTO_BASLAT = flag('--auto-start');
 const HEADED = flag('--headed');
-const BASE = arg('--base', 'http://localhost:5173/').replace(/\/+$/, '') + '/';
+const BASE_URL = new URL(arg('--base', 'http://localhost:5173/'));
+const BASE = BASE_URL.href.replace(/\/+$/, '') + '/';
+const BASENAME = BASE_URL.pathname.replace(/\/+$/, '');
 
 const cfg = JSON.parse(readFileSync(resolve(KOK, 'data/santiye.config.json'), 'utf8'));
 const SANTIYE_ADI = cfg.genel.santiyeAdi;
@@ -93,9 +95,21 @@ async function sayfadaBeklenen(beklenenler, timeout = 15000) {
   }
 }
 
+function yolEsit(rota) {
+  const beklenen = (BASENAME + rota).replace(/\/+$/, '') || '/';
+  return (url) => (url.pathname.replace(/\/+$/, '') || '/') === beklenen;
+}
+
+async function spaGez(rota) {
+  await page.evaluate((r) => {
+    window.history.pushState({}, '', r);
+    window.dispatchEvent(new PopStateEvent('popstate'));
+  }, BASENAME + rota);
+}
+
 async function gez(rota, beklenenler, adimAdi) {
   await adim(adimAdi, async () => {
-    await page.goto(BASE + rota.replace(/^\//, ''), { waitUntil: 'load', timeout: 30000 });
+    await spaGez(rota);
     await sayfadaBeklenen(beklenenler);
   });
 }
@@ -108,20 +122,21 @@ async function girisYap(kullanici) {
   if (!secenek) throw new Error(`Login listesinde "${kullanici}" bulunamadi. Secenekler: ${mevcutSecenekler.join(', ')}`);
   await page.locator('select').first().selectOption({ label: secenek });
   await page.getByRole('button', { name: 'Giriş Yap' }).click();
-  await page.waitForURL((url) => url.pathname === '/', { timeout: 30000 });
+  await page.waitForURL(yolEsit('/'), { timeout: 30000 });
   await sayfadaBeklenen([SANTIYE_ADI]);
 }
 
 async function cikisYap() {
   page.once('dialog', (d) => d.accept());
   await page.getByRole('button', { name: 'Çıkış' }).click();
-  await page.waitForURL((url) => url.pathname === '/login', { timeout: 15000 });
+  await page.waitForURL(yolEsit('/login'), { timeout: 15000 });
 }
 
 let page;
 
 async function main() {
-  if (!devServerAyakta()) {
+  const yerelDev = BASE_URL.hostname === 'localhost' || BASE_URL.hostname === '127.0.0.1';
+  if (yerelDev && !devServerAyakta()) {
     if (!OTO_BASLAT) {
       console.error('[tester] Dev server ayakta degil. Once "npm run dev", sonra tekrar deneyin.');
       console.error('[tester] Ya da --auto-start ile baslatilabilir.');
@@ -163,7 +178,7 @@ async function main() {
 
     await adim('Giriş ekranına yönlendirme', async () => {
       await page.goto(BASE, { waitUntil: 'load', timeout: 30000 });
-      await page.waitForURL((url) => url.pathname === '/login', { timeout: 15000 });
+      await page.waitForURL(yolEsit('/login'), { timeout: 15000 });
       await sayfadaBeklenen(['Rapor Takip Sistemi']);
     });
 
@@ -180,7 +195,7 @@ async function main() {
     await gez('/profil', ['Profil'], 'Profil');
 
     await adim('Rapor ekleme akışı (tek sayfa + kaydet)', async () => {
-      await page.goto(BASE + 'rapor-ekle', { waitUntil: 'load', timeout: 30000 });
+      await spaGez('/rapor-ekle');
       await sayfadaBeklenen(['Rapor Ekle']);
 
       await page.locator(`button[data-ada="${ILK_ADA}"]`).first().click();
@@ -194,13 +209,13 @@ async function main() {
       await page.getByRole('button', { name: String(ILK_BLOK), exact: true }).click();
       await page.locator('textarea').fill(`Otomatik test: ${KALEM} - ${ILK_ADA}`);
       await page.getByRole('button', { name: /Rapor Kaydet/ }).click();
-      await page.waitForURL((url) => url.pathname === '/raporlar', { timeout: 15000 });
+      await page.waitForURL(yolEsit('/raporlar'), { timeout: 15000 });
       await sayfadaBeklenen(['Raporlar', KALEM]);
     });
 
     await adim('/toplu-rapor → /rapor-ekle yönlendirmesi', async () => {
-      await page.goto(BASE + 'toplu-rapor', { waitUntil: 'load', timeout: 30000 });
-      await page.waitForURL((url) => url.pathname === '/rapor-ekle', { timeout: 15000 });
+      await spaGez('/toplu-rapor');
+      await page.waitForURL(yolEsit('/rapor-ekle'), { timeout: 15000 });
       await sayfadaBeklenen(['Rapor Ekle']);
     });
 
@@ -216,7 +231,7 @@ async function main() {
       if (!secenek) throw new Error(`Desktop giris listesinde "${USER}" bulunamadi`);
       await dpage.locator('select').first().selectOption({ label: secenek });
       await dpage.getByRole('button', { name: 'Giriş Yap' }).click();
-      await dpage.waitForURL((url) => url.pathname === '/', { timeout: 30000 });
+      await dpage.waitForURL(yolEsit('/'), { timeout: 30000 });
       for (const metin of [SANTIYE_ADI, 'Rapor Kapsamı', 'Zaman Trendi', 'İş Kalemi Bazında İlerleme', 'Ada × Blok Matrisi', 'Yaklaşan Hedefler', 'Ada Detay', 'Son Raporlar']) {
         await dpage.locator('body').getByText(metin, { exact: false }).first().waitFor({ state: 'visible', timeout: 15000 });
       }
@@ -227,8 +242,8 @@ async function main() {
     });
 
     await adim('/ayarlar şantiye şefi için yasak (→ / yönlendirme)', async () => {
-      await page.goto(BASE + 'ayarlar', { waitUntil: 'load', timeout: 30000 });
-      await page.waitForURL((url) => url.pathname === '/', { timeout: 15000 });
+      await spaGez('/ayarlar');
+      await page.waitForURL(yolEsit('/'), { timeout: 15000 });
       await sayfadaBeklenen([SANTIYE_ADI]);
     });
 
