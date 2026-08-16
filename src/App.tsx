@@ -1,4 +1,4 @@
-import { BrowserRouter, HashRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter, HashRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { Capacitor } from '@capacitor/core';
 import { lazy, Suspense, useEffect, useState, useSyncExternalStore } from 'react';
 import Layout from './components/Layout';
@@ -72,6 +72,21 @@ function resolveAppBasename(): string | undefined {
     : '/';
 }
 
+// GitHub Pages gibi alt dizin yayinlarinda kok pathname trailing slash'siz
+// kalirsa goreli kaynak yollari (manifest, ikonlar) site kokune cozulur.
+// AppRouter icinde calismasi gerektigi icin ayri bir bilesendir.
+function TrailingSlashDuzenle() {
+  const location = useLocation();
+  useEffect(() => {
+    if (isNative) return;
+    const base = resolveAppBasename();
+    if (base && base !== '/' && location.pathname === base) {
+      window.history.replaceState(null, '', base + '/');
+    }
+  }, [location.pathname]);
+  return null;
+}
+
 export default function App() {
   const [authTick, setAuthTick] = useState(0);
 
@@ -137,6 +152,7 @@ export default function App() {
 
   return (
     <AppRouter basename={resolveAppBasename()}>
+      <TrailingSlashDuzenle />
       <ErrorBoundary>
         <>
           <TitleUpdater />
