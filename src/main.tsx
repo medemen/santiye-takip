@@ -7,6 +7,16 @@ import { getTemaSecim, temaSeciminiUygula } from './stores/themeStore'
 getTemaSecim()
 temaSeciminiUygula()
 
+// Alt dizin yayinlarinda (GitHub Pages) gecici trailing-slash'siz URL'lerde
+// goreli ikon/manifest yollari site kokune cozulur; bu yuzden link'ler
+// ilk yuklemede mutlak URL'e cevrilir.
+for (const el of Array.from(document.querySelectorAll('link[rel="manifest"], link[rel="icon"], link[rel="apple-touch-icon"]'))) {
+  const href = el.getAttribute('href')
+  if (href && !href.startsWith('http')) {
+    el.setAttribute('href', new URL(href, document.baseURI).href)
+  }
+}
+
 function hataGoster(msg: string) {
   const root = document.getElementById('root')
   if (!root || root.childElementCount > 0) return
@@ -23,7 +33,7 @@ window.addEventListener('unhandledrejection', (e) => hataGoster(String(e.reason)
 
 if (import.meta.env.PROD && 'serviceWorker' in navigator) {
   window.addEventListener('load', () => {
-    navigator.serviceWorker.register(import.meta.env.BASE_URL + 'sw.js').catch(() => {
+    navigator.serviceWorker.register(new URL('sw.js', document.baseURI).href).catch(() => {
       /* SW kaydi basarisiz olursa uygulama normal sekilde devam eder */
     });
   });
