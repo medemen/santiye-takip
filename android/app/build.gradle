@@ -1,5 +1,16 @@
 apply plugin: 'com.android.application'
 
+// Imzalama bilgileri burada duz metin tutulmaz: once SANTIYE_KEYSTORE_*
+// ortam degiskenlerine, yoksa (gitignore'li) keystore.properties dosyasina
+// bakilir; ikisi de yoksa build "clearTextKeystore" uyarisiyla duser.
+def keystoreProps = new Properties()
+def keystorePropsFile = rootProject.file('keystore.properties')
+if (keystorePropsFile.exists()) {
+    keystorePropsFile.withInputStream { keystoreProps.load(it) }
+}
+def keystorePass = System.getenv('SANTIYE_KEYSTORE_PASS') ?: keystoreProps['KEYSTORE_PASSWORD']
+def keystoreAlias = System.getenv('SANTIYE_KEYSTORE_ALIAS') ?: keystoreProps['KEY_ALIAS']
+
 // versionCode/versionName artik version.properties'ten okunur ve her
 // apk/aab uretiminde (assemble*/bundle* gorevleri) otomatik artirilir.
 def versionPropsFile = file('version.properties')
@@ -18,6 +29,10 @@ def requestedTasks = gradle.startParameter.taskNames.join(' ').toLowerCase()
 def isPackagingBuild = requestedTasks.contains('assemble') || requestedTasks.contains('bundle')
 
 if (isPackagingBuild) {
+    if (keystorePass == null || keystoreAlias == null) {
+        logger.error('Imzalama bilgisi bulunamadi: SANTIYE_KEYSTORE_PASS/ALIAS ortam degiskeni veya android/keystore.properties dosyasini tanimlayin.')
+        throw new GradleException('Release imzalama bilgisi eksik (env veya keystore.properties)')
+    }
     appVersionCode += 1
     def parts = appVersionName.split('\\.')
     parts[-1] = (parts[-1].toInteger() + 1).toString()
@@ -50,9 +65,9 @@ android {
     signingConfigs {
         release {
             storeFile file('release-keystore.jks')
-            storePassword 'santiyetakip'
-            keyAlias 'santiye_takip'
-            keyPassword 'santiyetakip'
+            storePassword keystorePass
+            keyAlias keystoreAlias
+            keyPassword keystorePass
         }
     }
     buildTypes {
