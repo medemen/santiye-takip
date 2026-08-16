@@ -207,7 +207,7 @@ export default function Dashboard() {
     const sinir = Date.now() - 7 * 24 * 60 * 60 * 1000;
     const sayilar = new Map<string, number>();
     for (const r of raporlar) {
-      if (new Date(r.olusturma_tarihi).getTime() < sinir) continue;
+      if (!r.raporlayan || new Date(r.olusturma_tarihi).getTime() < sinir) continue;
       sayilar.set(r.raporlayan, (sayilar.get(r.raporlayan) ?? 0) + 1);
     }
     return Array.from(sayilar.entries())

@@ -169,7 +169,7 @@ export function getKullaniciAdaAtamasi(ad_soyad: string): string | null {
 }
 
 export async function supabaseAtamalariYukle(): Promise<void> {
-  if (!isSupabaseReady()) return;
+  if (!isSupabaseReady() || !supabaseOturumAktif()) return;
   try {
     const { data: adaRows, error: adaError } = await getSupabase()
       .from('kullanici_ada_atamalari')

@@ -18,7 +18,7 @@ export default function PersonelAktiviteKart({ kisiler }: Props) {
       <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
         {kisiler.map((p, i) => (
           <div
-            key={p.ad_soyad}
+            key={`${p.ad_soyad}-${i}`}
             style={{
               display: 'flex',
               justifyContent: 'space-between',
