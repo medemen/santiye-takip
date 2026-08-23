@@ -79,7 +79,9 @@ for (const ada of cfg.yapi.adalar) {
 // --- isKalemleri ---
 const grupIdleri = new Set();
 const tumKalemler = new Map();
-for (const g of cfg.isKalemleri?.gruplar ?? []) {
+const gruplar = cfg.isKalemleri?.gruplar ?? [];
+if (gruplar.length === 0) hata('isKalemleri.gruplar bos olmamali (en az bir grup gerekli)');
+for (const g of gruplar) {
   if (!str(g.id)) hata('isKalemleri: grup id eksik');
   else if (grupIdleri.has(g.id)) hata('isKalemleri: tekrar eden grup id "' + g.id + '"');
   else grupIdleri.add(g.id);

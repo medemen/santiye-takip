@@ -114,6 +114,12 @@ export function configValidate(cfg: SantiyeConfig): string[] {
     }
   });
 
+  if (!cfg.isKalemleri.gruplar.length) {
+    // Grup listesi bosken tum uygulama 0 is kalemiyle hesap yapar
+    // (Dashboard matrisinde NaN, ilerleme 0/0); kokten engelle.
+    hata.push('En az bir imalat grubu tanımlanmalı.');
+  }
+
   const kalemler = cfg.isKalemleri.gruplar.flatMap((g) =>
     g.kalemler.map((k) => k.trim()).filter(Boolean)
   );

@@ -427,6 +427,8 @@ begin
   -- Rapor sahipligi ad_soyad uzerinden kuruldugundan ayni isimli ikinci
   -- kullanici, digerinin raporlarini 'kendi adina' yazabilir. Ad soyad
   -- benzersizligi hem burada hem asagidaki unique index ile garanti edilir.
+  v_user_id := gen_random_uuid();
+
   if exists (
     select 1 from public.kullanicilar
     where lower(btrim(ad_soyad)) = lower(btrim(p_ad_soyad))
@@ -434,8 +436,6 @@ begin
   ) then
     raise exception 'Bu ad soyad zaten kayıtlı: %', p_ad_soyad;
   end if;
-
-  v_user_id := gen_random_uuid();
 
   insert into auth.users (
     instance_id, id, aud, role, email, encrypted_password,

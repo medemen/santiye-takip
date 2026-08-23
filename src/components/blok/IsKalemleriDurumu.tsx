@@ -193,8 +193,9 @@ export default function IsKalemleriDurumu({ ada, blokNum, gruplar, kalemIlerleme
                                       setDuzenlenenKalem(isKalemi);
                                     }}
                                     style={{
-                                      fontSize: 11,
-                                      padding: '2px 8px',
+                                      fontSize: 13,
+                                      padding: '6px 10px',
+                                      lineHeight: 1,
                                       borderRadius: 8,
                                       border: '1px solid #e5e7eb',
                                       backgroundColor: 'var(--bg-card)',

@@ -1,6 +1,7 @@
 import type { Rapor } from '../types';
 import { DURUM_LABELLARI } from '../config/defaultConfig';
 import { hedefKalanGun } from '../data/plan';
+import { raporEtkinYuzde } from '../stores/reportStore';
 
 export interface HedefExportKaynak {
   ada: string;
@@ -26,7 +27,8 @@ function hedefSatiri(
     'Hedef Tarih': h.hedef_tarih,
     'Kalan Gün': kalanGun,
     'Durum': durum,
-    'İlerleme (%)': rapor ? `${rapor.ilerleme_yuzde}%` : '',
+    // Sayisal yaz: "75%" metni Excel'de filtre/formul engeller
+    'İlerleme (%)': rapor ? raporEtkinYuzde(rapor) : '',
     'Son Rapor Durumu': rapor ? DURUM_LABELLARI[rapor.durum] || rapor.durum : 'Rapor Yok',
   };
 }
@@ -92,7 +94,7 @@ function adaOzetleri(raporlar: Rapor[]): RaporOzetSatiri[] {
     else if (r.durum === 'devam_ediyor') mevcut['Devam Ediyor']++;
     else if (r.durum === 'planlandi') mevcut.Planlandı++;
     else if (r.durum === 'gecikme') mevcut.Gecikme++;
-    mevcut['Ortalama İlerleme (%)'] += r.durum === 'tamamlandi' ? 100 : r.ilerleme_yuzde;
+    mevcut['Ortalama İlerleme (%)'] += raporEtkinYuzde(r);
     harita.set(r.ada, mevcut);
   }
   for (const satir of harita.values()) {
@@ -116,7 +118,7 @@ export async function raporlarXlsxExport(
       'Blok': r.blok_no === 0 ? 'Ada Geneli' : r.blok_no,
       'İş Kalemi': r.is_kalemi,
       'Durum': DURUM_LABELLARI[r.durum] || r.durum,
-      'İlerleme (%)': `${r.ilerleme_yuzde}%`,
+      'İlerleme (%)': r.ilerleme_yuzde,
       'Tarih': r.tarih,
       'Raporlayan': r.raporlayan,
       'Açıklama': r.aciklama || '-',

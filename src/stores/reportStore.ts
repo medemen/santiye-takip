@@ -283,7 +283,7 @@ export function saveRaporlar(
   if (supabaseOturumAktif()) {
     getSupabase()
       .from('raporlar')
-      .insert(yeniler.map(raporToSupabase))
+      .insert(yeniler.map((r) => raporToSupabase(r)))
       .then(({ error }) => {
         if (error) {
           console.warn('Supabase toplu rapor kaydetme hatası:', error.message);
@@ -389,9 +389,7 @@ export function getBlokGenelIlerleme(
   if (values.length === 0) return 0;
   const toplam = values.reduce((sum, r) => {
     if (!r) return sum;
-    if (r.durum === 'tamamlandi') return sum + 100;
-    if (r.durum === 'planlandi') return sum;
-    return sum + r.ilerleme_yuzde;
+    return sum + raporEtkinYuzde(r);
   }, 0);
   return Math.round(toplam / values.length);
 }

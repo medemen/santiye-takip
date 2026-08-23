@@ -295,8 +295,9 @@ export default function ReportList() {
                       background: 'var(--bg-danger)',
                       border: 'none',
                       borderRadius: 6,
-                      padding: '2px 6px',
-                      fontSize: 12,
+                      padding: '6px 10px',
+                      fontSize: 13,
+                      lineHeight: 1,
                       cursor: 'pointer',
                       color: '#ef4444',
                     }}

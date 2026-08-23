@@ -363,7 +363,7 @@ export default function Hakedis() {
                           {seciliAda !== 'TÜMÜ' && (
                             <button
                               onClick={() => kaydet(kalem)}
-                              style={{ fontSize: 11, padding: '5px 10px', borderRadius: 8, border: 'none', backgroundColor: '#f59e0b', color: '#fff', fontWeight: 600, cursor: 'pointer' }}
+                              style={{ fontSize: 12, padding: '8px 14px', borderRadius: 8, border: 'none', backgroundColor: '#f59e0b', color: '#fff', fontWeight: 600, cursor: 'pointer' }}
                             >
                               Kaydet
                             </button>
@@ -468,7 +468,7 @@ export default function Hakedis() {
                             <option value="gecikme">Gecikme</option>
                           </select>
                           {seciliAda !== 'TÜMÜ' && (
-                            <button onClick={() => kaydet(kalem)} style={{ fontSize: 11, padding: '5px 10px', borderRadius: 8, border: 'none', backgroundColor: '#f59e0b', color: '#fff', fontWeight: 600, cursor: 'pointer' }}>
+                            <button onClick={() => kaydet(kalem)} style={{ fontSize: 12, padding: '8px 14px', borderRadius: 8, border: 'none', backgroundColor: '#f59e0b', color: '#fff', fontWeight: 600, cursor: 'pointer' }}>
                               Kaydet
                             </button>
                           )}

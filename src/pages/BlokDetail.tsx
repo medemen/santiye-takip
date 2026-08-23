@@ -9,7 +9,7 @@ import { useSiteConfig } from '../hooks/useSiteConfig';
 import { useHedefler } from '../hooks/useHedefler';
 import { useRaporlar } from '../hooks/useRaporlar';
 import { getBlok, getAllKalemler, getGrupByKalem } from '../config/helpers';
-import { getBlokProgress } from '../stores/reportStore';
+import { getBlokGenelIlerleme, getBlokProgress } from '../stores/reportStore';
 import { getSantiyeSefi } from '../stores/kullanicilarStore';
 import { hedefDuzetmeYetkisiVarMi } from '../stores/hedefStore';
 
@@ -25,16 +25,8 @@ export default function BlokDetail() {
   const isKalemleri = getAllKalemler(config);
 
   const progress = getBlokProgress(ada!, blokNum, isKalemleri);
-  const genelIlerleme = (() => {
-    const values = Object.values(progress);
-    if (values.length === 0) return 0;
-    const toplam = values.reduce((sum, r) => {
-      if (!r) return sum;
-      if (r.durum === 'tamamlandi') return sum + 100;
-      return sum + r.ilerleme_yuzde;
-    }, 0);
-    return Math.round(toplam / values.length);
-  })();
+  // reportStore'daki merkezi hesapla ayni (kopya mantik degil)
+  const genelIlerleme = getBlokGenelIlerleme(ada!, blokNum, isKalemleri);
   const santiyeSefi = getSantiyeSefi(ada!);
   const blokRaporlar = useMemo(
     () => raporlar

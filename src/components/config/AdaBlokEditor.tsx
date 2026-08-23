@@ -2,6 +2,7 @@ import { useState } from 'react';
 import type { AdaBlok, BlokYapisi } from '../../config/types';
 import { adaBloklariniYenidenUret, adaTamamla, bosBlok } from '../../config/editor';
 import { onayla } from '../../utils/dialog';
+import { toastGoster } from '../../stores/toastStore';
 
 interface Props {
   adalar: AdaBlok[];
@@ -43,7 +44,8 @@ export default function AdaBlokEditor({ adalar, onChange }: Props) {
     const ad = yeniAdaAdi.trim();
     if (!ad) return;
     if (adalar.some((a) => a.ada === ad)) {
-      alert(`'${ad}' adı zaten var.`);
+      // alert() native WebView'de desteklenmez; toast kullan
+      toastGoster(`'${ad}' adı zaten var.`, 'error');
       return;
     }
     const n = Math.max(1, Math.floor(yeniBlokSayisi) || 1);
@@ -237,7 +239,12 @@ export default function AdaBlokEditor({ adalar, onChange }: Props) {
                       />
                     </div>
                     <button
-                      onClick={() => adaGuncelle(adaIdx, (x) => adaBloklariniYenidenUret(x))}
+                      onClick={async () => {
+                        // Yikici islem: tum blok detaylari (tip/daire/kat) ilk
+                        // blokla ezilir; onaysiz geri alinamaz kayip yaratir.
+                        if (!(await onayla(`'${a.ada}' adasindaki tum bloklar ilk blokun degerleriyle yeniden uretilecek. Mevcut blok detaylari silinecek. Devam edilsin mi?`))) return;
+                        adaGuncelle(adaIdx, (x) => adaBloklariniYenidenUret(x));
+                      }}
                       style={{
                         padding: '8px 12px',
                         backgroundColor: '#f3f4f6',

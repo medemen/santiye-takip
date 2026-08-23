@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { getIstatistikler, getAdaGenelIlerleme, getBlokProgress, getGrupAgirlikliAdaIlerleme, getProjeAgirlikliIlerleme } from '../stores/reportStore';
+import { getIstatistikler, getAdaGenelIlerleme, getBlokProgress, getGrupAgirlikliAdaIlerleme, getProjeAgirlikliIlerleme, raporEtkinYuzde } from '../stores/reportStore';
 import { useHedefler } from '../hooks/useHedefler';
 import { useRaporlar } from '../hooks/useRaporlar';
 import { getHedefOzeti, hedefKalanGun } from '../data/plan';
@@ -126,7 +126,7 @@ export default function Dashboard() {
         let sum = 0;
         for (const ik of isKalemleri) {
           const r = progress[ik];
-          const val = r ? r.ilerleme_yuzde : 0;
+          const val = raporEtkinYuzde(r);
           sum += val;
           if (r) {
             raporluHuc++;

@@ -123,8 +123,9 @@ const kucukButon = {
   background: 'none',
   border: '1px solid #e5e7eb',
   borderRadius: 6,
-  padding: '2px 8px',
-  fontSize: 11,
+  padding: '7px 12px',
+  fontSize: 12,
+  lineHeight: 1,
   color: 'var(--text-faint)',
   cursor: 'pointer',
 } as const;
