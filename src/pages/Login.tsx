@@ -4,12 +4,16 @@ import { getKullanicilar } from '../stores/kullanicilarStore';
 import { girisYap } from '../stores/authStore';
 import { toastGoster } from '../stores/toastStore';
 import { useSiteConfig } from '../hooks/useSiteConfig';
+import { isSupabaseReady } from '../lib/supabase';
 
 export default function Login() {
   const navigate = useNavigate();
   const config = useSiteConfig();
   const [selected, setSelected] = useState('');
+  const [sifre, setSifre] = useState('');
+  const [hata, setHata] = useState('');
   const [yukleniyor, setYukleniyor] = useState(false);
+  const supabaseAktif = isSupabaseReady();
 
   const tumKullanicilar = getKullanicilar().map((k) => ({
     ad_soyad: k.ad_soyad,
@@ -29,11 +33,13 @@ export default function Login() {
     const kisi = tumKullanicilar.find((p) => p.ad_soyad === selected);
     if (!kisi) return;
     setYukleniyor(true);
+    setHata('');
     try {
-      await girisYap(kisi.ad_soyad, kisi.rol);
+      await girisYap(kisi.ad_soyad, kisi.rol, sifre);
       navigate('/');
     } catch (err) {
       const mesaj = err instanceof Error ? err.message : 'Giriş yapılamadı';
+      setHata(mesaj);
       toastGoster(mesaj, 'error');
     } finally {
       setYukleniyor(false);
@@ -59,7 +65,8 @@ export default function Login() {
         </p>
       </div>
 
-      <div
+      <form
+        onSubmit={(e) => { e.preventDefault(); void handleGiris(); }}
         style={{
           backgroundColor: 'var(--bg-card)',
           borderRadius: 16,
@@ -68,13 +75,15 @@ export default function Login() {
           border: '1px solid #f0f0f0',
         }}
       >
-        <label style={{ display: 'block', fontSize: 13, fontWeight: 500, color: 'var(--text-muted)', marginBottom: 8 }}>
+        <label htmlFor="login-kullanici" style={{ display: 'block', fontSize: 13, fontWeight: 500, color: 'var(--text-muted)', marginBottom: 8 }}>
           Kullanıcı Adı
         </label>
         <select
+          id="login-kullanici"
           value={selected}
           onChange={(e) => setSelected(e.target.value)}
           disabled={yukleniyor}
+          autoComplete="off"
           style={{
             width: '100%', padding: '12px 14px', borderRadius: 12,
             border: '2px solid #e5e7eb', fontSize: 14, backgroundColor: 'var(--bg-card)',
@@ -98,20 +107,55 @@ export default function Login() {
           </optgroup>
         </select>
 
+        {supabaseAktif && (
+          <>
+            <label htmlFor="login-sifre" style={{ display: 'block', fontSize: 13, fontWeight: 500, color: 'var(--text-muted)', marginBottom: 8 }}>
+              Şifre
+            </label>
+            <input
+              id="login-sifre"
+              type="password"
+              value={sifre}
+              onChange={(e) => setSifre(e.target.value)}
+              disabled={yukleniyor}
+              autoComplete="current-password"
+              placeholder="Şifrenizi girin"
+              style={{
+                width: '100%', padding: '12px 14px', borderRadius: 12,
+                border: '2px solid #e5e7eb', fontSize: 14, backgroundColor: 'var(--bg-card)',
+                boxSizing: 'border-box', marginBottom: 16,
+                color: 'var(--text-primary)',
+              }}
+            />
+          </>
+        )}
+
+        {!supabaseAktif && (
+          <p style={{ fontSize: 12, color: 'var(--text-faint)', margin: '0 0 16px' }}>
+            Sunucu bağlantısı yok — çevrimdışı modda yerel verilerle giriş yapılır.
+          </p>
+        )}
+
+        {hata && (
+          <p role="alert" style={{ fontSize: 13, color: '#dc2626', margin: '0 0 12px', fontWeight: 500 }}>
+            {hata}
+          </p>
+        )}
+
         <button
-          onClick={handleGiris}
-          disabled={!selected || yukleniyor}
+          type="submit"
+          disabled={!selected || yukleniyor || (supabaseAktif && !sifre)}
           style={{
             width: '100%', padding: '14px',
-            backgroundColor: selected && !yukleniyor ? '#f59e0b' : 'var(--border)',
+            backgroundColor: selected && !yukleniyor && (!supabaseAktif || sifre) ? '#f59e0b' : 'var(--border)',
             border: 'none', borderRadius: 12, fontSize: 15, fontWeight: 700,
-            color: selected && !yukleniyor ? '#fff' : 'var(--text-subtle)',
-            cursor: selected && !yukleniyor ? 'pointer' : 'not-allowed',
+            color: selected && !yukleniyor && (!supabaseAktif || sifre) ? '#fff' : 'var(--text-subtle)',
+            cursor: selected && !yukleniyor && (!supabaseAktif || sifre) ? 'pointer' : 'not-allowed',
           }}
         >
           {yukleniyor ? 'Giriş yapılıyor…' : 'Giriş Yap'}
         </button>
-      </div>
+      </form>
     </div>
   );
 }

@@ -94,12 +94,17 @@ export default function HedefTakvim() {
           </button>
           <button
             onClick={async () => {
-              await hedeflerXlsxExport(
-                gorunenHedefler,
-                (a, b, ik) => gorunenHedefler.find((h) => h.ada === a && h.blok_no === b && h.is_kalemi === ik)?.rapor ?? null,
-                'hedef-takvimi.xlsx'
-              );
-              toastGoster(`${gorunenHedefler.length} hedef Excel olarak indiriliyor`, 'success');
+              try {
+                await hedeflerXlsxExport(
+                  gorunenHedefler,
+                  (a, b, ik) => gorunenHedefler.find((h) => h.ada === a && h.blok_no === b && h.is_kalemi === ik)?.rapor ?? null,
+                  'hedef-takvimi.xlsx'
+                );
+                toastGoster(`${gorunenHedefler.length} hedef Excel olarak indiriliyor`, 'success');
+              } catch (err) {
+                console.error('Excel aktarma hatası:', err);
+                toastGoster('Excel dosyası oluşturulamadı', 'error');
+              }
             }}
             style={{ background: 'none', border: '1px solid #e5e7eb', borderRadius: 8, padding: '4px 10px', fontSize: 12, color: 'var(--text-faint)', cursor: 'pointer' }}
             title="Excel Aktar"
@@ -108,9 +113,13 @@ export default function HedefTakvim() {
           </button>
           <button
             onClick={async () => {
-              if (pdfRef.current) {
+              if (!pdfRef.current) return;
+              try {
                 await elementPdfExport(pdfRef.current, `hedef-takvimi_${AY_ADLARI[gorunenAy.getMonth()]}_${gorunenAy.getFullYear()}.pdf`);
                 toastGoster('Hedef takvimi PDF olarak indiriliyor', 'success');
+              } catch (err) {
+                console.error('PDF aktarma hatası:', err);
+                toastGoster('PDF dosyası oluşturulamadı', 'error');
               }
             }}
             style={{ background: 'none', border: '1px solid #e5e7eb', borderRadius: 8, padding: '4px 10px', fontSize: 12, color: 'var(--text-faint)', cursor: 'pointer' }}

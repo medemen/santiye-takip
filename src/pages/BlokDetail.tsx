@@ -17,10 +17,11 @@ export default function BlokDetail() {
   const { ada, blokNo } = useParams<{ ada: string; blokNo: string }>();
   const navigate = useNavigate();
   const config = useSiteConfig();
-  const blokNum = parseInt(blokNo || '0');
+  const blokNumRaw = Number.parseInt(blokNo ?? '', 10);
+  const blokNum = Number.isFinite(blokNumRaw) && blokNumRaw >= 0 ? blokNumRaw : NaN;
   const raporlar = useRaporlar();
 
-  const blok = getBlok(config, ada!, blokNum);
+  const blok = Number.isNaN(blokNum) ? undefined : getBlok(config, ada!, blokNum);
   const isKalemleri = getAllKalemler(config);
 
   const progress = getBlokProgress(ada!, blokNum, isKalemleri);

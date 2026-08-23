@@ -97,7 +97,15 @@ export default function ReportList() {
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
         <h1 style={{ fontSize: 20, fontWeight: 700, color: 'var(--text-primary)', margin: 0 }}>Raporlar</h1>
         <button
-          onClick={async () => { await raporlarXlsxExport(filtered, 'raporlar.xlsx', getHedef); toastGoster(`${filtered.length} rapor Excel olarak indiriliyor`, 'success'); }}
+          onClick={async () => {
+            try {
+              await raporlarXlsxExport(filtered, 'raporlar.xlsx', getHedef);
+              toastGoster(`${filtered.length} rapor Excel olarak indiriliyor`, 'success');
+            } catch (err) {
+              console.error('Excel aktarma hatası:', err);
+              toastGoster('Excel dosyası oluşturulamadı', 'error');
+            }
+          }}
           style={{
             background: 'none', border: '1px solid #e5e7eb', borderRadius: 8,
             padding: '4px 10px', fontSize: 11, color: 'var(--text-faint)', cursor: 'pointer',

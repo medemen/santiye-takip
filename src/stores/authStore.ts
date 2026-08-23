@@ -28,8 +28,6 @@ export function epostaOlustur(ad_soyad: string): string {
   return `${slug}@${domain}`;
 }
 
-const varsayilanSifre = (): string => import.meta.env.VITE_DEFAULT_PASSWORD || 'Santiye2026';
-
 type AuthListener = () => void;
 const _authListeners = new Set<AuthListener>();
 
@@ -74,12 +72,17 @@ function oturumuKaydet(oturum: Oturum): void {
   notifyAuthListeners();
 }
 
-export async function girisYap(ad_soyad: string, rol: string): Promise<Oturum> {
+export async function girisYap(ad_soyad: string, rol: string, sifre: string): Promise<Oturum> {
   // Gerçek oturum: Supabase Auth ile signInWithPassword.
+  // Supabase yapılandırılmışsa şifre ZORUNLUDUR; hata durumunda sessiz statik
+  // oturuma düşmek kimlik doğrulamayı tamamen atlatılabilir kılar (güvenlik açığı).
   if (isSupabaseReady()) {
+    if (!sifre) {
+      throw new Error('Şifre gerekli');
+    }
     const { data, error } = await getSupabase().auth.signInWithPassword({
       email: epostaOlustur(ad_soyad),
-      password: varsayilanSifre(),
+      password: sifre,
     });
     if (!error && data.user) {
       const { data: profil } = await getSupabase()
@@ -102,10 +105,14 @@ export async function girisYap(ad_soyad: string, rol: string): Promise<Oturum> {
       oturumuKaydet(oturum);
       return oturum;
     }
-    // Ağ hatası veya kullanıcı bulunamadı: offline fallback (statik veri).
-    console.warn('Supabase girişi başarısız, statik oturuma düşülüyor.', error?.message);
+    // Kullanıcı var ama şifre yanlış / kullanıcı yok / ağ hatası ayrıştırılmaz:
+    // tek tip mesaj kullanıcı varlığını sızdırmasın.
+    console.warn('Supabase girişi başarısız.', error?.message);
+    throw new Error('Kullanıcı adı veya şifre hatalı');
   }
 
+  // Supabase hiç yapılandırılmamışsa (tam offline mod) yerel oturum açılır;
+  // bu modda sunucu verisi olmadığından yazma işlemleri zaten engellidir.
   const oturum = statikOturum(ad_soyad, rol);
   oturumuKaydet(oturum);
   return oturum;
@@ -154,6 +161,8 @@ export function isSahaPersoneli(rol: string): boolean {
   return getSiteConfig().roller.sahaPersoneliRolleri.includes(rol);
 }
 
+let _authStateListenerBagli = false;
+
 export async function supabaseAuthInit(): Promise<void> {
   if (!isSupabaseReady()) return;
   const { data: { session } } = await getSupabase().auth.getSession();
@@ -177,6 +186,9 @@ export async function supabaseAuthInit(): Promise<void> {
     }
   }
 
+  // StrictMode cift mount'ta iki kez kayit yapilmasin
+  if (_authStateListenerBagli) return;
+  _authStateListenerBagli = true;
   getSupabase().auth.onAuthStateChange(async (event, session) => {
     if (event === 'SIGNED_IN' && session?.user) {
       const { data: profil } = await getSupabase()

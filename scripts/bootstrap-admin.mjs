@@ -91,10 +91,13 @@ const mevcut = mevcutListe.users.find((u) => u.email?.toLowerCase() === eposta);
 
 let userId;
 if (mevcut) {
-  const { data, error } = await sb.auth.admin.updateUserById(mevcut.id, {
-    password: DEFAULT_PASSWORD,
-    user_metadata: meta,
-  });
+  // Var olan kullanicinin sifresi her kosumda sifirlanmaz; kullanici
+  // sifresini degistirmis olabilir. Zorla sifirlamak icin SEED_RESET_PASSWORD=1.
+  const guncelleme = { user_metadata: meta };
+  if (process.env.SEED_RESET_PASSWORD === '1') {
+    guncelleme.password = DEFAULT_PASSWORD;
+  }
+  const { data, error } = await sb.auth.admin.updateUserById(mevcut.id, guncelleme);
   if (error) throw error;
   userId = data.user.id;
   console.log(`Auth kullanicisi guncellendi: ${eposta}`);
@@ -124,5 +127,8 @@ const { error } = await sb.from('kullanicilar').upsert(
 );
 if (error) throw error;
 
-console.log(`OK: admin hazir -> ${eposta} / ${DEFAULT_PASSWORD}`);
+console.log(`OK: admin hazir -> ${eposta}`);
+if (process.env.SEED_RESET_PASSWORD === '1') {
+  console.log(`Sifirlandi -> ${DEFAULT_PASSWORD}`);
+}
 console.log(`Rol: ${meta.rol}, yetkili adalar: ${tumAdalar.length > 0 ? tumAdalar.join(', ') : '(hepsi)'}`);

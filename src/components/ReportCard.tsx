@@ -3,6 +3,7 @@ import type { Rapor } from '../types';
 import StatusBadge from './StatusBadge';
 import { formatDateTime } from '../utils/helpers';
 import { raporPdfExport } from '../utils/exportPdf';
+import { toastGoster } from '../stores/toastStore';
 
 interface Props {
   rapor: Rapor;
@@ -47,7 +48,14 @@ const ReportCard = memo(function ReportCard({ rapor, onClick, showActions }: Pro
         <div style={{ display: 'flex', gap: 4, alignItems: 'center' }}>
           {showActions && (
             <button
-              onClick={(e) => { e.stopPropagation(); if (cardRef.current) raporPdfExport(rapor, cardRef.current); }}
+              onClick={(e) => {
+                e.stopPropagation();
+                if (!cardRef.current) return;
+                Promise.resolve(raporPdfExport(rapor, cardRef.current)).catch((err) => {
+                  console.error('PDF aktarma hatası:', err);
+                  toastGoster('PDF dosyası oluşturulamadı', 'error');
+                });
+              }}
               style={{
                 background: 'none', border: '1px solid #e5e7eb', borderRadius: 6,
                 padding: '1px 6px', fontSize: 11, color: 'var(--text-faint)', cursor: 'pointer',

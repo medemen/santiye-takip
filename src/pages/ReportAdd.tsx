@@ -78,6 +78,7 @@ export default function ReportAdd() {
   const [ilerleme, setIlerleme] = useState(50);
   const [aciklama, setAciklama] = useState('');
   const [tarih, setTarih] = useState(todayISO());
+  const [kaydediliyor, setKaydediliyor] = useState(false);
 
   useEffect(() => {
     if (editId) {
@@ -241,11 +242,17 @@ export default function ReportAdd() {
       ada,
       is_kalemi: isKalemi,
       durum,
-      ilerleme_yuzde: durum === 'tamamlandi' ? 100 : ilerleme,
+      // 'planlandi' henuz baslanmamis is: hesaplamalar da 0 kabul ediyor,
+      // kayitli deger tutarli olsun diye burada da 0 yazilir.
+      ilerleme_yuzde: durum === 'tamamlandi' ? 100 : durum === 'planlandi' ? 0 : ilerleme,
       aciklama,
     };
     if (editMode && editId) {
-      updateRapor(editId, { ...veri, blok_no: blokNo });
+      const basarili = updateRapor(editId, { ...veri, blok_no: blokNo });
+      if (!basarili) {
+        toastGoster('Rapor güncellenemedi — bulunamadı veya yetkiniz yok', 'error');
+        return null;
+      }
       toastGoster('Rapor güncellendi', 'success');
       return editId;
     }
@@ -265,23 +272,35 @@ export default function ReportAdd() {
   };
 
   const handleSubmit = () => {
-    const id = kaydetRapor();
-    if (!id) return;
-    navigate('/raporlar');
+    if (kaydediliyor) return;
+    setKaydediliyor(true);
+    try {
+      const id = kaydetRapor();
+      if (!id) return;
+      navigate('/raporlar');
+    } finally {
+      setKaydediliyor(false);
+    }
   };
 
   const handleKaydetVeYeni = () => {
-    const id = kaydetRapor();
-    if (!id) return;
-    sonKombinasyon.current = '';
-    setIsKalemi('');
-    setKalemArama('');
-    setSeciliBloklar([]);
-    setAdaGeneli(false);
-    setDurum('devam_ediyor');
-    setIlerleme(50);
-    setAciklama('');
-    setTarih(todayISO());
+    if (kaydediliyor) return;
+    setKaydediliyor(true);
+    try {
+      const id = kaydetRapor();
+      if (!id) return;
+      sonKombinasyon.current = '';
+      setIsKalemi('');
+      setKalemArama('');
+      setSeciliBloklar([]);
+      setAdaGeneli(false);
+      setDurum('devam_ediyor');
+      setIlerleme(50);
+      setAciklama('');
+      setTarih(todayISO());
+    } finally {
+      setKaydediliyor(false);
+    }
   };
 
   if (gosterilecekAdalar.length === 0) {
@@ -380,17 +399,17 @@ export default function ReportAdd() {
         {!editMode && (
           <button
             onClick={handleKaydetVeYeni}
-            disabled={!canSave}
+            disabled={!canSave || kaydediliyor}
             style={{
               flex: 1,
               padding: 12,
-              backgroundColor: canSave ? 'var(--bg-info)' : 'var(--bg-subtle)',
+              backgroundColor: canSave && !kaydediliyor ? 'var(--bg-info)' : 'var(--bg-subtle)',
               border: 'none',
               borderRadius: 12,
               fontSize: 14,
               fontWeight: 600,
-              color: canSave ? '#1e40af' : 'var(--text-subtle)',
-              cursor: canSave ? 'pointer' : 'not-allowed',
+              color: canSave && !kaydediliyor ? '#1e40af' : 'var(--text-subtle)',
+              cursor: canSave && !kaydediliyor ? 'pointer' : 'not-allowed',
             }}
           >
             Kaydet ve Yeni
@@ -398,20 +417,20 @@ export default function ReportAdd() {
         )}
         <button
           onClick={handleSubmit}
-          disabled={!canSave}
+          disabled={!canSave || kaydediliyor}
           style={{
             flex: 2,
             padding: 12,
-            backgroundColor: canSave ? '#f59e0b' : 'var(--border)',
+            backgroundColor: canSave && !kaydediliyor ? '#f59e0b' : 'var(--border)',
             border: 'none',
             borderRadius: 12,
             fontSize: 14,
             fontWeight: 700,
-            color: canSave ? '#fff' : 'var(--text-subtle)',
-            cursor: canSave ? 'pointer' : 'not-allowed',
+            color: canSave && !kaydediliyor ? '#fff' : 'var(--text-subtle)',
+            cursor: canSave && !kaydediliyor ? 'pointer' : 'not-allowed',
           }}
         >
-          {editMode ? 'Güncelle' : kaydetEtiketi}
+          {kaydediliyor ? 'Kaydediliyor…' : editMode ? 'Güncelle' : kaydetEtiketi}
         </button>
       </div>
     </div>

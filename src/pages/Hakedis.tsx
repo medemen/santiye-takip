@@ -46,6 +46,14 @@ export default function Hakedis() {
   const [acikGruplar, setAcikGruplar] = useState<Set<string>>(new Set());
   const [duzenleme, setDuzenleme] = useState<Record<string, { yuzde: number; durum: IsDurumu }>>({});
 
+  // Ada degisiminde acik gruplar ve duzenleme degerleri eski adaya ait
+  // kalmasin; aksi halde A adasinin slider degerleri B adasina kaydedilir.
+  function adaSec(ada: string) {
+    setSeciliAda(ada);
+    setAcikGruplar(new Set());
+    setDuzenleme({});
+  }
+
   const gruplar = useMemo(() => {
     if (!hk) return [];
     return Object.entries(hk.gruplar)
@@ -235,7 +243,7 @@ export default function Hakedis() {
 
         <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginBottom: 16 }}>
           <button
-            onClick={() => setSeciliAda('TÜMÜ')}
+            onClick={() => adaSec('TÜMÜ')}
             style={{
               padding: '8px 14px', borderRadius: 20, border: '1px solid #e5e7eb', cursor: 'pointer', fontSize: 13,
               fontWeight: 600, backgroundColor: seciliAda === 'TÜMÜ' ? 'var(--bg-accent)' : 'var(--bg-card)', color: seciliAda === 'TÜMÜ' ? 'var(--accent-dark)' : 'var(--text-muted)',
@@ -246,7 +254,7 @@ export default function Hakedis() {
           {adalar.map((a) => (
             <button
               key={a.ada}
-              onClick={() => setSeciliAda(a.ada)}
+              onClick={() => adaSec(a.ada)}
               style={{
                 padding: '8px 14px', borderRadius: 20, border: '1px solid #e5e7eb', cursor: 'pointer', fontSize: 13,
                 fontWeight: 600, backgroundColor: seciliAda === a.ada ? 'var(--bg-accent)' : 'var(--bg-card)', color: seciliAda === a.ada ? 'var(--accent-dark)' : 'var(--text-muted)',
@@ -397,11 +405,11 @@ export default function Hakedis() {
       </div>
 
       <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginBottom: 16 }}>
-        <button onClick={() => setSeciliAda('TÜMÜ')} style={{ padding: '8px 14px', borderRadius: 20, border: '1px solid #e5e7eb', cursor: 'pointer', fontSize: 13, fontWeight: 600, backgroundColor: seciliAda === 'TÜMÜ' ? 'var(--bg-accent)' : 'var(--bg-card)', color: seciliAda === 'TÜMÜ' ? 'var(--accent-dark)' : 'var(--text-muted)' }}>
+        <button onClick={() => adaSec('TÜMÜ')} style={{ padding: '8px 14px', borderRadius: 20, border: '1px solid #e5e7eb', cursor: 'pointer', fontSize: 13, fontWeight: 600, backgroundColor: seciliAda === 'TÜMÜ' ? 'var(--bg-accent)' : 'var(--bg-card)', color: seciliAda === 'TÜMÜ' ? 'var(--accent-dark)' : 'var(--text-muted)' }}>
           Tümü
         </button>
         {adalar.map((a) => (
-          <button key={a.ada} onClick={() => setSeciliAda(a.ada)} style={{ padding: '8px 14px', borderRadius: 20, border: '1px solid #e5e7eb', cursor: 'pointer', fontSize: 13, fontWeight: 600, backgroundColor: seciliAda === a.ada ? 'var(--bg-accent)' : 'var(--bg-card)', color: seciliAda === a.ada ? 'var(--accent-dark)' : 'var(--text-muted)' }}>
+          <button key={a.ada} onClick={() => adaSec(a.ada)} style={{ padding: '8px 14px', borderRadius: 20, border: '1px solid #e5e7eb', cursor: 'pointer', fontSize: 13, fontWeight: 600, backgroundColor: seciliAda === a.ada ? 'var(--bg-accent)' : 'var(--bg-card)', color: seciliAda === a.ada ? 'var(--accent-dark)' : 'var(--text-muted)' }}>
             {a.ada}
           </button>
         ))}

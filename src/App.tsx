@@ -34,6 +34,20 @@ function PageLoader() {
   );
 }
 
+function NotFound() {
+  return (
+    <div style={{ padding: 48, textAlign: 'center' }}>
+      <div style={{ fontSize: 40, marginBottom: 8 }}>🧭</div>
+      <h2 style={{ fontSize: 18, fontWeight: 700, color: 'var(--text-primary)', margin: '0 0 8px' }}>
+        Sayfa bulunamadı
+      </h2>
+      <p style={{ fontSize: 13, color: 'var(--text-muted)', margin: 0 }}>
+        Aradığınız sayfa mevcut değil veya taşınmış olabilir.
+      </p>
+    </div>
+  );
+}
+
 function TitleUpdater() {
   const config = useSyncExternalStore(subscribeSiteConfig, getSiteConfig);
   useEffect(() => {
@@ -179,6 +193,7 @@ export default function App() {
                         <Route path="/profil" element={<Profile />} />
                         <Route path="/istatistik" element={<Statistics />} />
                         <Route path="/hakedis" element={<Hakedis />} />
+                        <Route path="*" element={<NotFound />} />
                         <Route path="/ayarlar" element={<PmRoute><Settings /></PmRoute>} />
                         <Route path="/yeni-santiye" element={<PmRoute><NewSantiyeWizard /></PmRoute>} />
                       </Routes>

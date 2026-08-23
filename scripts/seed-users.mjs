@@ -95,10 +95,13 @@ async function ensureUser(kayit, mevcut) {
   };
   const varolan = mevcut.get(eposta);
   if (varolan) {
-    const { error } = await sb.auth.admin.updateUserById(varolan.id, {
-      password: DEFAULT_PASSWORD,
-      user_metadata: meta,
-    });
+    // Var olan kullanicilarin sifresi her kosumda sifirlanmaz; kullanici
+    // sifresini degistirmis olabilir. Zorla sifirlamak icin SEED_RESET_PASSWORD=1.
+    const guncelleme = { user_metadata: meta };
+    if (process.env.SEED_RESET_PASSWORD === '1') {
+      guncelleme.password = DEFAULT_PASSWORD;
+    }
+    const { error } = await sb.auth.admin.updateUserById(varolan.id, guncelleme);
     if (error) throw error;
     return { eposta, durum: 'guncellendi' };
   }

@@ -21,22 +21,23 @@ export default function AdaDetail() {
   useRaporlar();
 
   const hedefler = useHedefler();
-  const hedefOzeti = getHedefOzeti(
-    hedefler.filter((h) => h.ada === ada),
-    (a, b, ik) => getSonRapor(a, b, ik)
-  );
-
-  const adaData = getAda(config, ada!);
-  const bloklar = getBloklar(config, ada!);
-  const ilerleme = getAdaGenelIlerleme(ada!, bloklar, getAllKalemler(config));
   const blokNavigate = useCallback(
     (blokNo: number) => navigate(`/ada/${ada}/blok/${blokNo}`),
     [navigate, ada]
   );
 
+  const adaData = getAda(config, ada!);
   if (!adaData) {
     return <div style={{ padding: 40, textAlign: 'center', color: 'var(--text-subtle)' }}>Ada bulunamadı</div>;
   }
+
+  const hedefOzeti = getHedefOzeti(
+    hedefler.filter((h) => h.ada === ada),
+    (a, b, ik) => getSonRapor(a, b, ik)
+  );
+
+  const bloklar = getBloklar(config, ada!);
+  const ilerleme = getAdaGenelIlerleme(ada!, bloklar, getAllKalemler(config));
 
   const santiyeSefi = getSantiyeSefi(ada!);
   const sorumlular = getBlokSorumlulari(ada!);

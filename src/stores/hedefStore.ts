@@ -7,6 +7,15 @@ import { getCurrentUser, supabaseOturumAktif } from './authStore';
 
 const STORAGE_KEY = `${getSiteConfig().marka.localStoragePrefix}_hedefler`;
 
+// Fire-and-forget isteklerde reject yakalanmazsa hata sessizce kaybolur.
+function agHatasiYakala(islem: string): (err: unknown) => void {
+  return (err: unknown) => {
+    const mesaj = err instanceof Error ? err.message : String(err);
+    console.warn('Sunucu istegi basarisiz (' + islem + '):', mesaj);
+    toastGoster('Sunucuya ulaşılamadı — hedef cihazda saklandı', 'error');
+  };
+}
+
 type Listener = () => void;
 const _hedefListeners = new Set<Listener>();
 let _version = 0;
@@ -138,7 +147,7 @@ export function setHedef(
             console.warn('Supabase hedef silme hatası:', error.message);
             toastGoster('Hedef sunucudan silinemedi: ' + error.message, 'error');
           }
-        });
+        }, agHatasiYakala('hedef sil'));
     } else {
       getSupabase()
         .from('is_kalemi_hedefleri')
@@ -151,7 +160,7 @@ export function setHedef(
             console.warn('Supabase hedef kaydetme hatası:', error.message);
             toastGoster('Hedef sunucuya kaydedilemedi: ' + error.message, 'error');
           }
-        });
+        }, agHatasiYakala('hedef kaydet'));
     }
   }
   return true;

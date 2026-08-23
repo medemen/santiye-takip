@@ -121,6 +121,10 @@ async function girisYap(kullanici) {
   const secenek = mevcutSecenekler.find((s) => s.includes(kullanici));
   if (!secenek) throw new Error(`Login listesinde "${kullanici}" bulunamadi. Secenekler: ${mevcutSecenekler.join(', ')}`);
   await page.locator('select').first().selectOption({ label: secenek });
+  const sifreAlani = page.locator('input[type="password"]');
+  if (await sifreAlani.count() > 0) {
+    await sifreAlani.first().fill(process.env.VITE_DEFAULT_PASSWORD || 'Santiye2026');
+  }
   await page.getByRole('button', { name: 'Giriş Yap' }).click();
   await page.waitForURL(yolEsit('/'), { timeout: 30000 });
   await sayfadaBeklenen([SANTIYE_ADI]);
@@ -230,6 +234,10 @@ async function main() {
       const secenek = secenekler.find((s) => s.includes(USER));
       if (!secenek) throw new Error(`Desktop giris listesinde "${USER}" bulunamadi`);
       await dpage.locator('select').first().selectOption({ label: secenek });
+      const dsifre = dpage.locator('input[type="password"]');
+      if (await dsifre.count() > 0) {
+        await dsifre.first().fill(process.env.VITE_DEFAULT_PASSWORD || 'Santiye2026');
+      }
       await dpage.getByRole('button', { name: 'Giriş Yap' }).click();
       await dpage.waitForURL(yolEsit('/'), { timeout: 30000 });
       for (const metin of [SANTIYE_ADI, 'Rapor Kapsamı', 'Zaman Trendi', 'İş Kalemi Bazında İlerleme', 'Ada × Blok Matrisi', 'Yaklaşan Hedefler', 'Ada Detay', 'Son Raporlar']) {

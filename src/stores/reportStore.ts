@@ -118,7 +118,7 @@ export function getRaporlar(): Rapor[] {
   return _raporCache;
 }
 
-function raporToSupabase(r: Rapor) {
+function raporToSupabase(r: Rapor, includeUserId = true) {
   return {
     id: r.id,
     tarih: r.tarih,
@@ -130,8 +130,31 @@ function raporToSupabase(r: Rapor) {
     ilerleme_yuzde: r.ilerleme_yuzde,
     aciklama: r.aciklama || '',
     olusturma_tarihi: r.olusturma_tarihi,
-    user_id: getCurrentUser()?.user_id ?? null,
+    // Guncellemede gonderilmez: admin/PM baskasinin raporunu duzenlerken
+    // orijinal yazarin user_id audit izini ezmesin.
+    ...(includeUserId ? { user_id: getCurrentUser()?.user_id ?? null } : {}),
   };
+}
+
+// Fire-and-forget zincirlerde reject yakalanmazsa hata sessizce kaybolur;
+// veri yerelde gorunur ama sunucuya gitmemis olur.
+function agHatasiYakala(islem: string): (err: unknown) => void {
+  return (err: unknown) => {
+    const mesaj = err instanceof Error ? err.message : String(err);
+    console.warn('Sunucu istegi basarisiz (' + islem + '):', mesaj);
+    toastGoster('Sunucuya ulaşılamadı — değişiklik cihazda saklandı, bağlantı gelince gönderilecek', 'error');
+  };
+}
+
+function yeniRaporId(): string {
+  if (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function') {
+    return crypto.randomUUID();
+  }
+  return (
+    Date.now().toString(36) +
+    Math.random().toString(36).slice(2, 10) +
+    Math.random().toString(36).slice(2, 10)
+  );
 }
 
 let _raporChannel: RealtimeChannel | null = null;
@@ -197,12 +220,23 @@ export async function supabaseRaporlariYukle(): Promise<void> {
       if (!oturum || !supabaseOturumAktif()) return false;
       return oturum.admin || oturum.proje_muduru || r.raporlayan === oturum.ad_soyad;
     });
+    // Parça parça toplu upsert: uzun çevrimdışı dönemde birikmiş yüzlerce
+    // rapor için tek tek istek atmak dakikalar sürebilir. Bir parça tamamen
+    // başarısız olursa içindeki suçlu kaydı izole etmek için tek tek denenir.
     const basarisiz: Rapor[] = [];
-    for (const r of adaylar) {
-      const { error: upsertError } = await getSupabase()
+    const PARCA_BOYUTU = 50;
+    for (let i = 0; i < adaylar.length; i += PARCA_BOYUTU) {
+      const parca = adaylar.slice(i, i + PARCA_BOYUTU);
+      const { error: parcaError } = await getSupabase()
         .from('raporlar')
-        .upsert(raporToSupabase(r), { onConflict: 'id' });
-      if (upsertError) basarisiz.push(r);
+        .upsert(parca.map((r) => raporToSupabase(r)), { onConflict: 'id' });
+      if (!parcaError) continue;
+      for (const r of parca) {
+        const { error: upsertError } = await getSupabase()
+          .from('raporlar')
+          .upsert(raporToSupabase(r), { onConflict: 'id' });
+        if (upsertError) basarisiz.push(r);
+      }
     }
     if (basarisiz.length > 0) {
       const ilk = basarisiz[0];
@@ -222,7 +256,7 @@ export async function supabaseRaporlariYukle(): Promise<void> {
 export function saveRapor(rapor: Omit<Rapor, 'id' | 'olusturma_tarihi'>): Rapor {
   const yeni: Rapor = {
     ...rapor,
-    id: Date.now().toString(36) + Math.random().toString(36).slice(2, 8),
+    id: yeniRaporId(),
     olusturma_tarihi: new Date().toISOString(),
   };
   setRaporlar([...getRaporlar(), yeni]);
@@ -232,7 +266,7 @@ export function saveRapor(rapor: Omit<Rapor, 'id' | 'olusturma_tarihi'>): Rapor 
         console.warn('Supabase rapor kaydetme hatası:', error.message);
         toastGoster('Rapor sunucuya kaydedilemedi: ' + error.message, 'error');
       }
-    });
+    }, agHatasiYakala('rapor kaydet'));
   }
   return yeni;
 }
@@ -242,7 +276,7 @@ export function saveRaporlar(
 ): Rapor[] {
   const yeniler: Rapor[] = raporlar.map((r) => ({
     ...r,
-    id: Date.now().toString(36) + Math.random().toString(36).slice(2, 8),
+    id: yeniRaporId(),
     olusturma_tarihi: new Date().toISOString(),
   }));
   setRaporlar([...getRaporlar(), ...yeniler]);
@@ -255,7 +289,7 @@ export function saveRaporlar(
           console.warn('Supabase toplu rapor kaydetme hatası:', error.message);
           toastGoster('Raporlar sunucuya kaydedilemedi: ' + error.message, 'error');
         }
-      });
+      }, agHatasiYakala('toplu rapor kaydet'));
   }
   return yeniler;
 }
@@ -264,24 +298,37 @@ export function updateRapor(id: string, guncelleme: Partial<Omit<Rapor, 'id' | '
   const raporlar = getRaporlar();
   const idx = raporlar.findIndex((r) => r.id === id);
   if (idx === -1) return false;
+  // RLS ile ayni kural client tarafinda da uygulanir: yalnizca sahibi veya
+  // admin/PM guncelleyebilir. UI atlatilursa sunucu zaten reddeder.
+  if (!raporDuzenleyebilir(raporlar[idx])) {
+    toastGoster('Bu raporu düzenleme yetkiniz yok.', 'error');
+    return false;
+  }
   const guncel = { ...raporlar[idx], ...guncelleme };
   const yeniListe = [...raporlar];
   yeniListe[idx] = guncel;
   setRaporlar(yeniListe);
   if (supabaseOturumAktif()) {
-    getSupabase().from('raporlar').update(raporToSupabase(guncel)).eq('id', id).then(({ error }) => {
+    getSupabase().from('raporlar').update(raporToSupabase(guncel, false)).eq('id', id).then(({ error }) => {
       if (error) {
         console.warn('Supabase rapor güncelleme hatası:', error.message);
         toastGoster('Rapor sunucuya güncellenemedi: ' + error.message, 'error');
       }
-    });
+    }, agHatasiYakala('rapor guncelle'));
   }
   return true;
 }
 
 export function deleteRapor(id: string): boolean {
   const raporlar = getRaporlar();
-  if (!raporlar.find((r) => r.id === id)) return false;
+  const rapor = raporlar.find((r) => r.id === id);
+  if (!rapor) return false;
+  // DB politikasiyla uyumlu: silme yetkisi yalnizca sef/PM'dedir.
+  const oturum = getCurrentUser();
+  if (!oturum || !(oturum.admin || oturum.proje_muduru)) {
+    toastGoster('Rapor silme yetkiniz yok.', 'error');
+    return false;
+  }
   setRaporlar(raporlar.filter((r) => r.id !== id));
   if (supabaseOturumAktif()) {
     getSupabase().from('raporlar').delete().eq('id', id).then(({ error }) => {
@@ -289,9 +336,16 @@ export function deleteRapor(id: string): boolean {
         console.warn('Supabase rapor silme hatası:', error.message);
         toastGoster('Rapor sunucudan silinemedi: ' + error.message, 'error');
       }
-    });
+    }, agHatasiYakala('rapor sil'));
   }
   return true;
+}
+
+function raporDuzenleyebilir(rapor: Rapor): boolean {
+  const oturum = getCurrentUser();
+  if (!oturum) return false;
+  if (oturum.admin || oturum.proje_muduru) return true;
+  return rapor.raporlayan === oturum.ad_soyad;
 }
 
 export function getRaporById(id: string): Rapor | undefined {
@@ -336,15 +390,28 @@ export function getBlokGenelIlerleme(
   const toplam = values.reduce((sum, r) => {
     if (!r) return sum;
     if (r.durum === 'tamamlandi') return sum + 100;
+    if (r.durum === 'planlandi') return sum;
     return sum + r.ilerleme_yuzde;
   }, 0);
   return Math.round(toplam / values.length);
 }
 
+// Etkin ilerleme: ortalamalara katilan deger. 'tamamlandi' -> 100,
+// 'planlandi' -> 0 (eski kayitlardan kopyalanan yuzde ortalamayi
+// sisirmesin), diger -> kayitli yuzde. Tum ekran ve export'lar bu
+// fonksiyonu kullanmak zorunda; aksi halde ayni veri farkli gorunur.
+export function raporEtkinYuzde(r: Rapor | null | undefined): number {
+  if (!r) return 0;
+  if (r.durum === 'tamamlandi') return 100;
+  if (r.durum === 'planlandi') return 0;
+  return Number.isFinite(r.ilerleme_yuzde) ? r.ilerleme_yuzde : 0;
+}
+
 function raporYuzde(r: Rapor | null | undefined): number | null {
   if (!r) return null;
-  if (r.durum === 'tamamlandi') return 100;
-  return r.ilerleme_yuzde;
+  // 'planlandi' henuz baslamamis is demektir; eski kayitlardan kopyalanan
+  // ilerleme_yuzde degeri ortalamalari sisirmesin, 0 ile katilsin.
+  return raporEtkinYuzde(r);
 }
 
 export function getKalemAdaIlerleme(

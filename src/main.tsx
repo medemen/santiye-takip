@@ -20,12 +20,20 @@ for (const el of Array.from(document.querySelectorAll('link[rel="manifest"], lin
 function hataGoster(msg: string) {
   const root = document.getElementById('root')
   if (!root || root.childElementCount > 0) return
-  root.innerHTML =
-    '<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:80dvh;padding:40px;text-align:center;font-family:sans-serif">' +
-    '<div style="font-size:48px;margin-bottom:12px">⚠️</div>' +
-    '<h2 style="font-size:18px;font-weight:700;color:#1f2937;margin-bottom:8px">Bir hata oluştu</h2>' +
-    '<p style="font-size:13px;color:#6b7280;word-break:break-word">' + msg + '</p>' +
-    '</div>'
+  // innerHTML yerine DOM API: hata mesaji guvenilmez kaynaklardan gelebilir
+  const kutu = document.createElement('div')
+  kutu.style.cssText = 'display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:80dvh;padding:40px;text-align:center;font-family:sans-serif'
+  const ikon = document.createElement('div')
+  ikon.style.cssText = 'font-size:48px;margin-bottom:12px'
+  ikon.textContent = '⚠️'
+  const baslik = document.createElement('h2')
+  baslik.style.cssText = 'font-size:18px;font-weight:700;color:#1f2937;margin:0 0 8px'
+  baslik.textContent = 'Bir hata oluştu'
+  const aciklama = document.createElement('p')
+  aciklama.style.cssText = 'font-size:13px;color:#6b7280;word-break:break-word;margin:0'
+  aciklama.textContent = msg
+  kutu.append(ikon, baslik, aciklama)
+  root.replaceChildren(kutu)
 }
 
 window.addEventListener('error', (e) => hataGoster(e.message || 'Bilinmeyen hata'))

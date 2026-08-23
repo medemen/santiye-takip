@@ -135,7 +135,8 @@ export default function Dashboard() {
           kalemToplam.set(ik, (kalemToplam.get(ik) ?? 0) + val);
         }
         toplamHuc += isKalemleri.length;
-        blokMap[b.blok_no] = Math.round(sum / isKalemleri.length);
+        // is kalemi listesi bosken 0/0 = NaN uretilmesin
+        blokMap[b.blok_no] = isKalemleri.length > 0 ? Math.round(sum / isKalemleri.length) : 0;
       }
       adaBlokMap[a.ada] = blokMap;
     }
