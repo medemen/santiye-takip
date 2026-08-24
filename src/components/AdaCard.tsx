@@ -26,7 +26,8 @@ const AdaCard = memo(function AdaCard({ ada, blokSayisi, toplamDaire, toplamKat,
   }, [ada, bloklar, config, raporlar]);
 
   return (
-    <div
+    <button
+      type="button"
       onClick={onClick}
       style={{
         backgroundColor: 'var(--bg-card)',
@@ -38,6 +39,10 @@ const AdaCard = memo(function AdaCard({ ada, blokSayisi, toplamDaire, toplamKat,
         transition: 'transform 0.15s, box-shadow 0.15s',
         position: 'relative',
         overflow: 'hidden',
+        font: 'inherit',
+        textAlign: 'left',
+        width: '100%',
+        display: 'block',
       }}
       onMouseEnter={(e) => {
         e.currentTarget.style.transform = 'translateY(-2px)';
@@ -79,7 +84,7 @@ const AdaCard = memo(function AdaCard({ ada, blokSayisi, toplamDaire, toplamKat,
         <span>📐 {toplamKat} Kat</span>
       </div>
       <ProgressBar value={ilerleme} height={6} />
-    </div>
+    </button>
   );
 });
 

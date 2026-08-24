@@ -24,18 +24,20 @@ export default function GecikenKart({ isler, onNavigate }: Props) {
       </div>
       <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
         {isler.slice(0, 5).map((r) => (
-          <div
+          <button
             key={r.id}
+            type="button"
             onClick={() => onNavigate(r.ada, r.blok_no)}
             style={{
               display: 'flex', justifyContent: 'space-between',
               padding: '6px 10px', backgroundColor: 'var(--bg-card)',
-              borderRadius: 8, cursor: 'pointer', fontSize: 12,
+              border: 'none', borderRadius: 8, cursor: 'pointer', fontSize: 12,
+              font: 'inherit', textAlign: 'left', width: '100%',
             }}
           >
             <span style={{ fontWeight: 500 }}>{r.ada} - {r.blok_no === 0 ? 'Ada Geneli' : `Blok ${r.blok_no}`}</span>
             <span style={{ color: '#ef4444' }}>{r.is_kalemi}</span>
-          </div>
+          </button>
         ))}
       </div>
     </div>

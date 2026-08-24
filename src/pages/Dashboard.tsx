@@ -232,7 +232,7 @@ export default function Dashboard() {
               onClick={() => navigate('/hedef-takvim')}
               style={{
                 ...btnGhost,
-                border: '1px solid #e5e7eb',
+                border: '1px solid var(--border)',
                 borderRadius: 10,
                 padding: '8px 14px',
               }}
@@ -335,7 +335,7 @@ export default function Dashboard() {
         onClick={() => navigate('/hedef-takvim')}
         style={{
           display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-          width: '100%', background: 'var(--bg-card)', border: '1px solid #e5e7eb',
+          width: '100%', background: 'var(--bg-card)', border: '1px solid var(--border)',
           borderRadius: 12, padding: '14px 16px', marginBottom: 16, cursor: 'pointer',
           boxShadow: '0 1px 3px rgba(0,0,0,0.05)',
         }}

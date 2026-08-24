@@ -417,7 +417,7 @@ export default function Hakedis() {
           const kalemler = eşlenenKalemler(g.id);
           return (
             <div key={g.id} style={{ borderBottom: '1px solid #f5f5f5' }}>
-              <div onClick={() => toggleGrup(g.id)} style={{ padding: '12px 14px', cursor: 'pointer', backgroundColor: acik ? 'var(--bg-accent-soft)' : 'var(--bg-card)' }}>
+              <button type="button" onClick={() => toggleGrup(g.id)} style={{ padding: '12px 14px', cursor: 'pointer', backgroundColor: acik ? 'var(--bg-accent-soft)' : 'var(--bg-card)', border: 'none', width: '100%', textAlign: 'left', font: 'inherit' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6 }}>
                   <span style={{ width: 8, height: 8, borderRadius: 4, backgroundColor: DISIPLIN_RENKLERI[g.disiplin], flexShrink: 0 }} />
                   <span style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-primary)', flex: 1 }}>{g.ad}</span>
@@ -442,7 +442,7 @@ export default function Hakedis() {
                   </div>
                 </div>
                 {h.uygulama !== null && <div style={{ marginTop: 6 }}><ProgressBar value={h.uygulama} height={5} /></div>}
-              </div>
+              </button>
               {acik && (
                 <div style={{ padding: '4px 14px 12px', backgroundColor: 'var(--bg-accent-soft)', borderTop: '1px dashed #fde68a' }}>
                   {kalemler.length === 0 && <div style={{ fontSize: 12, color: 'var(--text-subtle)', padding: '8px 0' }}>Bu gruba eşlenmiş iş kalemi yok.</div>}

@@ -72,7 +72,7 @@ export default function Login() {
           borderRadius: 16,
           padding: 24,
           boxShadow: '0 1px 3px rgba(0,0,0,0.06)',
-          border: '1px solid #f0f0f0',
+          border: '1px solid var(--border-soft)',
         }}
       >
         <label htmlFor="login-kullanici" style={{ display: 'block', fontSize: 13, fontWeight: 500, color: 'var(--text-muted)', marginBottom: 8 }}>
@@ -86,7 +86,7 @@ export default function Login() {
           autoComplete="off"
           style={{
             width: '100%', padding: '12px 14px', borderRadius: 12,
-            border: '2px solid #e5e7eb', fontSize: 14, backgroundColor: 'var(--bg-card)',
+            border: '2px solid var(--border)', fontSize: 14, backgroundColor: 'var(--bg-card)',
             boxSizing: 'border-box', marginBottom: 16,
           }}
         >
@@ -122,7 +122,7 @@ export default function Login() {
               placeholder="Şifrenizi girin"
               style={{
                 width: '100%', padding: '12px 14px', borderRadius: 12,
-                border: '2px solid #e5e7eb', fontSize: 14, backgroundColor: 'var(--bg-card)',
+                border: '2px solid var(--border)', fontSize: 14, backgroundColor: 'var(--bg-card)',
                 boxSizing: 'border-box', marginBottom: 16,
                 color: 'var(--text-primary)',
               }}

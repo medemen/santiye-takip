@@ -274,7 +274,16 @@ export default function ReportList() {
             return (
             <div
               key={r.id}
+              role={editable ? 'button' : undefined}
+              tabIndex={editable ? 0 : undefined}
               onClick={() => editable ? navigate(`/rapor-ekle?edit=${r.id}`) : undefined}
+              onKeyDown={(e) => {
+                if (!editable || e.defaultPrevented) return;
+                if (e.key === 'Enter' || e.key === ' ') {
+                  e.preventDefault();
+                  navigate(`/rapor-ekle?edit=${r.id}`);
+                }
+              }}
               style={{ cursor: editable ? 'pointer' : 'default', position: 'relative' }}
             >
               <ReportCard rapor={r} showActions />
@@ -302,6 +311,7 @@ export default function ReportList() {
                       color: '#ef4444',
                     }}
                     title="Sil"
+                    aria-label={`${r.ada} ${r.blok_no === 0 ? 'ada geneli' : `blok ${r.blok_no}`} raporunu sil`}
                   >
                     🗑️
                   </button>

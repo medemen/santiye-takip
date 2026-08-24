@@ -42,7 +42,12 @@ export default function PersonelKart({
           style={{ marginRight: 10, accentColor: '#f59e0b', width: 18, height: 18, cursor: 'pointer' }}
         />
       )}
-      <div onClick={bulkMode ? undefined : onClick} style={{ flex: 1, cursor: bulkMode ? 'default' : 'pointer' }}>
+      <button
+        type="button"
+        onClick={bulkMode ? undefined : onClick}
+        tabIndex={bulkMode ? -1 : undefined}
+        style={{ flex: 1, cursor: bulkMode ? 'default' : 'pointer', background: 'none', border: 'none', padding: 0, textAlign: 'left', font: 'inherit' }}
+      >
         <div style={{ fontSize: 13, fontWeight: 500, color: 'var(--text-primary)' }}>{person.ad_soyad}</div>
         <span
           style={{
@@ -57,7 +62,7 @@ export default function PersonelKart({
         >
           {person.rol}
         </span>
-      </div>
+      </button>
       {isAdmin && !bulkMode && (
         <button
           onClick={onEdit}
@@ -72,6 +77,7 @@ export default function PersonelKart({
             marginLeft: 8,
           }}
           title="Düzenle"
+          aria-label={`${person.ad_soyad} kişisini düzenle`}
         >
           ✏️
         </button>

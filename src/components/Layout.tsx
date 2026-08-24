@@ -107,13 +107,14 @@ export default function Layout({ children }: Props) {
             overflowY: 'auto',
           }}
         >
-          <div
+          <button
+            type="button"
             onClick={() => navigate('/')}
-            style={{ cursor: 'pointer', padding: '0 8px 18px', borderBottom: '1px solid #f0f0f0', marginBottom: 14 }}
+            style={{ cursor: 'pointer', padding: '0 8px 18px', marginBottom: 14, background: 'none', border: 'none', borderBottom: '1px solid #f0f0f0', textAlign: 'left', font: 'inherit', width: '100%' }}
           >
             <div style={{ fontSize: 17, fontWeight: 700, color: 'var(--text-primary)' }}>{config.genel.santiyeAdi}</div>
             <div style={{ fontSize: 12, color: 'var(--text-subtle)' }}>{config.genel.projeAdi}</div>
-          </div>
+          </button>
 
           <nav style={{ display: 'flex', flexDirection: 'column', gap: 4, flex: 1 }}>
             {gorunurNav

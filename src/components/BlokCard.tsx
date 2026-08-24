@@ -46,7 +46,8 @@ const BlokCard = memo(function BlokCard({ ada, blok, onClick }: Props) {
   const adaGenelinden = blokOzelRaporlar.length === 0;
 
   return (
-    <div
+    <button
+      type="button"
       onClick={onClick ? () => onClick(blok.blok_no) : undefined}
       style={{
         backgroundColor: 'var(--bg-card)',
@@ -56,6 +57,10 @@ const BlokCard = memo(function BlokCard({ ada, blok, onClick }: Props) {
         boxShadow: '0 1px 3px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.06)',
         border: '1px solid #f0f0f0',
         transition: 'transform 0.15s, box-shadow 0.15s',
+        font: 'inherit',
+        textAlign: 'left',
+        width: '100%',
+        display: 'block',
       }}
       onMouseEnter={(e) => {
         e.currentTarget.style.transform = 'translateY(-2px)';
@@ -101,7 +106,7 @@ const BlokCard = memo(function BlokCard({ ada, blok, onClick }: Props) {
           ⚠ {geciken} gecikme
         </div>
       )}
-    </div>
+    </button>
   );
 });
 
