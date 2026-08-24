@@ -1,4 +1,5 @@
 import { card } from '../../utils/styles';
+import { yerelTarih } from '../../utils/helpers';
 import { isoDate } from './aylar';
 import type { HedefTakvimGorunumu } from './types';
 
@@ -38,7 +39,9 @@ export default function TakvimIzgarasi({ gorunenAy, tarihHedefleri, seciliAda, o
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: 2 }}>
         {ayHucreleri(gorunenAy.getFullYear(), gorunenAy.getMonth()).map((tarih, i) => {
           if (!tarih) return <div key={`bos-${i}`} style={{ minHeight: 46 }} />;
-          const gun = new Date(tarih);
+          // new Date('YYYY-MM-DD') UTC parse eder; UTC+3'te ayin ilk gunu
+          // bir onceki ayin 31'i olur ve hücre yanlislikla soluk cizilir.
+          const gun = yerelTarih(tarih);
           const gunHedefleri = tarihHedefleri.get(tarih) ?? [];
           const bugunMu = tarih === bugunAnahtari;
           const digerAydan = gun.getMonth() !== gorunenAy.getMonth();

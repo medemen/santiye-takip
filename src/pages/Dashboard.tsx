@@ -1,14 +1,13 @@
 import { useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { getIstatistikler, getAdaGenelIlerleme, getBlokProgress, getGrupAgirlikliAdaIlerleme, getProjeAgirlikliIlerleme, raporEtkinYuzde } from '../stores/reportStore';
+import { getIstatistikler, getAdaGenelIlerleme, getBlokProgress, getGrupAgirlikliAdaIlerleme, getProjeAgirlikliIlerleme, raporEtkinYuzde, getSonRaporHaritasi, getGenelIlerleme } from '../stores/reportStore';
 import { useHedefler } from '../hooks/useHedefler';
 import { useRaporlar } from '../hooks/useRaporlar';
 import { getHedefOzeti, hedefKalanGun } from '../data/plan';
-import type { Rapor } from '../types';
+import { adaDurumSayilari, durumDonutVerisi, BOS_ADA_SAYISI } from '../data/istatistik';
 import { useSiteConfig } from '../hooks/useSiteConfig';
 import { useIsDesktop } from '../hooks/useIsDesktop';
 import { getAdaList, getAllKalemler } from '../config/helpers';
-import { DURUM_RENKLERI } from '../config/defaultConfig';
 import DonutChart from '../components/DonutChart';
 import BarChart from '../components/BarChart';
 import BlokMatrisi from '../components/BlokMatrisi';
@@ -43,16 +42,10 @@ export default function Dashboard() {
 
   const hedefler = useHedefler();
 
+  // raporlar dep'de: store icindeki harita degistiginde yeniden hesapla
   const sonRaporlarMap = useMemo(() => {
-    const map = new Map<string, Rapor>();
-    for (const r of raporlar) {
-      const anahtar = `${r.ada}|${r.blok_no}|${r.is_kalemi}`;
-      const mevcut = map.get(anahtar);
-      if (!mevcut || new Date(r.olusturma_tarihi).getTime() > new Date(mevcut.olusturma_tarihi).getTime()) {
-        map.set(anahtar, r);
-      }
-    }
-    return map;
+    void raporlar;
+    return getSonRaporHaritasi();
   }, [raporlar]);
 
   const hedefOzeti = useMemo(
@@ -61,12 +54,13 @@ export default function Dashboard() {
   );
 
   const donutData = useMemo(
-    () => [
-      { name: 'Tamamlandı', value: stats.tamamlananIsler, color: DURUM_RENKLERI.tamamlandi },
-      { name: 'Devam Ediyor', value: stats.devamEdenIsler, color: DURUM_RENKLERI.devam_ediyor },
-      { name: 'Planlandı', value: stats.planlananIsler, color: DURUM_RENKLERI.planlandi },
-      { name: 'Gecikme', value: stats.gecikenIsler, color: DURUM_RENKLERI.gecikme },
-    ],
+    () =>
+      durumDonutVerisi({
+        tamamlananIsler: stats.tamamlananIsler,
+        devamEdenIsler: stats.devamEdenIsler,
+        planlananIsler: stats.planlananIsler,
+        gecikenIsler: stats.gecikenIsler,
+      }),
     [stats]
   );
 
@@ -82,27 +76,12 @@ export default function Dashboard() {
     }));
   }, [raporlar, adalar, isKalemleri]);
 
-  const genelIlerleme =
-    adaProgress.length > 0
-      ? Math.round(adaProgress.reduce((s, a) => s + a.value, 0) / adaProgress.length)
-      : 0;
+  const genelIlerleme = getGenelIlerleme(adalar, isKalemleri);
 
   const adaDetay = useMemo(() => {
-    const adaSayilari = new Map<string, { toplam: number; tamam: number; devam: number; gecikme: number; plan: number }>();
-    for (const r of raporlar) {
-      let s = adaSayilari.get(r.ada);
-      if (!s) {
-        s = { toplam: 0, tamam: 0, devam: 0, gecikme: 0, plan: 0 };
-        adaSayilari.set(r.ada, s);
-      }
-      s.toplam++;
-      if (r.durum === 'tamamlandi') s.tamam++;
-      else if (r.durum === 'devam_ediyor') s.devam++;
-      else if (r.durum === 'gecikme') s.gecikme++;
-      else if (r.durum === 'planlandi') s.plan++;
-    }
+    const sayilar = adaDurumSayilari(raporlar);
     return adalar.map((a) => {
-      const s = adaSayilari.get(a.ada) ?? { toplam: 0, tamam: 0, devam: 0, gecikme: 0, plan: 0 };
+      const s = sayilar.get(a.ada) ?? BOS_ADA_SAYISI;
       return {
         ada: a.ada,
         ...s,

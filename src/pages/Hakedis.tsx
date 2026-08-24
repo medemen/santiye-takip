@@ -16,13 +16,8 @@ import { getCurrentUser } from '../stores/authStore';
 import type { IsDurumu } from '../types';
 import ProgressBar from '../components/ProgressBar';
 import { card, pageTitle } from '../utils/styles';
-
-const DURUM_RENKLERI: Record<IsDurumu, string> = {
-  planlandi: '#f59e0b',
-  devam_ediyor: '#3b82f6',
-  tamamlandi: '#22c55e',
-  gecikme: '#ef4444',
-};
+import { todayISO } from '../utils/helpers';
+import { DURUM_RENKLERI } from '../config/defaultConfig';
 
 const DISIPLIN_RENKLERI: Record<string, string> = {
   İNŞ: '#f59e0b',
@@ -181,7 +176,7 @@ export default function Hakedis() {
     if (!deger) return;
     if (seciliAda === 'TÜMÜ') return;
     const kullanici = getCurrentUser();
-    const tarih = new Date().toISOString().slice(0, 10);
+    const tarih = todayISO();
     const mevcut = getSonRapor(seciliAda, 0, kalem);
     const ilerleme_yuzde = deger.durum === 'tamamlandi' ? 100 : Math.max(0, Math.min(100, Math.round(deger.yuzde)));
     if (mevcut) {

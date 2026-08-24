@@ -1,11 +1,11 @@
 import { useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { getIstatistikler, getAdaGenelIlerleme } from '../stores/reportStore';
+import { getIstatistikler, getAdaGenelIlerleme, getGenelIlerleme } from '../stores/reportStore';
 import { useRaporlar } from '../hooks/useRaporlar';
 import { getAllPersonel } from '../stores/kullanicilarStore';
 import { useSiteConfig } from '../hooks/useSiteConfig';
 import { getAdaList, getAllKalemler } from '../config/helpers';
-import { DURUM_RENKLERI } from '../config/defaultConfig';
+import { adaDurumSayilari, durumDonutVerisi, BOS_ADA_SAYISI } from '../data/istatistik';
 import GenelIlerlemeKart from '../components/istatistik/GenelIlerlemeKart';
 import RaporDagilimiKart from '../components/istatistik/RaporDagilimiKart';
 import AdaBazindaIlerlemeKart from '../components/istatistik/AdaBazindaIlerlemeKart';
@@ -22,31 +22,20 @@ export default function Statistics() {
   const adalar = getAdaList(config);
 
   const donutData = useMemo(
-    () => [
-      { name: 'Tamamlandı', value: stats.tamamlananIsler, color: DURUM_RENKLERI.tamamlandi },
-      { name: 'Devam Ediyor', value: stats.devamEdenIsler, color: DURUM_RENKLERI.devam_ediyor },
-      { name: 'Planlandı', value: stats.planlananIsler, color: DURUM_RENKLERI.planlandi },
-      { name: 'Gecikme', value: stats.gecikenIsler, color: DURUM_RENKLERI.gecikme },
-    ],
+    () =>
+      durumDonutVerisi({
+        tamamlananIsler: stats.tamamlananIsler,
+        devamEdenIsler: stats.devamEdenIsler,
+        planlananIsler: stats.planlananIsler,
+        gecikenIsler: stats.gecikenIsler,
+      }),
     [stats]
   );
 
   const adaDetay = useMemo(() => {
-    const adaSayilari = new Map<string, { toplam: number; tamam: number; devam: number; gecikme: number; plan: number }>();
-    for (const r of raporlar) {
-      let s = adaSayilari.get(r.ada);
-      if (!s) {
-        s = { toplam: 0, tamam: 0, devam: 0, gecikme: 0, plan: 0 };
-        adaSayilari.set(r.ada, s);
-      }
-      s.toplam++;
-      if (r.durum === 'tamamlandi') s.tamam++;
-      else if (r.durum === 'devam_ediyor') s.devam++;
-      else if (r.durum === 'gecikme') s.gecikme++;
-      else if (r.durum === 'planlandi') s.plan++;
-    }
+    const sayilar = adaDurumSayilari(raporlar);
     return adalar.map((a) => {
-      const s = adaSayilari.get(a.ada) ?? { toplam: 0, tamam: 0, devam: 0, gecikme: 0, plan: 0 };
+      const s = sayilar.get(a.ada) ?? BOS_ADA_SAYISI;
       return {
         ada: a.ada,
         ...s,
@@ -74,10 +63,7 @@ export default function Statistics() {
       .slice(0, 10);
   }, [raporlar]);
 
-  const genelIlerleme =
-    adaDetay.length > 0
-      ? Math.round(adaDetay.reduce((s, a) => s + a.ilerleme, 0) / adaDetay.length)
-      : 0;
+  const genelIlerleme = getGenelIlerleme(adalar, isKalemleri);
 
   return (
     <div>

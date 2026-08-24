@@ -5,7 +5,7 @@ import { useRaporlar } from '../hooks/useRaporlar';
 import { useSiteConfig } from '../hooks/useSiteConfig';
 import { getAdaList } from '../config/helpers';
 import { getIlerlemeDurumu, hedefKalanGun } from '../data/plan';
-import type { Rapor } from '../types';
+import { getSonRaporHaritasi } from '../stores/reportStore';
 import { hedeflerXlsxExport } from '../utils/exportXlsx';
 import { elementPdfExport } from '../utils/exportPdf';
 import { toastGoster } from '../stores/toastStore';
@@ -29,14 +29,8 @@ export default function HedefTakvim() {
   const adalar = getAdaList(config);
 
   const gorunenHedefler = useMemo(() => {
-    const sonRaporlarMap = new Map<string, Rapor>();
-    for (const r of raporlar) {
-      const anahtar = `${r.ada}|${r.blok_no}|${r.is_kalemi}`;
-      const mevcut = sonRaporlarMap.get(anahtar);
-      if (!mevcut || new Date(r.olusturma_tarihi).getTime() > new Date(mevcut.olusturma_tarihi).getTime()) {
-        sonRaporlarMap.set(anahtar, r);
-      }
-    }
+    void raporlar;
+    const sonRaporlarMap = getSonRaporHaritasi();
     return hedefler
       .filter((h) => !seciliAda || h.ada === seciliAda)
       .map((h) => {

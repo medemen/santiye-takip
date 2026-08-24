@@ -4,6 +4,7 @@ import { getSiteConfig } from '../config/site';
 import { getHedefler } from './hedefStore';
 import { getRaporlar, getSonRapor } from './reportStore';
 import { hedefKalanGun } from '../data/plan';
+import { todayISO } from '../utils/helpers';
 
 const GUNLUK_OZET_ID = 9001;
 const UYARI_ID = 9002;
@@ -127,7 +128,7 @@ function acilMesaji(): { baslik: string; govde: string; adet: number } | null {
 
 function bugunGorulduMu(anahtarlar: string[]): boolean {
   try {
-    const bugun = new Date().toISOString().slice(0, 10);
+    const bugun = todayISO();
     const kayit = JSON.parse(localStorage.getItem(onEk + '_goruldu') || '{}') as Record<string, string[]>;
     const gorulenler = kayit[bugun] ?? [];
     return anahtarlar.every((k) => gorulenler.includes(k));
@@ -138,7 +139,7 @@ function bugunGorulduMu(anahtarlar: string[]): boolean {
 
 function bugunGorulduIsaretle(anahtarlar: string[]): void {
   try {
-    const bugun = new Date().toISOString().slice(0, 10);
+    const bugun = todayISO();
     const kayit = JSON.parse(localStorage.getItem(onEk + '_goruldu') || '{}') as Record<string, string[]>;
     const gorulenler = new Set(kayit[bugun] ?? []);
     anahtarlar.forEach((k) => gorulenler.add(k));

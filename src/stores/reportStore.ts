@@ -361,6 +361,19 @@ export function getSonRapor(ada: string, blokNo: number, isKalemi: string): Rapo
   return _sonRaporHaritasi.get(`${ada}|${blokNo}|${isKalemi}`) ?? null;
 }
 
+// Sayfalar kendi "son rapor" haritalarini kurmasin; tek kaynak burasi.
+// Anahtar bicimi: "ada|blok_no|is_kalemi".
+export function getSonRaporHaritasi(): ReadonlyMap<string, Rapor> {
+  getRaporlar();
+  return _sonRaporHaritasi;
+}
+
+// Tam anahtarla arar; ada-geneli devri YOKTUR (o icin getBlokProgress).
+export function getTamAnahtarSonRapor(ada: string, blokNo: number, isKalemi: string): Rapor | null {
+  getRaporlar();
+  return _sonRaporHaritasi.get(`${ada}|${blokNo}|${isKalemi}`) ?? null;
+}
+
 export function getBlokProgress(
   ada: string,
   blokNo: number,
@@ -379,7 +392,9 @@ export function getBlokProgress(
   return progress;
 }
 
-export function getBlokGenelIlerleme(
+// Yuvarlanmamis blok ilerlemesi: ada/proje ortalamalari ham degerle
+// hesaplanir; yoksa blok->ada->proje zincirinde yuvarlama hatasi birikir.
+function getBlokGenelIlerlemeHam(
   ada: string,
   blokNo: number,
   isKalemleri: readonly string[]
@@ -387,11 +402,16 @@ export function getBlokGenelIlerleme(
   const progress = getBlokProgress(ada, blokNo, isKalemleri);
   const values = Object.values(progress);
   if (values.length === 0) return 0;
-  const toplam = values.reduce((sum, r) => {
-    if (!r) return sum;
-    return sum + raporEtkinYuzde(r);
-  }, 0);
-  return Math.round(toplam / values.length);
+  const toplam = values.reduce((sum, r) => sum + raporEtkinYuzde(r), 0);
+  return toplam / values.length;
+}
+
+export function getBlokGenelIlerleme(
+  ada: string,
+  blokNo: number,
+  isKalemleri: readonly string[]
+): number {
+  return Math.round(getBlokGenelIlerlemeHam(ada, blokNo, isKalemleri));
 }
 
 // Etkin ilerleme: ortalamalara katilan deger. 'tamamlandi' -> 100,
@@ -484,16 +504,37 @@ export function getProjeAgirlikliIlerleme(
   return agirlikliToplam / pursantajToplam;
 }
 
-export function getAdaGenelIlerleme(
+function getAdaGenelIlerlemeHam(
   ada: string,
   blokList: { blok_no: number }[],
   isKalemleri: readonly string[]
 ): number {
   if (blokList.length === 0) return 0;
   const toplam = blokList.reduce((sum, b) => {
-    return sum + getBlokGenelIlerleme(ada, b.blok_no, isKalemleri);
+    return sum + getBlokGenelIlerlemeHam(ada, b.blok_no, isKalemleri);
   }, 0);
-  return Math.round(toplam / blokList.length);
+  return toplam / blokList.length;
+}
+
+export function getAdaGenelIlerleme(
+  ada: string,
+  blokList: { blok_no: number }[],
+  isKalemleri: readonly string[]
+): number {
+  return Math.round(getAdaGenelIlerlemeHam(ada, blokList, isKalemleri));
+}
+
+// Proje geneli: ada ortalamalarinin ortalamasi. Yuvarlama yalnizca
+// gosterimde ve en sonda yapilir (cift/basamakli yuvarlama yok).
+export function getGenelIlerleme(
+  adaList: { ada: string; bloklar: { blok_no: number }[] }[],
+  isKalemleri: readonly string[]
+): number {
+  if (adaList.length === 0) return 0;
+  const toplam = adaList.reduce((sum, a) => {
+    return sum + getAdaGenelIlerlemeHam(a.ada, a.bloklar, isKalemleri);
+  }, 0);
+  return Math.round(toplam / adaList.length);
 }
 
 export function getIstatistikler(raporlar: Rapor[]) {

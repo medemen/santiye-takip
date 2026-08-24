@@ -2,12 +2,12 @@ import { useState, useEffect, useMemo, useRef } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useSiteConfig } from '../hooks/useSiteConfig';
 import { getAda, getAdaList } from '../config/helpers';
-import { saveRapor, saveRaporlar, updateRapor, getRaporById } from '../stores/reportStore';
+import { saveRapor, saveRaporlar, updateRapor, getRaporById, getTamAnahtarSonRapor } from '../stores/reportStore';
 import { useRaporlar } from '../hooks/useRaporlar';
 import { getCurrentUser } from '../stores/authStore';
 import { getKullaniciAdaAtamasi, getKullaniciBloklari } from '../stores/atamaStore';
 import { useIsDesktop } from '../hooks/useIsDesktop';
-import type { IsDurumu, Rapor } from '../types';
+import type { IsDurumu } from '../types';
 import { todayISO } from '../utils/helpers';
 import { toastGoster } from '../stores/toastStore';
 import { card } from '../utils/styles';
@@ -186,24 +186,19 @@ export default function ReportAdd() {
     : [];
 
   const blokDurumMap = useMemo<Record<number, BlokBilgi>>(() => {
-    if (!ada || !isKalemi) return {};
-    const adaKalemRaporlari = raporlar.filter((r) => r.ada === ada && r.is_kalemi === isKalemi);
-    const sonByBlok = new Map<number, Rapor>();
-    for (const r of adaKalemRaporlari) {
-      const mevcut = sonByBlok.get(r.blok_no);
-      if (!mevcut || new Date(r.olusturma_tarihi).getTime() > new Date(mevcut.olusturma_tarihi).getTime()) {
-        sonByBlok.set(r.blok_no, r);
-      }
-    }
+    if (!ada || !isKalemi || !adaData) return {};
+    // raporlar dep'de: store haritasi degistiginde yeniden okunur
+    void raporlar;
+    // reportStore'un tek kaynakli son-rapor haritasindan oku (kopya mantik degil)
     const map: Record<number, BlokBilgi> = {};
-    for (const b of adaData?.bloklar ?? []) {
-      const blokOzel = sonByBlok.get(b.blok_no);
-      const sonRapor = blokOzel ?? sonByBlok.get(0);
+    for (const b of adaData.bloklar) {
+      const blokOzel = getTamAnahtarSonRapor(ada, b.blok_no, isKalemi);
+      const sonRapor = blokOzel ?? getTamAnahtarSonRapor(ada, 0, isKalemi);
       if (!sonRapor) continue;
       map[b.blok_no] = {
         durum: sonRapor.durum,
         ilerleme_yuzde: sonRapor.ilerleme_yuzde,
-        adaGenel: !adaKalemRaporlari.some((r) => r.blok_no === b.blok_no),
+        adaGenel: !blokOzel,
       };
     }
     return map;

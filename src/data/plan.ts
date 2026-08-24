@@ -1,4 +1,5 @@
 import type { Rapor } from '../types';
+import { DURUM_RENKLERI } from '../config/defaultConfig';
 import { yerelTarih } from '../utils/helpers';
 
 export function hedefKalanGun(hedefTarih: string): number {
@@ -14,17 +15,17 @@ export function getIlerlemeDurumu(
   rapor: Rapor | null,
   hedefTarih?: string
 ): { label: string; renk: string } {
-  if (rapor?.durum === 'tamamlandi') return { label: 'Tamamlandı', renk: '#22c55e' };
-  if (rapor?.durum === 'gecikme') return { label: 'Gecikme', renk: '#ef4444' };
+  if (rapor?.durum === 'tamamlandi') return { label: 'Tamamlandı', renk: DURUM_RENKLERI.tamamlandi };
+  if (rapor?.durum === 'gecikme') return { label: 'Gecikme', renk: DURUM_RENKLERI.gecikme };
   if (hedefTarih) {
     const kalanGun = hedefKalanGun(hedefTarih);
-    if (kalanGun < 0) return { label: `Süresi Geçti (${-kalanGun} gün)`, renk: '#ef4444' };
-    if (kalanGun === 0) return { label: 'Bugün', renk: '#f59e0b' };
-    if (kalanGun <= 7) return { label: `⚠ ${kalanGun} gün kaldı`, renk: '#f59e0b' };
-    return { label: `${kalanGun} gün kaldı`, renk: '#3b82f6' };
+    if (kalanGun < 0) return { label: `Süresi Geçti (${-kalanGun} gün)`, renk: DURUM_RENKLERI.gecikme };
+    if (kalanGun === 0) return { label: 'Bugün', renk: DURUM_RENKLERI.planlandi };
+    if (kalanGun <= 7) return { label: `⚠ ${kalanGun} gün kaldı`, renk: DURUM_RENKLERI.planlandi };
+    return { label: `${kalanGun} gün kaldı`, renk: DURUM_RENKLERI.devam_ediyor };
   }
-  if (rapor?.durum === 'devam_ediyor') return { label: 'Devam Ediyor', renk: '#3b82f6' };
-  if (rapor?.durum === 'planlandi') return { label: 'Planlandı', renk: '#f59e0b' };
+  if (rapor?.durum === 'devam_ediyor') return { label: 'Devam Ediyor', renk: DURUM_RENKLERI.devam_ediyor };
+  if (rapor?.durum === 'planlandi') return { label: 'Planlandı', renk: DURUM_RENKLERI.planlandi };
   return { label: 'Rapor Yok', renk: 'var(--text-subtle)' };
 }
 

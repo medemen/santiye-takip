@@ -5,6 +5,7 @@ import StatusBadge from './StatusBadge';
 import { useRaporlar } from '../hooks/useRaporlar';
 import { getAllKalemler } from '../config/helpers';
 import { useSiteConfig } from '../hooks/useSiteConfig';
+import { getBlokGenelIlerleme, getBlokProgress } from '../stores/reportStore';
 
 interface Props {
   ada: string;
@@ -22,21 +23,14 @@ const BlokCard = memo(function BlokCard({ ada, blok, onClick }: Props) {
   );
 
   const { tamamlanan, geciken, sonDurum } = useMemo(() => {
-    const sonRaporHaritasi = new Map<string, typeof raporlar[number]>();
-    for (const r of raporlar) {
-      if (r.ada !== ada) continue;
-      const anahtar = `${r.blok_no}|${r.is_kalemi}`;
-      const mevcut = sonRaporHaritasi.get(anahtar);
-      if (!mevcut || new Date(r.olusturma_tarihi).getTime() > new Date(mevcut.olusturma_tarihi).getTime()) {
-        sonRaporHaritasi.set(anahtar, r);
-      }
-    }
+    void raporlar;
+    // reportStore'un tek kaynakli haritasini kullan (kopya mantik degil);
+    // blok özel raporu yoksa ada geneli devralir — BlokDetail ile ayni.
+    const progress = getBlokProgress(ada, blok.blok_no, isKalemleri);
     let t = 0, g = 0;
     let son: IsDurumu | null = null;
     for (const ik of isKalemleri) {
-      const sonRapor =
-        sonRaporHaritasi.get(`${blok.blok_no}|${ik}`) ??
-        (blok.blok_no !== 0 ? sonRaporHaritasi.get(`0|${ik}`) : undefined);
+      const sonRapor = progress[ik];
       if (sonRapor) {
         if (sonRapor.durum === 'tamamlandi') t++;
         if (sonRapor.durum === 'gecikme') g++;
@@ -46,7 +40,9 @@ const BlokCard = memo(function BlokCard({ ada, blok, onClick }: Props) {
     return { tamamlanan: t, geciken: g, sonDurum: son };
   }, [raporlar, ada, blok.blok_no, isKalemleri]);
 
-  const genelIlerleme = isKalemleri.length > 0 ? Math.round((tamamlanan / isKalemleri.length) * 100) : 0;
+  // Kart bar'i ile BlokDetail ayni formulu gostersin; tamamlanan sayisi
+  // etikette ayri bilgi olarak kalir.
+  const genelIlerleme = getBlokGenelIlerleme(ada, blok.blok_no, isKalemleri);
   const adaGenelinden = blokOzelRaporlar.length === 0;
 
   return (
