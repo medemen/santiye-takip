@@ -37,6 +37,8 @@ Windows'ta `komutlar.bat` sık kullanılan komutları menüden çalıştırır;
 | `npm run build` | Tip kontrolü (`tsc -b`) + prod build → `dist/` |
 | `npm run preview` | Build'i yerelde önizle |
 | `npm run lint` | Oxlint |
+| `npm run test` | Vitest birim testleri (tarih/ilerleme hesapları, offline mutabakat, denetim özeti vb.) |
+| `npm run test:browser` | Headless Chrome smoke testi (16 adım). Dev server ayaktayken çalışır; `-- --auto-start` ile kendisi başlatır |
 | `npm run seed:users` | Supabase'e demo kullanıcı/personel seed'i (`SUPABASE_SERVICE_ROLE_KEY` gerekir) |
 | `npm run seed:config` | `data/santiye.config.json`'ı Supabase `santiye_config` tablosuna yazar |
 | `npm run seed:migration` | Eski JSON verilerini yeni şemaya taşıyan SQL migrasyonu üretir |
@@ -70,7 +72,11 @@ Tam liste ve örnek değerler için `.env.example`.
   (ayarlar + yeni şantiye sihirbazı), sıradan personel. Aynı kurallar Supabase RLS ile
   sunucu tarafında da uygulanır (`supabase/migrations/`).
 - **Offline-first:** Supabase erişilemezse uygulama `localStorage` + bundle verisiyle çalışmaya
-  devam eder.
+  devam eder. Hedef takvimde bekleyen silme/kayıt kuyrukları bağlantı gelince sunucuya
+  boşaltılır (silinen hedef dirilmez, güncelleme kaybolmaz).
+- **Denetim kaydı:** Rapor/hedef/kullanıcı yazma işlemleri sunucuda `audit_log` tablosuna
+  tetikleyiciyle yazılır (`supabase/migrations/20260824120000_denetim_kaydi.sql`); ayarlar
+  sayfasından son 100 işlem görüntülenir. Doğrudan yazma yetkisi yoktur.
 
 Detaylar için [`AGENTS.md`](AGENTS.md#mimari-desenler).
 
