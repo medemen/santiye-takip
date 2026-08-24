@@ -6,6 +6,42 @@ import { toastGoster } from './toastStore';
 import { getCurrentUser, supabaseOturumAktif } from './authStore';
 
 const STORAGE_KEY = `${getSiteConfig().marka.localStoragePrefix}_hedefler`;
+// Offline mutabakat: sunucuya ulasilmayan silme/ekleme-guncelleme islemleri
+// kuyrukta bekletilir; bir sonraki basarili yuklemede uygulanir. Kuyruk
+// olmasaydi sunucu listesi yerel degisikligi ezer (silinen hedef "dirilir").
+const SILME_KUYRUK_KEY = `${getSiteConfig().marka.localStoragePrefix}_hedef_bekleyen_silmeler`;
+const KAYIT_KUYRUK_KEY = `${getSiteConfig().marka.localStoragePrefix}_hedef_bekleyen_kayitlar`;
+
+interface HedefAnahtari {
+  ada: string;
+  blok_no: number;
+  is_kalemi: string;
+}
+
+interface BekleyenKayit extends HedefAnahtari {
+  hedef_tarih: string;
+}
+
+function kuyrukOku<T>(key: string): T[] {
+  try {
+    const data = localStorage.getItem(key);
+    return data ? (JSON.parse(data) as T[]) : [];
+  } catch {
+    return [];
+  }
+}
+
+function kuyrukYaz<T>(key: string, liste: T[]): void {
+  try {
+    localStorage.setItem(key, JSON.stringify(liste));
+  } catch {
+    /* localStorage dolu/engelli olabilir */
+  }
+}
+
+function anahtarMetni(k: HedefAnahtari): string {
+  return `${k.ada}|${k.blok_no}|${k.is_kalemi}`;
+}
 
 // Fire-and-forget isteklerde reject yakalanmazsa hata sessizce kaybolur.
 function agHatasiYakala(islem: string): (err: unknown) => void {
@@ -82,9 +118,50 @@ export async function supabaseHedefleriYukle(): Promise<void> {
       .select('id, ada, blok_no, is_kalemi, hedef_tarih');
     if (error) throw error;
     const sunucu = (data ?? []) as IsKalemiHedefi[];
-    _hedefCache = sunucu;
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(sunucu));
+
+    // Bekleyen yerel islemleri sunucu verisinin uzerine uygula
+    const silmeSeti = new Set(kuyrukOku<HedefAnahtari>(SILME_KUYRUK_KEY).map(anahtarMetni));
+    const birlesik = sunucu.filter((h) => !silmeSeti.has(anahtarMetni(h)));
+    for (const bk of kuyrukOku<BekleyenKayit>(KAYIT_KUYRUK_KEY)) {
+      const idx = birlesik.findIndex((h) => anahtarMetni(h) === anahtarMetni(bk));
+      if (idx >= 0) {
+        birlesik[idx] = { ...birlesik[idx], hedef_tarih: bk.hedef_tarih };
+      } else {
+        birlesik.push({ id: 0, ...bk });
+      }
+    }
+    _hedefCache = birlesik;
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(birlesik));
     notifyHedefListeners();
+
+    // Kuyruklari sunucuya bosaltmayi dene (online ise)
+    if (!supabaseOturumAktif()) return;
+
+    const silmeler = kuyrukOku<HedefAnahtari>(SILME_KUYRUK_KEY);
+    for (const s of silmeler) {
+      const { error: silmeError } = await getSupabase()
+        .from('is_kalemi_hedefleri')
+        .delete()
+        .eq('ada', s.ada)
+        .eq('blok_no', s.blok_no)
+        .eq('is_kalemi', s.is_kalemi);
+      if (!silmeError) {
+        kuyrukYaz(SILME_KUYRUK_KEY, kuyrukOku<HedefAnahtari>(SILME_KUYRUK_KEY).filter((x) => anahtarMetni(x) !== anahtarMetni(s)));
+      }
+    }
+
+    const kayitlar = kuyrukOku<BekleyenKayit>(KAYIT_KUYRUK_KEY);
+    for (const k of kayitlar) {
+      const { error: kayitError } = await getSupabase()
+        .from('is_kalemi_hedefleri')
+        .upsert(
+          { ada: k.ada, blok_no: k.blok_no, is_kalemi: k.is_kalemi, hedef_tarih: k.hedef_tarih },
+          { onConflict: 'ada, blok_no, is_kalemi' }
+        );
+      if (!kayitError) {
+        kuyrukYaz(KAYIT_KUYRUK_KEY, kuyrukOku<BekleyenKayit>(KAYIT_KUYRUK_KEY).filter((x) => anahtarMetni(x) !== anahtarMetni(k)));
+      }
+    }
   } catch {
     /* supabase offline, cache devam */
   }
@@ -134,6 +211,28 @@ export function setHedef(
   localStorage.setItem(STORAGE_KEY, JSON.stringify(hedefler));
   notifyHedefListeners();
 
+  const buHedef: HedefAnahtari = { ada, blok_no: blokNo, is_kalemi: isKalemi };
+
+  if (hedefTarih === null || hedefTarih === '') {
+    // Silme: sunucuya kanitlanana dek kuyrukta tut (dirilme engeli)
+    const silmeler = kuyrukOku<HedefAnahtari>(SILME_KUYRUK_KEY);
+    if (!silmeler.some((s) => anahtarMetni(s) === anahtarMetni(buHedef))) {
+      silmeler.push(buHedef);
+      kuyrukYaz(SILME_KUYRUK_KEY, silmeler);
+    }
+    // Varsa bekleyen kaydi da dus
+    kuyrukYaz(KAYIT_KUYRUK_KEY, kuyrukOku<BekleyenKayit>(KAYIT_KUYRUK_KEY).filter((x) => anahtarMetni(x) !== anahtarMetni(buHedef)));
+  } else {
+    // Kayit/guncelleme: ayni mantikla kuyrukta; silme kuyrugundan cikar
+    const kayitlar = kuyrukOku<BekleyenKayit>(KAYIT_KUYRUK_KEY);
+    const yeni: BekleyenKayit = { ada, blok_no: blokNo, is_kalemi: isKalemi, hedef_tarih: hedefTarih };
+    const kayitIdx = kayitlar.findIndex((x) => anahtarMetni(x) === anahtarMetni(yeni));
+    if (kayitIdx >= 0) kayitlar[kayitIdx] = yeni;
+    else kayitlar.push(yeni);
+    kuyrukYaz(KAYIT_KUYRUK_KEY, kayitlar);
+    kuyrukYaz(SILME_KUYRUK_KEY, kuyrukOku<HedefAnahtari>(SILME_KUYRUK_KEY).filter((x) => anahtarMetni(x) !== anahtarMetni(yeni)));
+  }
+
   if (supabaseOturumAktif()) {
     if (hedefTarih === null || hedefTarih === '') {
       getSupabase()
@@ -143,9 +242,11 @@ export function setHedef(
         .eq('blok_no', blokNo)
         .eq('is_kalemi', isKalemi)
         .then(({ error }) => {
-          if (error) {
+          if (!error) {
+            kuyrukYaz(SILME_KUYRUK_KEY, kuyrukOku<HedefAnahtari>(SILME_KUYRUK_KEY).filter((x) => anahtarMetni(x) !== anahtarMetni(buHedef)));
+          } else {
             console.warn('Supabase hedef silme hatası:', error.message);
-            toastGoster('Hedef sunucudan silinemedi: ' + error.message, 'error');
+            toastGoster('Hedef sunucudan silinemedi — bağlantı gelince tekrar denenecek', 'error');
           }
         }, agHatasiYakala('hedef sil'));
     } else {
@@ -156,9 +257,11 @@ export function setHedef(
           { onConflict: 'ada, blok_no, is_kalemi' }
         )
         .then(({ error }) => {
-          if (error) {
+          if (!error) {
+            kuyrukYaz(KAYIT_KUYRUK_KEY, kuyrukOku<BekleyenKayit>(KAYIT_KUYRUK_KEY).filter((x) => anahtarMetni(x) !== anahtarMetni(buHedef)));
+          } else {
             console.warn('Supabase hedef kaydetme hatası:', error.message);
-            toastGoster('Hedef sunucuya kaydedilemedi: ' + error.message, 'error');
+            toastGoster('Hedef sunucuya kaydedilemedi — bağlantı gelince tekrar denenecek', 'error');
           }
         }, agHatasiYakala('hedef kaydet'));
     }

@@ -1,14 +1,14 @@
-﻿-- ============================================================
--- SANTÄ°YE TAKÄ°P - EKSÄ°K ÅEMA TAMAMLAMA (SQL EDITOR)
 -- ============================================================
--- Bu dosya, supabase/migrations altÄ±ndaki tÃ¼m migration'larÄ±n
--- FINAL durumunu temsil eden idempotent (tekrar Ã§alÄ±ÅŸtÄ±rÄ±labilir)
--- birleÅŸimidir. Son senkron: 20260823120000_guvenlik_ve_butunluk_duzeltmeleri.
+-- SANTİYE TAKİP - EKSİK ŞEMA TAMAMLAMA (SQL EDITOR)
+-- ============================================================
+-- Bu dosya, supabase/migrations altındaki tüm migration'ların
+-- FINAL durumunu temsil eden idempotent (tekrar çalıştırılabilir)
+-- birleşimidir. Son senkron: 20260824120000_denetim_kaydi.
 -- Yeni projede (szjpnaslernezvjoscag) zaten var olan
--- tablolara/veriye DOKUNMAZ; yalnÄ±zca eksik parÃ§alarÄ± kurar.
+-- tablolara/veriye DOKUNMAZ; yalnızca eksik parçaları kurar.
 --
--- KULLANIM: Supabase Dashboard -> SQL Editor -> yapÄ±ÅŸtÄ±r -> Run.
--- Tekrar Ã§alÄ±ÅŸtÄ±rÄ±lmasÄ± gÃ¼venlidir.
+-- KULLANIM: Supabase Dashboard -> SQL Editor -> yapıştır -> Run.
+-- Tekrar çalıştırılması güvenlidir.
 -- ============================================================
 
 -- ============================================================
@@ -94,7 +94,7 @@ alter table public.kullanici_blok_atamalari add column if not exists user_id uui
 -- ============================================================
 -- 2a. user_id FK'leri: ON DELETE SET NULL
 --     (rapor/atama gecmisi olan kullanici silinebilsin; audit kolonu
---     null'a dÃ¶ner, kayit silinmez)
+--     null'a döner, kayit silinmez)
 -- ============================================================
 do $$
 declare r record;
@@ -232,7 +232,7 @@ stable
 security definer
 set search_path = public
 as $$
-  select coalesce((select (rol = 'Proje MÃ¼dÃ¼rÃ¼' or proje_muduru) from public.kullanicilar where id = auth.uid()), false)
+  select coalesce((select (rol = 'Proje Müdürü' or proje_muduru) from public.kullanicilar where id = auth.uid()), false)
 $$;
 
 create or replace function public.santiye_yetkili_adalar()
@@ -344,7 +344,7 @@ set search_path = public
 as $$
   select regexp_replace(
     regexp_replace(
-      lower(translate(p_metin, 'Ã§ÄŸÄ±Ã¶ÅŸÃ¼Ã‡ÄÄ°Ã–ÅÃœÃ¢Ã®Ã»', 'cgiosuCGIOSUaiu')),
+      lower(translate(p_metin, 'çğıöşüÇĞİÖŞÜâîû', 'cgiosuCGIOSUaiu')),
       '[^a-z0-9.]+', '.', 'g'
     ),
     '^\.+|\.+$', '', 'g'
@@ -379,10 +379,10 @@ begin
   end if;
 
   if p_ad_soyad is null or btrim(p_ad_soyad) = '' then
-    raise exception 'Ad soyad boÅŸ olamaz';
+    raise exception 'Ad soyad boş olamaz';
   end if;
   if p_sifre is null or length(p_sifre) < 6 then
-    raise exception 'Åifre en az 6 karakter olmalÄ±';
+    raise exception 'Şifre en az 6 karakter olmalı';
   end if;
 
   select coalesce(config->'marka'->>'emailDomain', 'santiye.com')
@@ -393,7 +393,7 @@ begin
   v_email := public.santiye_slug(p_ad_soyad) || '@' || v_domain;
 
   if exists (select 1 from auth.users where email = v_email) then
-    raise exception 'Bu e-posta zaten kayÄ±tlÄ±: %', v_email;
+    raise exception 'Bu e-posta zaten kayıtlı: %', v_email;
   end if;
 
   -- Rapor sahipligi ad_soyad uzerinden kuruldugundan ayni isimli ikinci
@@ -406,7 +406,7 @@ begin
     where lower(btrim(ad_soyad)) = lower(btrim(p_ad_soyad))
       and id <> v_user_id
   ) then
-    raise exception 'Bu ad soyad zaten kayÄ±tlÄ±: %', p_ad_soyad;
+    raise exception 'Bu ad soyad zaten kayıtlı: %', p_ad_soyad;
   end if;
 
   insert into auth.users (
@@ -456,7 +456,7 @@ begin
   return json_build_object('id', v_user_id, 'email', v_email);
 exception
   when unique_violation then
-    raise exception 'Bu e-posta zaten kayÄ±tlÄ±: %', v_email;
+    raise exception 'Bu e-posta zaten kayıtlı: %', v_email;
 end;
 $$;
 
@@ -471,14 +471,14 @@ begin
     raise exception 'Yetkiniz yok';
   end if;
   if p_yeni_sifre is null or length(p_yeni_sifre) < 6 then
-    raise exception 'Åifre en az 6 karakter olmalÄ±';
+    raise exception 'Şifre en az 6 karakter olmalı';
   end if;
   update auth.users
   set encrypted_password = extensions.crypt(p_yeni_sifre, extensions.gen_salt('bf')),
       updated_at = now()
   where id = p_user_id;
   if not found then
-    raise exception 'KullanÄ±cÄ± bulunamadÄ±';
+    raise exception 'Kullanıcı bulunamadı';
   end if;
 end;
 $$;
@@ -494,7 +494,7 @@ begin
     raise exception 'Yetkiniz yok';
   end if;
   if p_user_id = auth.uid() then
-    raise exception 'Kendi hesabÄ±nÄ±zÄ± silemezsiniz';
+    raise exception 'Kendi hesabınızı silemezsiniz';
   end if;
   delete from public.kullanicilar where id = p_user_id;
   delete from auth.users where id = p_user_id;
@@ -885,17 +885,105 @@ where email_change is null
 -- Rol adlari yeni saha personeli setine esitlenir
 update public.kullanicilar
 set rol = case
-  when rol = 'Saha MÃ¼hendisi' then 'Ä°nÅŸaat MÃ¼hendisi'
-  when rol = 'Saha MimarÄ±' then 'Mimar'
+  when rol = 'Saha Mühendisi' then 'İnşaat Mühendisi'
+  when rol = 'Saha Mimarı' then 'Mimar'
   when rol = 'Saha Teknikeri' then 'Tekniker'
   else rol
 end
-where rol in ('Saha MÃ¼hendisi', 'Saha MimarÄ±', 'Saha Teknikeri');
+where rol in ('Saha Mühendisi', 'Saha Mimarı', 'Saha Teknikeri');
 
 -- Santiye config baslangic satiri (tam icerik bundle config'ten gelir)
 insert into public.santiye_config (id, config, version, updated_at)
 values (1, '{}'::jsonb, 2, now())
 on conflict (id) do update set version = excluded.version, updated_at = now();
+
+-- ============================================================
+-- 11. DENETIM KAYDI (AUDIT TRAIL)
+--     Yazma: hicbir rol dogrudan yazamaz (RLS varsayilan reddeder);
+--     kayitlari yalnizca asagidaki SECURITY DEFINER tetikleyici uretir.
+--     Okuma: yalnizca santiye sefi (admin) ve proje muduru.
+-- ============================================================
+create table if not exists public.audit_log (
+  id bigint generated always as identity primary key,
+  tablo_adi text not null,
+  kayit_id text not null,
+  islem text not null check (islem in ('INSERT', 'UPDATE', 'DELETE')),
+  eski_deger jsonb,
+  yeni_deger jsonb,
+  islem_yapan uuid references auth.users(id) on delete set null,
+  islem_yapan_ad text,
+  islem_zamani timestamptz not null default now()
+);
+
+alter table public.audit_log enable row level security;
+
+create index if not exists idx_audit_log_zaman
+  on public.audit_log (islem_zamani desc);
+create index if not exists idx_audit_log_tablo_kayit
+  on public.audit_log (tablo_adi, kayit_id);
+
+-- DELETE tetikleyicisinde NEW tanimsiz oldugundan referanslar tg_op ile
+-- dallandirilir.
+create or replace function public.santiye_audit()
+returns trigger
+language plpgsql
+security definer
+set search_path = public
+as $$
+declare
+  v_yapan uuid := auth.uid();
+  v_ad text;
+begin
+  if v_yapan is not null then
+    begin
+      select ad_soyad into v_ad from public.kullanicilar where id = v_yapan;
+    exception when others then
+      v_ad := null;
+    end;
+  end if;
+
+  insert into public.audit_log (
+    tablo_adi, kayit_id, islem, eski_deger, yeni_deger, islem_yapan, islem_yapan_ad
+  ) values (
+    tg_table_name,
+    case
+      when tg_op = 'INSERT' then to_jsonb(new) ->> 'id'
+      else to_jsonb(old) ->> 'id'
+    end,
+    tg_op,
+    case when tg_op in ('UPDATE', 'DELETE') then to_jsonb(old) end,
+    case when tg_op in ('INSERT', 'UPDATE') then to_jsonb(new) end,
+    v_yapan,
+    v_ad
+  );
+
+  return coalesce(new, old);
+end;
+$$;
+
+revoke execute on function public.santiye_audit() from public;
+revoke execute on function public.santiye_audit() from anon;
+
+drop trigger if exists raporlar_audit on public.raporlar;
+create trigger raporlar_audit
+after insert or update or delete on public.raporlar
+for each row execute procedure public.santiye_audit();
+
+drop trigger if exists hedefler_audit on public.is_kalemi_hedefleri;
+create trigger hedefler_audit
+after insert or update or delete on public.is_kalemi_hedefleri
+for each row execute procedure public.santiye_audit();
+
+drop trigger if exists kullanicilar_audit on public.kullanicilar;
+create trigger kullanicilar_audit
+after insert or update or delete on public.kullanicilar
+for each row execute procedure public.santiye_audit();
+
+drop policy if exists "Denetim kaydi sef ve PM gorur" on public.audit_log;
+create policy "Denetim kaydi sef ve PM gorur" on public.audit_log
+  for select using (
+    (select santiye_is_admin()) or (select santiye_is_pm())
+  );
 
 -- ============================================================
 -- BITTI. Hata yoksa sekma tamdir.
