@@ -92,7 +92,8 @@ export default function HedefTakvim() {
                 await hedeflerXlsxExport(
                   gorunenHedefler,
                   (a, b, ik) => gorunenHedefler.find((h) => h.ada === a && h.blok_no === b && h.is_kalemi === ik)?.rapor ?? null,
-                  'hedef-takvimi.xlsx'
+                  'hedef-takvimi.xlsx',
+                  { santiyeAdi: config.genel.santiyeAdi }
                 );
                 toastGoster(`${gorunenHedefler.length} hedef Excel olarak indiriliyor`, 'success');
               } catch (err) {

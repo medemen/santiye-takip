@@ -36,7 +36,8 @@ function hedefSatiri(
 export async function hedeflerXlsxExport(
   hedefler: HedefExportKaynak[],
   raporBul: (ada: string, blokNo: number, isKalemi: string) => Rapor | null,
-  dosyaAdi = 'hedef-takvimi.xlsx'
+  dosyaAdi = 'hedef-takvimi.xlsx',
+  meta?: XlsxMeta
 ): Promise<void> {
   const XLSX = await import('xlsx');
   const satirlar = hedefler
@@ -44,14 +45,9 @@ export async function hedeflerXlsxExport(
     .sort((a, b) => a.hedef_tarih.localeCompare(b.hedef_tarih))
     .map((h) => hedefSatiri(h, raporBul));
 
-  const ws = XLSX.utils.json_to_sheet(satirlar);
+  const ws = metaSheet(XLSX, meta, satirlar.length, 'Hedef Sayısı', satirlar);
   const wb = XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(wb, ws, 'Hedef Takvimi');
-
-  ws['!cols'] = [
-    { wch: 8 }, { wch: 10 }, { wch: 26 }, { wch: 12 },
-    { wch: 10 }, { wch: 20 }, { wch: 12 }, { wch: 16 },
-  ];
 
   XLSX.writeFile(wb, dosyaAdi);
 }
@@ -75,6 +71,37 @@ function formatDateTime(iso: string): string {
   const s = String(d.getHours()).padStart(2, '0');
   const dk = String(d.getMinutes()).padStart(2, '0');
   return `${g}.${a}.${y} ${s}:${dk}`;
+}
+
+export interface XlsxMeta {
+  santiyeAdi?: string;
+}
+
+// Meta satirlari + bosluk + basliklar + veri satirlarini tek AOA'da birlestirir.
+function metaSheet(
+  XLSX: typeof import('xlsx'),
+  meta: XlsxMeta | undefined,
+  kayitSayisi: number,
+  kayitAdi: string,
+  satirlar: Record<string, string | number>[]
+) {
+  const basliklar = Object.keys(satirlar[0] ?? {});
+  const aoa: (string | number)[][] = [
+    ['Şantiye', meta?.santiyeAdi ?? '-'],
+    [kayitAdi, kayitSayisi],
+    ['Dışa Aktarma Zamanı', formatDateTime(new Date().toISOString())],
+    [],
+    basliklar,
+    ...satirlar.map((s) => basliklar.map((b) => s[b] ?? '')),
+  ];
+  const ws = XLSX.utils.aoa_to_sheet(aoa);
+  ws['!cols'] = basliklar.map((b, i) => ({
+    wch: Math.min(
+      42,
+      Math.max(b.length + 2, ...aoa.slice(5).map((r) => String(r[i]).length + 2), 8)
+    ),
+  }));
+  return ws;
 }
 
 function adaOzetleri(raporlar: Rapor[]): RaporOzetSatiri[] {
@@ -108,7 +135,8 @@ function adaOzetleri(raporlar: Rapor[]): RaporOzetSatiri[] {
 export async function raporlarXlsxExport(
   raporlar: Rapor[],
   dosyaAdi = 'raporlar.xlsx',
-  hedefBul?: (ada: string, blokNo: number, isKalemi: string) => { hedef_tarih: string } | undefined
+  hedefBul?: (ada: string, blokNo: number, isKalemi: string) => { hedef_tarih: string } | undefined,
+  meta?: XlsxMeta
 ): Promise<void> {
   const XLSX = await import('xlsx');
   const data = raporlar.map((r) => {
@@ -133,15 +161,18 @@ export async function raporlarXlsxExport(
     return satir;
   });
 
-  const ws = XLSX.utils.json_to_sheet(data);
+  // Hedef kolonlari yalnizca bazilarda var; AOA tabanli sheet ayni sutun
+  // sayisi beklediginden eksik alanlari bos doldur.
+  const tumBasliklar = Array.from(new Set(data.flatMap((d) => Object.keys(d))));
+  const duzenli = data.map((d) => {
+    const tam: Record<string, string | number> = {};
+    for (const b of tumBasliklar) tam[b] = d[b] ?? '';
+    return tam;
+  });
+
+  const ws = metaSheet(XLSX, meta, duzenli.length, 'Rapor Sayısı', duzenli);
   const wb = XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(wb, ws, 'Raporlar');
-
-  ws['!cols'] = [
-    { wch: 8 }, { wch: 10 }, { wch: 18 }, { wch: 14 },
-    { wch: 12 }, { wch: 12 }, { wch: 22 }, { wch: 40 }, { wch: 18 },
-    { wch: 12 }, { wch: 14 },
-  ];
 
   const ozet = XLSX.utils.json_to_sheet(adaOzetleri(raporlar));
   XLSX.utils.book_append_sheet(wb, ozet, 'Ada Özeti');

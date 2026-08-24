@@ -99,7 +99,7 @@ export default function ReportList() {
         <button
           onClick={async () => {
             try {
-              await raporlarXlsxExport(filtered, 'raporlar.xlsx', getHedef);
+              await raporlarXlsxExport(filtered, 'raporlar.xlsx', getHedef, { santiyeAdi: config.genel.santiyeAdi });
               toastGoster(`${filtered.length} rapor Excel olarak indiriliyor`, 'success');
             } catch (err) {
               console.error('Excel aktarma hatası:', err);
