@@ -13,7 +13,7 @@ const inputStyle: React.CSSProperties = {
   width: '100%',
   padding: '8px 10px',
   borderRadius: 8,
-  border: '1px solid #e5e7eb',
+  border: '1px solid var(--border)',
   fontSize: 13,
   boxSizing: 'border-box',
   backgroundColor: '#fff',
@@ -74,11 +74,11 @@ export default function AdaBlokEditor({ adalar, onChange }: Props) {
     <div>
       <div
         style={{
-          backgroundColor: '#f9fafb',
+          backgroundColor: 'var(--bg-hover)',
           borderRadius: 10,
           padding: 12,
           marginBottom: 12,
-          border: '1px solid #e5e7eb',
+          border: '1px solid var(--border)',
         }}
       >
         <div style={{ fontSize: 12, fontWeight: 600, color: '#374151', marginBottom: 8 }}>
@@ -165,7 +165,7 @@ export default function AdaBlokEditor({ adalar, onChange }: Props) {
           return (
             <div
               key={`${a.ada}-${adaIdx}`}
-              style={{ border: '1px solid #e5e7eb', borderRadius: 10, overflow: 'hidden' }}
+              style={{ border: '1px solid var(--border)', borderRadius: 10, overflow: 'hidden' }}
             >
               <div
                 style={{
@@ -173,7 +173,7 @@ export default function AdaBlokEditor({ adalar, onChange }: Props) {
                   alignItems: 'center',
                   gap: 8,
                   padding: '8px 10px',
-                  backgroundColor: acikMi ? '#fef3c7' : '#f9fafb',
+                  backgroundColor: acikMi ? 'var(--bg-accent)' : 'var(--bg-hover)',
                 }}
               >
                 <input
@@ -192,7 +192,7 @@ export default function AdaBlokEditor({ adalar, onChange }: Props) {
                   onClick={() => setAcik(acikMi ? null : adaIdx)}
                   style={{
                     background: 'none',
-                    border: '1px solid #e5e7eb',
+                    border: '1px solid var(--border)',
                     borderRadius: 6,
                     padding: '2px 8px',
                     fontSize: 11,
@@ -248,7 +248,7 @@ export default function AdaBlokEditor({ adalar, onChange }: Props) {
                       style={{
                         padding: '8px 12px',
                         backgroundColor: '#f3f4f6',
-                        border: '1px solid #e5e7eb',
+                        border: '1px solid var(--border)',
                         borderRadius: 8,
                         fontSize: 12,
                         fontWeight: 600,
@@ -271,7 +271,7 @@ export default function AdaBlokEditor({ adalar, onChange }: Props) {
                           backgroundColor: '#fff',
                           borderRadius: 8,
                           padding: 6,
-                          border: '1px solid #f0f0f0',
+                          border: '1px solid var(--border-soft)',
                         }}
                       >
                         <span

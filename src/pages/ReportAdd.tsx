@@ -310,7 +310,7 @@ export default function ReportAdd() {
             borderRadius: 16,
             padding: 40,
             textAlign: 'center',
-            border: '1px solid #f0f0f0',
+            border: '1px solid var(--border-soft)',
           }}
         >
           <div style={{ fontSize: 40, marginBottom: 12 }}>🔒</div>
@@ -471,7 +471,7 @@ export default function ReportAdd() {
             borderRadius: 12,
             padding: '12px 16px',
             marginBottom: 16,
-            border: '1px solid #f0f0f0',
+            border: '1px solid var(--border-soft)',
             fontSize: 13,
             color: 'var(--text-secondary)',
           }}

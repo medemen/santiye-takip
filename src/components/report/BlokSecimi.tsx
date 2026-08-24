@@ -40,7 +40,7 @@ export default function BlokSecimi({
             onClick={onToggleAdaGeneli}
             style={{
               background: adaGeneli ? 'var(--bg-accent)' : 'none',
-              border: adaGeneli ? '1px solid #f59e0b' : '1px solid #e5e7eb',
+              border: adaGeneli ? '1px solid #f59e0b' : '1px solid var(--border)',
               borderRadius: 6,
               padding: '2px 8px',
               fontSize: 11,
@@ -121,7 +121,7 @@ export default function BlokSecimi({
 
 const kucukButon = {
   background: 'none',
-  border: '1px solid #e5e7eb',
+  border: '1px solid var(--border)',
   borderRadius: 6,
   padding: '7px 12px',
   fontSize: 12,

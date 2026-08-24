@@ -60,7 +60,7 @@ export default function IsKalemleriDurumu({ ada, blokNum, gruplar, kalemIlerleme
         padding: 16,
         marginBottom: 16,
         boxShadow: '0 1px 3px rgba(0,0,0,0.06)',
-        border: '1px solid #f0f0f0',
+        border: '1px solid var(--border-soft)',
       }}
     >
       <h3 style={{ fontSize: 14, fontWeight: 600, color: 'var(--text-muted)', margin: 0, marginBottom: 12 }}>
@@ -72,7 +72,7 @@ export default function IsKalemleriDurumu({ ada, blokNum, gruplar, kalemIlerleme
           const grupKalemleri = kalemIlerlemeleri.filter((p) => p.grup?.id === g.id);
           const grupTamam = grupKalemleri.filter((p) => p.rapor?.durum === 'tamamlandi').length;
           return (
-            <div key={g.id} style={{ border: '1px solid #e5e7eb', borderRadius: 10, overflow: 'hidden' }}>
+            <div key={g.id} style={{ border: '1px solid var(--border)', borderRadius: 10, overflow: 'hidden' }}>
               <button
                 onClick={() => toggleGrup(g.id)}
                 style={{
@@ -140,7 +140,7 @@ export default function IsKalemleriDurumu({ ada, blokNum, gruplar, kalemIlerleme
                                     fontSize: 11,
                                     padding: '3px 6px',
                                     borderRadius: 8,
-                                    border: '1px solid #e5e7eb',
+                                    border: '1px solid var(--border)',
                                     backgroundColor: 'var(--bg-card)',
                                     color: 'var(--text-primary)',
                                   }}
@@ -169,7 +169,7 @@ export default function IsKalemleriDurumu({ ada, blokNum, gruplar, kalemIlerleme
                                     fontSize: 11,
                                     padding: '3px 8px',
                                     borderRadius: 8,
-                                    border: '1px solid #e5e7eb',
+                                    border: '1px solid var(--border)',
                                     backgroundColor: 'var(--bg-card)',
                                     color: 'var(--text-faint)',
                                     cursor: 'pointer',
@@ -197,7 +197,7 @@ export default function IsKalemleriDurumu({ ada, blokNum, gruplar, kalemIlerleme
                                       padding: '6px 10px',
                                       lineHeight: 1,
                                       borderRadius: 8,
-                                      border: '1px solid #e5e7eb',
+                                      border: '1px solid var(--border)',
                                       backgroundColor: 'var(--bg-card)',
                                       color: 'var(--text-faint)',
                                       cursor: 'pointer',

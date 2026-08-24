@@ -68,7 +68,7 @@ export default function PersonelKart({
           onClick={onEdit}
           style={{
             background: 'none',
-            border: '1px solid #e5e7eb',
+            border: '1px solid var(--border)',
             borderRadius: 8,
             padding: '4px 10px',
             fontSize: 13,

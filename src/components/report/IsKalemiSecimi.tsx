@@ -37,7 +37,7 @@ export default function IsKalemiSecimi({
           width: '100%',
           padding: '10px 12px',
           borderRadius: 10,
-          border: '1px solid #e5e7eb',
+          border: '1px solid var(--border)',
           fontSize: 13,
           boxSizing: 'border-box',
           marginBottom: 8,
@@ -50,7 +50,7 @@ export default function IsKalemiSecimi({
             textAlign: 'center',
             color: 'var(--text-subtle)',
             fontSize: 13,
-            border: '1px dashed #e5e7eb',
+            border: '1px dashed var(--border)',
             borderRadius: 10,
           }}
         >
@@ -61,7 +61,7 @@ export default function IsKalemiSecimi({
           style={{
             maxHeight: 340,
             overflowY: 'auto',
-            border: '1px solid #e5e7eb',
+            border: '1px solid var(--border)',
             borderRadius: 10,
           }}
         >
@@ -77,7 +77,7 @@ export default function IsKalemiSecimi({
                   fontSize: 12,
                   fontWeight: 700,
                   color: 'var(--text-faint)',
-                  borderBottom: '1px solid #f0f0f0',
+                  borderBottom: '1px solid var(--border-soft)',
                 }}
               >
                 {g.ad} ({g.kalemler.length})

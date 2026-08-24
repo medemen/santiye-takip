@@ -61,7 +61,7 @@ export default function Profile() {
           borderRadius: 16,
           padding: 20,
           marginBottom: 16,
-          border: '1px solid #f0f0f0',
+          border: '1px solid var(--border-soft)',
           textAlign: 'center',
         }}
       >
@@ -81,7 +81,7 @@ export default function Profile() {
           borderRadius: 16,
           padding: 16,
           marginBottom: 16,
-          border: '1px solid #f0f0f0',
+          border: '1px solid var(--border-soft)',
         }}
       >
         <h3 style={{ fontSize: 14, fontWeight: 600, color: 'var(--text-muted)', margin: 0, marginBottom: 12 }}>
@@ -142,7 +142,7 @@ export default function Profile() {
           borderRadius: 16,
           padding: 16,
           marginBottom: 16,
-          border: '1px solid #f0f0f0',
+          border: '1px solid var(--border-soft)',
         }}
       >
         <h3 style={{ fontSize: 14, fontWeight: 600, color: 'var(--text-muted)', margin: 0, marginBottom: 4 }}>
@@ -216,7 +216,7 @@ export default function Profile() {
                   value={ayarlar.gunlukSaat}
                   onChange={(e) => ayarlariGuncelle({ ...ayarlar, gunlukSaat: e.target.value })}
                   style={{
-                    padding: '6px 10px', borderRadius: 8, border: '1px solid #e5e7eb', fontSize: 13,
+                    padding: '6px 10px', borderRadius: 8, border: '1px solid var(--border)', fontSize: 13,
                   }}
                 />
               </div>
@@ -246,7 +246,7 @@ export default function Profile() {
           borderRadius: 16,
           padding: 16,
           marginBottom: 16,
-          border: '1px solid #f0f0f0',
+          border: '1px solid var(--border-soft)',
         }}
       >
         <h3 style={{ fontSize: 14, fontWeight: 600, color: 'var(--text-muted)', margin: 0, marginBottom: 12 }}>

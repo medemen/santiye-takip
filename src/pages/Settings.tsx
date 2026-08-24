@@ -111,7 +111,7 @@ export default function Settings() {
     width: '100%',
     padding: '10px 12px',
     borderRadius: 10,
-    border: '1px solid #e5e7eb',
+    border: '1px solid var(--border)',
     fontSize: 13,
     boxSizing: 'border-box',
     backgroundColor: 'var(--bg-card)',

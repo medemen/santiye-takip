@@ -13,7 +13,7 @@ export default function RaporGecmisi({ raporlar }: Props) {
         borderRadius: 16,
         padding: 16,
         boxShadow: '0 1px 3px rgba(0,0,0,0.06)',
-        border: '1px solid #f0f0f0',
+        border: '1px solid var(--border-soft)',
       }}
     >
       <h3 style={{ fontSize: 14, fontWeight: 600, color: 'var(--text-muted)', margin: 0, marginBottom: 12 }}>

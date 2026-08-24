@@ -240,7 +240,7 @@ export default function Hakedis() {
           <button
             onClick={() => adaSec('TÜMÜ')}
             style={{
-              padding: '8px 14px', borderRadius: 20, border: '1px solid #e5e7eb', cursor: 'pointer', fontSize: 13,
+              padding: '8px 14px', borderRadius: 20, border: '1px solid var(--border)', cursor: 'pointer', fontSize: 13,
               fontWeight: 600, backgroundColor: seciliAda === 'TÜMÜ' ? 'var(--bg-accent)' : 'var(--bg-card)', color: seciliAda === 'TÜMÜ' ? 'var(--accent-dark)' : 'var(--text-muted)',
             }}
           >
@@ -251,7 +251,7 @@ export default function Hakedis() {
               key={a.ada}
               onClick={() => adaSec(a.ada)}
               style={{
-                padding: '8px 14px', borderRadius: 20, border: '1px solid #e5e7eb', cursor: 'pointer', fontSize: 13,
+                padding: '8px 14px', borderRadius: 20, border: '1px solid var(--border)', cursor: 'pointer', fontSize: 13,
                 fontWeight: 600, backgroundColor: seciliAda === a.ada ? 'var(--bg-accent)' : 'var(--bg-card)', color: seciliAda === a.ada ? 'var(--accent-dark)' : 'var(--text-muted)',
               }}
             >
@@ -284,7 +284,7 @@ export default function Hakedis() {
         </div>
 
         <div style={{ ...card, padding: 0, overflow: 'hidden' }}>
-          <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr 1fr 1fr 1fr', gap: 8, padding: '10px 16px', fontSize: 11, color: 'var(--text-subtle)', fontWeight: 700, borderBottom: '1px solid #f0f0f0' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr 1fr 1fr 1fr', gap: 8, padding: '10px 16px', fontSize: 11, color: 'var(--text-subtle)', fontWeight: 700, borderBottom: '1px solid var(--border-soft)' }}>
             <span>İmalat Grubu</span>
             <span style={{ textAlign: 'right' }}>Pursantaj</span>
             <span style={{ textAlign: 'right' }}>Uygulama</span>
@@ -296,7 +296,7 @@ export default function Hakedis() {
             const acik = acikGruplar.has(g.id);
             const kalemler = eşlenenKalemler(g.id);
             return (
-              <div key={g.id} style={{ borderBottom: '1px solid #f5f5f5' }}>
+              <div key={g.id} style={{ borderBottom: '1px solid var(--border-soft)' }}>
                 <div
                   onClick={() => toggleGrup(g.id)}
                   style={{ display: 'grid', gridTemplateColumns: '2fr 1fr 1fr 1fr 1fr', gap: 8, alignItems: 'center', padding: '10px 16px', cursor: 'pointer', backgroundColor: acik ? 'var(--bg-accent-soft)' : 'var(--bg-card)' }}
@@ -313,7 +313,7 @@ export default function Hakedis() {
                   <span style={{ textAlign: 'right', fontSize: 13, fontWeight: 700, color: h.fark !== null ? farkRengi(h.fark) : 'var(--text-subtle)' }}>{h.fark !== null ? yuvarla(h.fark) : '—'}</span>
                 </div>
                 {acik && (
-                  <div style={{ padding: '4px 16px 12px', backgroundColor: 'var(--bg-accent-soft)', borderTop: '1px dashed #fde68a' }}>
+                  <div style={{ padding: '4px 16px 12px', backgroundColor: 'var(--bg-accent-soft)', borderTop: '1px dashed var(--border)' }}>
                     {kalemler.length === 0 && (
                       <div style={{ fontSize: 12, color: 'var(--text-subtle)', padding: '8px 0' }}>
                         Bu gruba eşlenmiş iş kalemi yok.
@@ -323,7 +323,7 @@ export default function Hakedis() {
                       const duzen = duzenleme[kalem] ?? { yuzde: 0, durum: 'devam_ediyor' as IsDurumu };
                       const mevcut = getSonRapor(seciliAda === 'TÜMÜ' ? (adalar[0]?.ada ?? '') : seciliAda, 0, kalem);
                       return (
-                        <div key={kalem} style={{ display: 'grid', gridTemplateColumns: '1.6fr 1fr 1fr auto', gap: 10, alignItems: 'center', padding: '8px 0', borderBottom: '1px solid #fef3c7' }}>
+                        <div key={kalem} style={{ display: 'grid', gridTemplateColumns: '1.6fr 1fr 1fr auto', gap: 10, alignItems: 'center', padding: '8px 0', borderBottom: '1px solid var(--border)' }}>
                           <span style={{ fontSize: 12, color: 'var(--text-secondary)', minWidth: 0 }}>
                             {kalem}
                             {mevcut && <span style={{ fontSize: 10, color: 'var(--text-subtle)', marginLeft: 6 }}>rapor: {mevcut.raporlayan}</span>}
@@ -348,7 +348,7 @@ export default function Hakedis() {
                               const durum = e.target.value as IsDurumu;
                               setDuzenleme({ ...duzenleme, [kalem]: { ...duzen, durum } });
                             }}
-                            style={{ fontSize: 11, padding: '4px 6px', borderRadius: 8, border: '1px solid #e5e7eb', backgroundColor: 'var(--bg-card)', color: 'var(--text-secondary)' }}
+                            style={{ fontSize: 11, padding: '4px 6px', borderRadius: 8, border: '1px solid var(--border)', backgroundColor: 'var(--bg-card)', color: 'var(--text-secondary)' }}
                           >
                             <option value="planlandi">Planlandı</option>
                             <option value="devam_ediyor">Devam</option>
@@ -400,11 +400,11 @@ export default function Hakedis() {
       </div>
 
       <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginBottom: 16 }}>
-        <button onClick={() => adaSec('TÜMÜ')} style={{ padding: '8px 14px', borderRadius: 20, border: '1px solid #e5e7eb', cursor: 'pointer', fontSize: 13, fontWeight: 600, backgroundColor: seciliAda === 'TÜMÜ' ? 'var(--bg-accent)' : 'var(--bg-card)', color: seciliAda === 'TÜMÜ' ? 'var(--accent-dark)' : 'var(--text-muted)' }}>
+        <button onClick={() => adaSec('TÜMÜ')} style={{ padding: '8px 14px', borderRadius: 20, border: '1px solid var(--border)', cursor: 'pointer', fontSize: 13, fontWeight: 600, backgroundColor: seciliAda === 'TÜMÜ' ? 'var(--bg-accent)' : 'var(--bg-card)', color: seciliAda === 'TÜMÜ' ? 'var(--accent-dark)' : 'var(--text-muted)' }}>
           Tümü
         </button>
         {adalar.map((a) => (
-          <button key={a.ada} onClick={() => adaSec(a.ada)} style={{ padding: '8px 14px', borderRadius: 20, border: '1px solid #e5e7eb', cursor: 'pointer', fontSize: 13, fontWeight: 600, backgroundColor: seciliAda === a.ada ? 'var(--bg-accent)' : 'var(--bg-card)', color: seciliAda === a.ada ? 'var(--accent-dark)' : 'var(--text-muted)' }}>
+          <button key={a.ada} onClick={() => adaSec(a.ada)} style={{ padding: '8px 14px', borderRadius: 20, border: '1px solid var(--border)', cursor: 'pointer', fontSize: 13, fontWeight: 600, backgroundColor: seciliAda === a.ada ? 'var(--bg-accent)' : 'var(--bg-card)', color: seciliAda === a.ada ? 'var(--accent-dark)' : 'var(--text-muted)' }}>
             {a.ada}
           </button>
         ))}
@@ -416,7 +416,7 @@ export default function Hakedis() {
           const acik = acikGruplar.has(g.id);
           const kalemler = eşlenenKalemler(g.id);
           return (
-            <div key={g.id} style={{ borderBottom: '1px solid #f5f5f5' }}>
+            <div key={g.id} style={{ borderBottom: '1px solid var(--border-soft)' }}>
               <button type="button" onClick={() => toggleGrup(g.id)} style={{ padding: '12px 14px', cursor: 'pointer', backgroundColor: acik ? 'var(--bg-accent-soft)' : 'var(--bg-card)', border: 'none', width: '100%', textAlign: 'left', font: 'inherit' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6 }}>
                   <span style={{ width: 8, height: 8, borderRadius: 4, backgroundColor: DISIPLIN_RENKLERI[g.disiplin], flexShrink: 0 }} />
@@ -444,19 +444,19 @@ export default function Hakedis() {
                 {h.uygulama !== null && <div style={{ marginTop: 6 }}><ProgressBar value={h.uygulama} height={5} /></div>}
               </button>
               {acik && (
-                <div style={{ padding: '4px 14px 12px', backgroundColor: 'var(--bg-accent-soft)', borderTop: '1px dashed #fde68a' }}>
+                <div style={{ padding: '4px 14px 12px', backgroundColor: 'var(--bg-accent-soft)', borderTop: '1px dashed var(--border)' }}>
                   {kalemler.length === 0 && <div style={{ fontSize: 12, color: 'var(--text-subtle)', padding: '8px 0' }}>Bu gruba eşlenmiş iş kalemi yok.</div>}
                   {kalemler.map((kalem) => {
                     const duzen = duzenleme[kalem] ?? { yuzde: 0, durum: 'devam_ediyor' as IsDurumu };
                     return (
-                      <div key={kalem} style={{ padding: '8px 0', borderBottom: '1px solid #fef3c7' }}>
+                      <div key={kalem} style={{ padding: '8px 0', borderBottom: '1px solid var(--border)' }}>
                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 8, marginBottom: 4 }}>
                           <span style={{ fontSize: 12, color: 'var(--text-secondary)', flex: 1 }}>{kalem}</span>
                           <span style={{ fontSize: 12, fontWeight: 700, color: DURUM_RENKLERI[duzen.durum] }}>%{duzen.yuzde}</span>
                         </div>
                         <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
                           <input type="range" min={0} max={100} step={1} value={duzen.yuzde} disabled={seciliAda === 'TÜMÜ'} onChange={(e) => setDuzenleme({ ...duzenleme, [kalem]: { ...duzen, yuzde: Number(e.target.value) } })} style={{ flex: 1, accentColor: '#f59e0b' }} />
-                          <select value={duzen.durum} disabled={seciliAda === 'TÜMÜ'} onChange={(e) => { const durum = e.target.value as IsDurumu; setDuzenleme({ ...duzenleme, [kalem]: { ...duzen, durum } }); }} style={{ fontSize: 11, padding: '4px 6px', borderRadius: 8, border: '1px solid #e5e7eb', backgroundColor: 'var(--bg-card)', color: 'var(--text-secondary)' }}>
+                          <select value={duzen.durum} disabled={seciliAda === 'TÜMÜ'} onChange={(e) => { const durum = e.target.value as IsDurumu; setDuzenleme({ ...duzenleme, [kalem]: { ...duzen, durum } }); }} style={{ fontSize: 11, padding: '4px 6px', borderRadius: 8, border: '1px solid var(--border)', backgroundColor: 'var(--bg-card)', color: 'var(--text-secondary)' }}>
                             <option value="planlandi">Planlandı</option>
                             <option value="devam_ediyor">Devam</option>
                             <option value="tamamlandi">Tamam</option>

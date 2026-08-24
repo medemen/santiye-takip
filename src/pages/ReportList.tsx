@@ -107,7 +107,7 @@ export default function ReportList() {
             }
           }}
           style={{
-            background: 'none', border: '1px solid #e5e7eb', borderRadius: 8,
+            background: 'none', border: '1px solid var(--border)', borderRadius: 8,
             padding: '4px 10px', fontSize: 11, color: 'var(--text-faint)', cursor: 'pointer',
           }}
           title="Excel Aktar"
@@ -122,7 +122,7 @@ export default function ReportList() {
           borderRadius: 12,
           padding: 14,
           marginBottom: 16,
-          border: '1px solid #f0f0f0',
+          border: '1px solid var(--border-soft)',
         }}
       >
         <input
@@ -134,7 +134,7 @@ export default function ReportList() {
             width: '100%',
             padding: '10px 12px',
             borderRadius: 8,
-            border: '1px solid #e5e7eb',
+            border: '1px solid var(--border)',
             fontSize: 13,
             marginBottom: 8,
             boxSizing: 'border-box',
@@ -197,7 +197,7 @@ export default function ReportList() {
               minWidth: 100,
               padding: '8px 10px',
               borderRadius: 8,
-              border: '1px solid #e5e7eb',
+              border: '1px solid var(--border)',
               fontSize: 12,
               backgroundColor: 'var(--bg-card)',
             }}
@@ -216,7 +216,7 @@ export default function ReportList() {
               minWidth: 80,
               padding: '8px 10px',
               borderRadius: 8,
-              border: '1px solid #e5e7eb',
+              border: '1px solid var(--border)',
               fontSize: 12,
               backgroundColor: 'var(--bg-card)',
             }}
@@ -240,7 +240,7 @@ export default function ReportList() {
               minWidth: 80,
               padding: '8px 10px',
               borderRadius: 8,
-              border: '1px solid #e5e7eb',
+              border: '1px solid var(--border)',
               fontSize: 12,
               backgroundColor: 'var(--bg-card)',
             }}
@@ -262,7 +262,7 @@ export default function ReportList() {
               color: 'var(--text-subtle)',
               backgroundColor: 'var(--bg-card)',
               borderRadius: 12,
-              border: '1px solid #f0f0f0',
+              border: '1px solid var(--border-soft)',
             }}
           >
             <p style={{ fontSize: 14 }}>Eşleşen rapor bulunamadı</p>
@@ -330,7 +330,7 @@ export default function ReportList() {
             disabled={gecerliSayfa === 1}
             style={{
               background: 'none',
-              border: '1px solid #e5e7eb',
+              border: '1px solid var(--border)',
               borderRadius: 8,
               padding: '6px 12px',
               fontSize: 12,
@@ -348,7 +348,7 @@ export default function ReportList() {
             disabled={gecerliSayfa === toplamSayfa}
             style={{
               background: 'none',
-              border: '1px solid #e5e7eb',
+              border: '1px solid var(--border)',
               borderRadius: 8,
               padding: '6px 12px',
               fontSize: 12,

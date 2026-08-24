@@ -97,7 +97,7 @@ export default function Layout({ children }: Props) {
             width: 248,
             flexShrink: 0,
             backgroundColor: 'var(--bg-card)',
-            borderRight: '1px solid #e5e7eb',
+            borderRight: '1px solid var(--border)',
             position: 'sticky',
             top: 0,
             height: '100dvh',
@@ -110,7 +110,7 @@ export default function Layout({ children }: Props) {
           <button
             type="button"
             onClick={() => navigate('/')}
-            style={{ cursor: 'pointer', padding: '0 8px 18px', marginBottom: 14, background: 'none', border: 'none', borderBottom: '1px solid #f0f0f0', textAlign: 'left', font: 'inherit', width: '100%' }}
+            style={{ cursor: 'pointer', padding: '0 8px 18px', marginBottom: 14, background: 'none', border: 'none', borderBottom: '1px solid var(--border-soft)', textAlign: 'left', font: 'inherit', width: '100%' }}
           >
             <div style={{ fontSize: 17, fontWeight: 700, color: 'var(--text-primary)' }}>{config.genel.santiyeAdi}</div>
             <div style={{ fontSize: 12, color: 'var(--text-subtle)' }}>{config.genel.projeAdi}</div>
@@ -165,7 +165,7 @@ export default function Layout({ children }: Props) {
             )}
           </nav>
 
-          <div style={{ borderTop: '1px solid #f0f0f0', paddingTop: 12 }}>
+          <div style={{ borderTop: '1px solid var(--border-soft)', paddingTop: 12 }}>
             <div style={{ fontSize: 13, color: 'var(--text-secondary)', fontWeight: 600 }}>
               👤 {user?.ad_soyad ?? 'Giriş yapılmadı'}
             </div>
@@ -180,7 +180,7 @@ export default function Layout({ children }: Props) {
               style={{
                 width: '100%',
                 background: 'none',
-                border: '1px solid #e5e7eb',
+                border: '1px solid var(--border)',
                 borderRadius: 8,
                 padding: '8px 10px',
                 fontSize: 12,
@@ -235,7 +235,7 @@ export default function Layout({ children }: Props) {
             onClick={handleLogout}
             style={{
               background: 'none',
-              border: '1px solid #e5e7eb',
+              border: '1px solid var(--border)',
               borderRadius: 8,
               padding: '4px 10px',
               fontSize: 11,
@@ -257,7 +257,7 @@ export default function Layout({ children }: Props) {
           width: '100%',
           maxWidth: 480,
           backgroundColor: 'var(--bg-card)',
-          borderTop: '1px solid #e5e7eb',
+          borderTop: '1px solid var(--border)',
           display: 'flex',
           justifyContent: 'space-around',
           alignItems: 'center',

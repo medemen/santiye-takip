@@ -13,7 +13,7 @@ export default function AdaIlerlemeKart({ ilerleme, onRaporEkle }: Props) {
         borderRadius: 12,
         padding: 14,
         marginBottom: 16,
-        border: '1px solid #f0f0f0',
+        border: '1px solid var(--border-soft)',
       }}
     >
       <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 6 }}>

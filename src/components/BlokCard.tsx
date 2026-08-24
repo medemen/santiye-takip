@@ -55,7 +55,7 @@ const BlokCard = memo(function BlokCard({ ada, blok, onClick }: Props) {
         padding: 14,
         cursor: onClick ? 'pointer' : 'default',
         boxShadow: '0 1px 3px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.06)',
-        border: '1px solid #f0f0f0',
+        border: '1px solid var(--border-soft)',
         transition: 'transform 0.15s, box-shadow 0.15s',
         font: 'inherit',
         textAlign: 'left',

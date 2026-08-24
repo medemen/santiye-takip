@@ -82,7 +82,7 @@ export default function HedefTakvim() {
         <div style={{ display: 'flex', gap: 6 }}>
           <button
             onClick={buguneGit}
-            style={{ background: 'none', border: '1px solid #e5e7eb', borderRadius: 8, padding: '4px 10px', fontSize: 12, color: 'var(--text-muted)', cursor: 'pointer' }}
+            style={{ background: 'none', border: '1px solid var(--border)', borderRadius: 8, padding: '4px 10px', fontSize: 12, color: 'var(--text-muted)', cursor: 'pointer' }}
           >
             Bugün
           </button>
@@ -101,7 +101,7 @@ export default function HedefTakvim() {
                 toastGoster('Excel dosyası oluşturulamadı', 'error');
               }
             }}
-            style={{ background: 'none', border: '1px solid #e5e7eb', borderRadius: 8, padding: '4px 10px', fontSize: 12, color: 'var(--text-faint)', cursor: 'pointer' }}
+            style={{ background: 'none', border: '1px solid var(--border)', borderRadius: 8, padding: '4px 10px', fontSize: 12, color: 'var(--text-faint)', cursor: 'pointer' }}
             title="Excel Aktar"
           >
             📥
@@ -117,7 +117,7 @@ export default function HedefTakvim() {
                 toastGoster('PDF dosyası oluşturulamadı', 'error');
               }
             }}
-            style={{ background: 'none', border: '1px solid #e5e7eb', borderRadius: 8, padding: '4px 10px', fontSize: 12, color: 'var(--text-faint)', cursor: 'pointer' }}
+            style={{ background: 'none', border: '1px solid var(--border)', borderRadius: 8, padding: '4px 10px', fontSize: 12, color: 'var(--text-faint)', cursor: 'pointer' }}
             title="PDF Aktar"
           >
             📄
@@ -126,11 +126,11 @@ export default function HedefTakvim() {
       </div>
 
       <div style={{ display: 'flex', gap: 8, alignItems: 'center', marginBottom: 12 }}>
-        <button onClick={ayOnce} style={{ background: 'none', border: '1px solid #e5e7eb', borderRadius: 8, width: 32, height: 32, cursor: 'pointer', fontSize: 14, color: 'var(--text-muted)' }}>◀</button>
+        <button onClick={ayOnce} style={{ background: 'none', border: '1px solid var(--border)', borderRadius: 8, width: 32, height: 32, cursor: 'pointer', fontSize: 14, color: 'var(--text-muted)' }}>◀</button>
         <div style={{ flex: 1, textAlign: 'center', fontSize: 15, fontWeight: 600, color: 'var(--text-secondary)' }}>
           {AY_ADLARI[gorunenAy.getMonth()]} {gorunenAy.getFullYear()}
         </div>
-        <button onClick={aySonra} style={{ background: 'none', border: '1px solid #e5e7eb', borderRadius: 8, width: 32, height: 32, cursor: 'pointer', fontSize: 14, color: 'var(--text-muted)' }}>▶</button>
+        <button onClick={aySonra} style={{ background: 'none', border: '1px solid var(--border)', borderRadius: 8, width: 32, height: 32, cursor: 'pointer', fontSize: 14, color: 'var(--text-muted)' }}>▶</button>
       </div>
 
       {adalar.length > 1 && (

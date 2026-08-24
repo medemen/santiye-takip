@@ -19,7 +19,7 @@ const inputStyle: React.CSSProperties = {
   width: '100%',
   padding: '10px 12px',
   borderRadius: 10,
-  border: '1px solid #e5e7eb',
+  border: '1px solid var(--border)',
   fontSize: 13,
   boxSizing: 'border-box',
   backgroundColor: 'var(--bg-card)',
@@ -155,7 +155,7 @@ export default function NewSantiyeWizard() {
                 textAlign: 'left',
                 padding: 16,
                 backgroundColor: 'var(--bg-card)',
-                border: '2px solid #e5e7eb',
+                border: '2px solid var(--border)',
                 borderRadius: 14,
                 cursor: 'pointer',
               }}
@@ -308,7 +308,7 @@ export default function NewSantiyeWizard() {
             borderRadius: 10,
             padding: 12,
             marginBottom: 12,
-            border: '1px solid #f0f0f0',
+            border: '1px solid var(--border-soft)',
             fontSize: 13,
             color: 'var(--text-secondary)',
             display: 'flex',
@@ -397,7 +397,7 @@ export default function NewSantiyeWizard() {
           onClick={() => navigate('/ayarlar')}
           style={{
             background: 'none',
-            border: '1px solid #e5e7eb',
+            border: '1px solid var(--border)',
             borderRadius: 8,
             padding: '6px 12px',
             fontSize: 12,

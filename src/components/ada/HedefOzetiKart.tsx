@@ -13,7 +13,7 @@ export default function HedefOzetiKart({ ozet, onHedefTikla }: Props) {
         borderRadius: 12,
         padding: 14,
         marginBottom: 16,
-        border: '1px solid #f0f0f0',
+        border: '1px solid var(--border-soft)',
       }}
     >
       <h3 style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-muted)', margin: 0, marginBottom: 8 }}>

@@ -19,7 +19,7 @@ export default function BlokBilgiKart({ ada, blok, santiyeSefi, tamamlanan, deva
         padding: 18,
         marginBottom: 16,
         boxShadow: '0 1px 3px rgba(0,0,0,0.06)',
-        border: '1px solid #f0f0f0',
+        border: '1px solid var(--border-soft)',
       }}
     >
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 }}>

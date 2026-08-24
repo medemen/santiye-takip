@@ -41,7 +41,7 @@ export default function AdaDetayTablo({ satirlar, onNavigate }: Props) {
               gap: 8,
               alignItems: 'center',
               padding: '8px 12px',
-              borderTop: '1px solid #f0f0f0',
+              borderTop: '1px solid var(--border-soft)',
               fontSize: 13,
               cursor: 'pointer',
               backgroundColor: 'var(--bg-card)',

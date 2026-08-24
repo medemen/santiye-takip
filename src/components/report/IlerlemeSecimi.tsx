@@ -16,7 +16,7 @@ export default function IlerlemeSecimi({ ilerleme, onChange }: Props) {
               style={{
                 padding: '2px 8px',
                 backgroundColor: ilerleme === p ? 'var(--bg-accent)' : 'var(--bg-hover)',
-                border: ilerleme === p ? '1px solid #f59e0b' : '1px solid #e5e7eb',
+                border: ilerleme === p ? '1px solid #f59e0b' : '1px solid var(--border)',
                 borderRadius: 6,
                 fontSize: 11,
                 color: ilerleme === p ? 'var(--accent-dark)' : 'var(--text-faint)',

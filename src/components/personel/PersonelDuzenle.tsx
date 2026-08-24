@@ -86,7 +86,7 @@ export default function PersonelDuzenle({
           borderRadius: 12,
           padding: 14,
           marginBottom: 16,
-          border: '1px solid #f0f0f0',
+          border: '1px solid var(--border-soft)',
         }}
       >
         <div style={{ fontSize: 15, fontWeight: 600, color: 'var(--text-primary)' }}>{editPerson}</div>
@@ -118,7 +118,7 @@ export default function PersonelDuzenle({
             width: '100%',
             padding: '12px 14px',
             borderRadius: 12,
-            border: '2px solid #e5e7eb',
+            border: '2px solid var(--border)',
             fontSize: 14,
             backgroundColor: 'var(--bg-card)',
             boxSizing: 'border-box',
@@ -144,7 +144,7 @@ export default function PersonelDuzenle({
               }}
               style={{
                 background: 'none',
-                border: '1px solid #e5e7eb',
+                border: '1px solid var(--border)',
                 borderRadius: 6,
                 padding: '2px 8px',
                 fontSize: 11,

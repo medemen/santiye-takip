@@ -12,7 +12,7 @@ const inputStyle: React.CSSProperties = {
   width: '100%',
   padding: '8px 10px',
   borderRadius: 8,
-  border: '1px solid #e5e7eb',
+  border: '1px solid var(--border)',
   fontSize: 13,
   boxSizing: 'border-box',
   backgroundColor: '#fff',
@@ -63,11 +63,11 @@ export default function KalemGrupEditor({ gruplar, onChange }: Props) {
     <div>
       <div
         style={{
-          backgroundColor: '#f9fafb',
+          backgroundColor: 'var(--bg-hover)',
           borderRadius: 10,
           padding: 12,
           marginBottom: 12,
-          border: '1px solid #e5e7eb',
+          border: '1px solid var(--border)',
         }}
       >
         <div style={{ fontSize: 12, fontWeight: 600, color: '#374151', marginBottom: 8 }}>
@@ -120,7 +120,7 @@ export default function KalemGrupEditor({ gruplar, onChange }: Props) {
 
       <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
         {gruplar.map((g) => (
-          <div key={g.id} style={{ border: '1px solid #e5e7eb', borderRadius: 10, padding: 10 }}>
+          <div key={g.id} style={{ border: '1px solid var(--border)', borderRadius: 10, padding: 10 }}>
             <div style={{ display: 'flex', gap: 8, marginBottom: 8 }}>
               <input
                 style={{ ...inputStyle, flex: 1, minWidth: 0 }}
