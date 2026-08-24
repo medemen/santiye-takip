@@ -33,6 +33,11 @@ const BASE = BASE_URL.href.replace(/\/+$/, '') + '/';
 const BASENAME = BASE_URL.pathname.replace(/\/+$/, '');
 
 const cfg = JSON.parse(readFileSync(resolve(KOK, 'data/santiye.config.json'), 'utf8'));
+const SIFRE = process.env.VITE_DEFAULT_PASSWORD;
+if (!SIFRE) {
+  console.error('.env icinde VITE_DEFAULT_PASSWORD yok. Guvenli bir sifre belirleyin ve repoya yazmayin.');
+  process.exit(1);
+}
 const SANTIYE_ADI = cfg.genel.santiyeAdi;
 const ADALAR = cfg.yapi.adalar ?? [];
 const ILK_ADA = ADALAR[0]?.ada;
@@ -123,7 +128,7 @@ async function girisYap(kullanici) {
   await page.locator('select').first().selectOption({ label: secenek });
   const sifreAlani = page.locator('input[type="password"]');
   if (await sifreAlani.count() > 0) {
-    await sifreAlani.first().fill(process.env.VITE_DEFAULT_PASSWORD || 'Santiye2026');
+    await sifreAlani.first().fill(SIFRE);
   }
   await page.getByRole('button', { name: 'Giriş Yap' }).click();
   await page.waitForURL(yolEsit('/'), { timeout: 30000 });
@@ -236,7 +241,7 @@ async function main() {
       await dpage.locator('select').first().selectOption({ label: secenek });
       const dsifre = dpage.locator('input[type="password"]');
       if (await dsifre.count() > 0) {
-        await dsifre.first().fill(process.env.VITE_DEFAULT_PASSWORD || 'Santiye2026');
+        await dsifre.first().fill(SIFRE);
       }
       await dpage.getByRole('button', { name: 'Giriş Yap' }).click();
       await dpage.waitForURL(yolEsit('/'), { timeout: 30000 });

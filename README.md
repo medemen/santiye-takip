@@ -53,7 +53,7 @@ Windows'ta `komutlar.bat` sık kullanılan komutları menüden çalıştırır;
 | Değişken | Açıklama |
 |---|---|
 | `VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY` | Uygulamanın çalışma zamanında kullandığı Supabase bağlantısı |
-| `VITE_DEFAULT_PASSWORD` | Seed script'lerinin oluşturduğu kullanıcılar için varsayılan şifre |
+| `VITE_DEFAULT_PASSWORD` | Seed script'lerinin oluşturduğu kullanıcılar için varsayılan şifre. **Zorunludur:** `seed:users`, `seed:migration`, `bootstrap:admin` ve `test:browser` bu değişken olmadan hata verip durur — repo içinde yedek şifre bulunmaz. Güçlü bir şifre belirleyin ve `.env`'i repoya işlemeyin. |
 | `SUPABASE_SERVICE_ROLE_KEY` | Yalnızca yerel `scripts/*.mjs` seed script'leri için — uygulama runtime'ında kullanılmaz, asla client'a sızdırılmaz |
 
 Tam liste ve örnek değerler için `.env.example`.

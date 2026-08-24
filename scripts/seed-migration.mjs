@@ -8,7 +8,11 @@ import { fileURLToPath } from 'node:url';
 import { dirname, join } from 'node:path';
 
 process.loadEnvFile();
-const DEFAULT_PASSWORD = process.env.VITE_DEFAULT_PASSWORD || 'Santiye2026';
+const DEFAULT_PASSWORD = process.env.VITE_DEFAULT_PASSWORD;
+if (!DEFAULT_PASSWORD) {
+  console.error('.env icinde VITE_DEFAULT_PASSWORD yok. Guvenli bir sifre belirleyin ve repoya yazmayin.');
+  process.exit(1);
+}
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const dataDir = join(__dirname, '..', 'data');
