@@ -4,7 +4,9 @@ import { getSiteConfig } from '../config/site';
 import { idbGet, idbSet } from '../lib/db';
 import type { RealtimeChannel } from '@supabase/supabase-js';
 import { toastGoster } from './toastStore';
-import { getCurrentUser, supabaseOturumAktif } from './authStore';
+import { getCurrentUser, supabaseOturumAktif, sefAdadaYetkiliMi } from './authStore';
+import { getKullaniciAdaAtamasi } from './atamaStore';
+import { getKullanicilar } from './kullanicilarStore';
 
 const STORAGE_KEY = `${getSiteConfig().marka.localStoragePrefix}_raporlar`;
 
@@ -197,6 +199,8 @@ function upsertHataMesajlari(basarisiz: Rapor[]): string {
   return Array.from(mesajlar).join(', ');
 }
 
+let _yuklemeHataBildirildi = false;
+
 export async function supabaseRaporlariYukle(): Promise<void> {
   if (!isSupabaseReady()) return;
   try {
@@ -213,12 +217,15 @@ export async function supabaseRaporlariYukle(): Promise<void> {
     const birlestirilmis = [...sunucu, ...bekleyen];
     setRaporlar(birlestirilmis);
     // Tek tek upsert: tek bir yetkisiz/uyumsuz rapor kalan tum raporlarin
-    // yuklenmesini bloke etmesin. RLS geregi yalnizca kullaniciya ait raporlar
-    // denenir (admin/PM her raporu deneyebilir).
+    // yuklenmesini bloke etmesin. RLS INSERT politikasinin client aynasi:
+    // PM sinirsiz; sef ada-scope'lu (bos dizi = sinirsiz); sahip yalnizca
+    // atanmis oldugu adaya yazabilir.
     const oturum = getCurrentUser();
     const adaylar = bekleyen.filter((r) => {
       if (!oturum || !supabaseOturumAktif()) return false;
-      return oturum.admin || oturum.proje_muduru || r.raporlayan === oturum.ad_soyad;
+      if (oturum.proje_muduru) return true;
+      if (oturum.admin) return sefAdadaYetkiliMi(oturum.yetkili_adalar, r.ada);
+      return r.raporlayan === oturum.ad_soyad && sahibiAdayaAtanmisMi(oturum.ad_soyad, r.ada);
     });
     // Parça parça toplu upsert: uzun çevrimdışı dönemde birikmiş yüzlerce
     // rapor için tek tek istek atmak dakikalar sürebilir. Bir parça tamamen
@@ -241,12 +248,19 @@ export async function supabaseRaporlariYukle(): Promise<void> {
     if (basarisiz.length > 0) {
       const ilk = basarisiz[0];
       console.warn('Supabase yerel rapor yukleme hatasi,', basarisiz.length, 'rapor:', upsertHataMesajlari(basarisiz));
-      toastGoster(
-        basarisiz.length + ' rapor sunucuya yuklenemedi (' + ilk.raporlayan + ', ' + ilk.ada +
-        (basarisiz.length > 1 ? ' ve ' + (basarisiz.length - 1) + ' daha' : '') +
-        '). Atama/rol izninizi kontrol edin.',
-        'error'
-      );
+      // Oturum basina tek bildirim: her yukleme denemesinde toast yiginini
+      // engelle (kalici reddedilen kayitlarin durum isareti Faz 3'te).
+      if (!_yuklemeHataBildirildi) {
+        _yuklemeHataBildirildi = true;
+        toastGoster(
+          basarisiz.length + ' rapor sunucuya yuklenemedi (' + ilk.raporlayan + ', ' + ilk.ada +
+          (basarisiz.length > 1 ? ' ve ' + (basarisiz.length - 1) + ' daha' : '') +
+          '). Atama/rol izninizi kontrol edin.',
+          'error'
+        );
+      }
+    } else if (adaylar.length > 0) {
+      _yuklemeHataBildirildi = false;
     }
   } catch {
     /* supabase offline, keep local data */
@@ -304,6 +318,12 @@ export function updateRapor(id: string, guncelleme: Partial<Omit<Rapor, 'id' | '
     toastGoster('Bu raporu düzenleme yetkiniz yok.', 'error');
     return false;
   }
+  // Ada/atama kapsami kontrolu yalnizca sunucuya yazilacakken uygulanir;
+  // tam offline modda yerel duzenleme serbesttir (offline-first).
+  if (supabaseOturumAktif() && !sunucudaDuzenlemeIzniVar(raporlar[idx])) {
+    toastGoster('Bu raporu düzenleme yetkiniz yok (ada/atama kapsamı dışında).', 'error');
+    return false;
+  }
   const guncel = { ...raporlar[idx], ...guncelleme };
   const yeniListe = [...raporlar];
   yeniListe[idx] = guncel;
@@ -329,6 +349,10 @@ export function deleteRapor(id: string): boolean {
     toastGoster('Rapor silme yetkiniz yok.', 'error');
     return false;
   }
+  if (supabaseOturumAktif() && !sunucudaSilmeIzniVar(rapor)) {
+    toastGoster('Bu adadaki raporu silme yetkiniz yok.', 'error');
+    return false;
+  }
   setRaporlar(raporlar.filter((r) => r.id !== id));
   if (supabaseOturumAktif()) {
     getSupabase().from('raporlar').delete().eq('id', id).then(({ error }) => {
@@ -346,6 +370,29 @@ function raporDuzenleyebilir(rapor: Rapor): boolean {
   if (!oturum) return false;
   if (oturum.admin || oturum.proje_muduru) return true;
   return rapor.raporlayan === oturum.ad_soyad;
+}
+
+// Sahip dali icin RLS atama kosulu: kullanici_ada_atamalari veya
+// kullanicilar.atanan_ada bu adayi kapsiyor olmali.
+function sahibiAdayaAtanmisMi(ad_soyad: string, ada: string): boolean {
+  if (getKullaniciAdaAtamasi(ad_soyad) === ada) return true;
+  const profil = getKullanicilar().find((k) => k.ad_soyad === ad_soyad);
+  return profil?.atanan_ada === ada;
+}
+
+function sunucudaDuzenlemeIzniVar(rapor: Rapor): boolean {
+  const oturum = getCurrentUser();
+  if (!oturum) return false;
+  if (oturum.proje_muduru) return true;
+  if (oturum.admin) return sefAdadaYetkiliMi(oturum.yetkili_adalar, rapor.ada);
+  return rapor.raporlayan === oturum.ad_soyad && sahibiAdayaAtanmisMi(oturum.ad_soyad, rapor.ada);
+}
+
+function sunucudaSilmeIzniVar(rapor: Rapor): boolean {
+  const oturum = getCurrentUser();
+  if (!oturum) return false;
+  if (oturum.proje_muduru) return true;
+  return oturum.admin && sefAdadaYetkiliMi(oturum.yetkili_adalar, rapor.ada);
 }
 
 export function getRaporById(id: string): Rapor | undefined {

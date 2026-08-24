@@ -149,6 +149,12 @@ export function isAdmin(): boolean {
   return user ? (user.admin || user.proje_muduru) : false;
 }
 
+// RLS semantiği: şefin yetkili_adalar dizisi boşsa sınırsızdır,
+// doluysa yalnızca listedeki adalarda yetkilidir.
+export function sefAdadaYetkiliMi(yetkili_adalar: string[], ada: string): boolean {
+  return yetkili_adalar.length === 0 || yetkili_adalar.includes(ada);
+}
+
 export function isProjeMuduruSession(): boolean {
   return getCurrentUser()?.proje_muduru ?? false;
 }

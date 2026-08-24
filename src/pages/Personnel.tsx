@@ -4,7 +4,7 @@ import { getAdaList } from '../config/helpers';
 import { getAllPersonel, getKullanicilar } from '../stores/kullanicilarStore';
 import { getPersonelRaporlari } from '../stores/reportStore';
 import { getKullaniciBlokAtamasi, setKullaniciBlokAtamasi, getKullaniciAdaAtamasi, setKullaniciAdaAtamasi } from '../stores/atamaStore';
-import { getCurrentUser, isProjeMuduruSession } from '../stores/authStore';
+import { getCurrentUser, isProjeMuduruSession, supabaseOturumAktif, sefAdadaYetkiliMi } from '../stores/authStore';
 import type { BlokAtamasi } from '../types';
 import { YeniKullaniciForm } from '../components/KullaniciYonetim';
 import PersonelKart from '../components/personel/PersonelKart';
@@ -92,6 +92,17 @@ export default function Personnel() {
 
   const saveEdit = () => {
     if (!editPerson) return;
+    // Sunucu RLS kapsam kontrolunun aynisi: kapsam disi atama yapilamaz.
+    const kapsamDisi = [
+      ...(editAda ? [editAda] : []),
+      ...Object.entries(editBlokAtama)
+        .filter(([, bloklar]) => (bloklar?.length ?? 0) > 0)
+        .map(([ada]) => ada),
+    ].filter((ada) => !(isPm || sefAdadaYetkiliMi(yetkiliAdalar, ada)));
+    if (supabaseOturumAktif() && kapsamDisi.length > 0) {
+      toastGoster('Bu adada atama yapma yetkiniz yok: ' + kapsamDisi.join(', '), 'error');
+      return;
+    }
     setKullaniciAdaAtamasi(editPerson, editAda || null);
     setKullaniciBlokAtamasi(editPerson, editBlokAtama);
     toastGoster(`${editPerson} atamaları kaydedildi`, 'success');
@@ -210,6 +221,10 @@ export default function Personnel() {
           onBulkAdaChange={setBulkAda}
           onUygula={() => {
             if (!bulkAda || seciliKisiler.size === 0) return;
+            if (supabaseOturumAktif() && !isPm && !sefAdadaYetkiliMi(yetkiliAdalar, bulkAda)) {
+              toastGoster('Bu adada atama yapma yetkiniz yok: ' + bulkAda, 'error');
+              return;
+            }
             seciliKisiler.forEach((k) => setKullaniciAdaAtamasi(k, bulkAda));
             toastGoster(`${seciliKisiler.size} kişi ${bulkAda} adasına atandı`, 'success');
             setSeciliKisiler(new Set());

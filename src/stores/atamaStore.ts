@@ -3,7 +3,7 @@ import { getSupabase, isSupabaseReady } from '../lib/supabase';
 import { getSiteConfig } from '../config/site';
 import type { RealtimeChannel } from '@supabase/supabase-js';
 import { toastGoster } from './toastStore';
-import { getCurrentUser, supabaseOturumAktif } from './authStore';
+import { getCurrentUser, supabaseOturumAktif, sefAdadaYetkiliMi } from './authStore';
 
 const PREFIX = getSiteConfig().marka.localStoragePrefix;
 const BLOK_KEY = `${PREFIX}_blok_atamalari`;
@@ -87,7 +87,26 @@ export function getKullaniciBlokAtamasi(ad_soyad: string): BlokAtamasi {
   return atamalar[ad_soyad] || {};
 }
 
+// RLS "Ada/Blok atamalari admin/PM ..." politikalarinin client aynasi:
+// PM sinirsiz; sef yalnizca yetkili_adalar kapsamindaki adalara atama yapabilir.
+function atamaSunucuIzniVar(ada: string): boolean {
+  const oturum = getCurrentUser();
+  if (!oturum) return false;
+  if (oturum.proje_muduru) return true;
+  return oturum.admin && sefAdadaYetkiliMi(oturum.yetkili_adalar, ada);
+}
+
 export function setKullaniciBlokAtamasi(ad_soyad: string, atama: BlokAtamasi): void {
+  // Kapsam disi ada iceren atama sunucuda reddedilir; erken engelle ki
+  // yerel/sunucu dagilmasi ve tekrarlayan hata bildirimleri olusmasin.
+  if (supabaseOturumAktif()) {
+    for (const [ada, bloklar] of Object.entries(atama)) {
+      if ((bloklar?.length ?? 0) > 0 && !atamaSunucuIzniVar(ada)) {
+        toastGoster('Bu adada atama yapma yetkiniz yok: ' + ada, 'error');
+        return;
+      }
+    }
+  }
   const atamalar = getBlokAtamalar();
   atamalar[ad_soyad] = atama;
   saveBlokAtamalar(atamalar);
@@ -140,6 +159,10 @@ function saveAdaAtamalar(atamalar: Record<string, string | null>): void {
 }
 
 export function setKullaniciAdaAtamasi(ad_soyad: string, ada: string | null): void {
+  if (ada !== null && supabaseOturumAktif() && !atamaSunucuIzniVar(ada)) {
+    toastGoster('Bu adada atama yapma yetkiniz yok: ' + ada, 'error');
+    return;
+  }
   const atamalar = getAdaAtamalar();
   if (ada === null) {
     delete atamalar[ad_soyad];
