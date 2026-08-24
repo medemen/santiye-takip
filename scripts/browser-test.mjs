@@ -16,6 +16,14 @@ import { fileURLToPath } from 'node:url';
 
 const KOK = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 
+// VITE_DEFAULT_PASSWORD icin; .env yoksa asagidaki zorunluluk kontrolu
+// anlasilir mesaj verir
+try {
+  process.loadEnvFile();
+} catch {
+  /* .env dosyasi olmayabilir */
+}
+
 function arg(ad, varsayilan) {
   const i = process.argv.indexOf(ad);
   return i >= 0 ? (process.argv[i + 1] ?? varsayilan) : varsayilan;
