@@ -12,6 +12,7 @@ import { card, pageTitle, btnGhost } from '../utils/styles';
 import { onayla } from '../utils/dialog';
 import AdaBlokEditor from '../components/config/AdaBlokEditor';
 import KalemGrupEditor from '../components/config/KalemGrupEditor';
+import AuditLogKart from '../components/config/AuditLogKart';
 
 export default function Settings() {
   const navigate = useNavigate();
@@ -256,6 +257,10 @@ export default function Settings() {
           ))}
         </div>
       )}
+
+      <div style={{ ...card, marginBottom: 16 }}>
+        <AuditLogKart />
+      </div>
 
       <div style={{ display: 'flex', gap: 10 }}>
         <button
