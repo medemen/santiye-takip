@@ -30,6 +30,8 @@ jobs:
           node-version: 22
           cache: npm
       - run: npm install
+      - run: npm run lint
+      - run: npm run test
       - run: npm run build
       - uses: actions/configure-pages@v4
       - uses: actions/upload-pages-artifact@v3

@@ -131,7 +131,22 @@ async function girisYap(kullanici) {
     await sifreAlani.first().fill(SIFRE);
   }
   await page.getByRole('button', { name: 'Giriş Yap' }).click();
-  await page.waitForURL(yolEsit('/'), { timeout: 30000 });
+  // Uzak Supabase auth gecikmesi yuzunden tek deneme zaman zaman asar;
+  // ayni formda bir kez daha dene (uygulama hatasi degil, ag gecirgenligi).
+  const DENEME = 2;
+  for (let deneme = 1; deneme <= DENEME; deneme++) {
+    try {
+      await page.waitForURL(yolEsit('/'), { timeout: 30000 });
+      break;
+    } catch (hata) {
+      if (deneme === DENEME) throw hata;
+      console.warn(`Giris yonlendirme ${deneme}. denemede zaman asina ugradi; tekrar deneniyor...`);
+      // Hala login sayfasindaysa tekrar tikla; baska sayfadaysa bekle
+      if (page.url().includes('/login')) {
+        await page.getByRole('button', { name: 'Giriş Yap' }).click();
+      }
+    }
+  }
   await sayfadaBeklenen([SANTIYE_ADI]);
 }
 

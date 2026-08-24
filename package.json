@@ -9,6 +9,7 @@
     "build": "tsc -b && vite build",
     "build:analyze": "vite build --config vite.analyze.config.ts",
     "lint": "oxlint",
+    "test": "vitest run",
     "preview": "vite preview",
     "seed:users": "node scripts/seed-users.mjs",
     "seed:config": "node scripts/seed-config.mjs",
@@ -51,6 +52,7 @@
     "playwright-core": "^1.62.1",
     "rollup-plugin-visualizer": "^7.0.1",
     "typescript": "~6.0.2",
-    "vite": "^8.1.1"
+    "vite": "^8.1.1",
+    "vitest": "^4.1.11"
   }
 }
