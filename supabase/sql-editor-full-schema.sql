@@ -1,13 +1,14 @@
+﻿-- ============================================================
+-- SANTÄ°YE TAKÄ°P - EKSÄ°K ÅEMA TAMAMLAMA (SQL EDITOR)
 -- ============================================================
--- SANTİYE TAKİP - EKSİK ŞEMA TAMAMLAMA (SQL EDITOR)
--- ============================================================
--- Bu dosya, supabase/migrations altındaki tüm migration'ların
--- FINAL durumunu temsil eden idempotent (tekrar çalıştırılabilir)
--- birleşimidir. Yeni projede (szjpnaslernezvjoscag) zaten var olan
--- tablolara/veriye DOKUNMAZ; yalnızca eksik parçaları kurar.
+-- Bu dosya, supabase/migrations altÄ±ndaki tÃ¼m migration'larÄ±n
+-- FINAL durumunu temsil eden idempotent (tekrar Ã§alÄ±ÅŸtÄ±rÄ±labilir)
+-- birleÅŸimidir. Son senkron: 20260823120000_guvenlik_ve_butunluk_duzeltmeleri.
+-- Yeni projede (szjpnaslernezvjoscag) zaten var olan
+-- tablolara/veriye DOKUNMAZ; yalnÄ±zca eksik parÃ§alarÄ± kurar.
 --
--- KULLANIM: Supabase Dashboard -> SQL Editor -> yapıştır -> Run.
--- Tekrar çalıştırılması güvenlidir.
+-- KULLANIM: Supabase Dashboard -> SQL Editor -> yapÄ±ÅŸtÄ±r -> Run.
+-- Tekrar Ã§alÄ±ÅŸtÄ±rÄ±lmasÄ± gÃ¼venlidir.
 -- ============================================================
 
 -- ============================================================
@@ -91,6 +92,117 @@ alter table public.kullanici_ada_atamalari add column if not exists user_id uuid
 alter table public.kullanici_blok_atamalari add column if not exists user_id uuid references auth.users(id);
 
 -- ============================================================
+-- 2a. user_id FK'leri: ON DELETE SET NULL
+--     (rapor/atama gecmisi olan kullanici silinebilsin; audit kolonu
+--     null'a dÃ¶ner, kayit silinmez)
+-- ============================================================
+do $$
+declare r record;
+begin
+  for r in
+    select conname from pg_constraint
+    where conrelid = 'public.raporlar'::regclass
+      and contype = 'f' and conname like '%user_id%'
+  loop
+    execute format('alter table public.raporlar drop constraint %I', r.conname);
+  end loop;
+end $$;
+do $$ begin
+  if not exists (
+    select 1 from pg_constraint
+    where conrelid = 'public.raporlar'::regclass and conname = 'raporlar_user_id_fkey'
+  ) then
+    alter table public.raporlar
+      add constraint raporlar_user_id_fkey
+      foreign key (user_id) references auth.users(id)
+      on delete set null;
+  end if;
+end $$;
+
+do $$
+declare r record;
+begin
+  for r in
+    select conname from pg_constraint
+    where conrelid = 'public.kullanici_ada_atamalari'::regclass
+      and contype = 'f' and conname like '%user_id%'
+  loop
+    execute format('alter table public.kullanici_ada_atamalari drop constraint %I', r.conname);
+  end loop;
+end $$;
+do $$ begin
+  if not exists (
+    select 1 from pg_constraint
+    where conrelid = 'public.kullanici_ada_atamalari'::regclass and conname = 'kullanici_ada_atamalari_user_id_fkey'
+  ) then
+    alter table public.kullanici_ada_atamalari
+      add constraint kullanici_ada_atamalari_user_id_fkey
+      foreign key (user_id) references auth.users(id)
+      on delete set null;
+  end if;
+end $$;
+
+do $$
+declare r record;
+begin
+  for r in
+    select conname from pg_constraint
+    where conrelid = 'public.kullanici_blok_atamalari'::regclass
+      and contype = 'f' and conname like '%user_id%'
+  loop
+    execute format('alter table public.kullanici_blok_atamalari drop constraint %I', r.conname);
+  end loop;
+end $$;
+do $$ begin
+  if not exists (
+    select 1 from pg_constraint
+    where conrelid = 'public.kullanici_blok_atamalari'::regclass and conname = 'kullanici_blok_atamalari_user_id_fkey'
+  ) then
+    alter table public.kullanici_blok_atamalari
+      add constraint kullanici_blok_atamalari_user_id_fkey
+      foreign key (user_id) references auth.users(id)
+      on delete set null;
+  end if;
+end $$;
+
+-- ============================================================
+-- 2b. Veri araligi CHECK kisitlari (NOT VALID: mevcut veriyi dokunmaz,
+--     yeni yazimlari denetler)
+-- ============================================================
+do $$ begin
+  if not exists (
+    select 1 from pg_constraint
+    where conrelid = 'public.raporlar'::regclass and conname = 'raporlar_ilerleme_yuzde_aralik'
+  ) then
+    alter table public.raporlar
+      add constraint raporlar_ilerleme_yuzde_aralik
+      check (ilerleme_yuzde between 0 and 100) not valid;
+  end if;
+end $$;
+
+do $$ begin
+  if not exists (
+    select 1 from pg_constraint
+    where conrelid = 'public.raporlar'::regclass and conname = 'raporlar_blok_no_aralik'
+  ) then
+    alter table public.raporlar
+      add constraint raporlar_blok_no_aralik
+      check (blok_no >= 0) not valid;
+  end if;
+end $$;
+
+do $$ begin
+  if not exists (
+    select 1 from pg_constraint
+    where conrelid = 'public.is_kalemi_hedefleri'::regclass and conname = 'hedefler_blok_no_aralik'
+  ) then
+    alter table public.is_kalemi_hedefleri
+      add constraint hedefler_blok_no_aralik
+      check (blok_no >= 0) not valid;
+  end if;
+end $$;
+
+-- ============================================================
 -- 3. YARDIMCI FONKSIYONLAR (SECURITY DEFINER)
 -- ============================================================
 create or replace function public.santiye_ad_soyad()
@@ -120,7 +232,7 @@ stable
 security definer
 set search_path = public
 as $$
-  select coalesce((select (rol = 'Proje Müdürü' or proje_muduru) from public.kullanicilar where id = auth.uid()), false)
+  select coalesce((select (rol = 'Proje MÃ¼dÃ¼rÃ¼' or proje_muduru) from public.kullanicilar where id = auth.uid()), false)
 $$;
 
 create or replace function public.santiye_yetkili_adalar()
@@ -134,7 +246,9 @@ as $$
 $$;
 
 -- Yeni kullanici trigger'i (auth.users -> kullanicilar)
--- yetkili_adalar JSON dizisi text[]'e dogru cevrilir (->> cast hataliydi, duzeltildi).
+-- yetkili_adalar jsonb_typeof ile guvenli ayristirilir (array veya string
+-- JSON dizisi); bozuk metadata tum signup'i dusurmesin diye her alan
+-- exception-guard'lidir.
 create or replace function public.handle_new_user()
 returns trigger
 language plpgsql
@@ -142,23 +256,51 @@ security definer
 set search_path = public
 as $$
 declare
-  v_adalar text[] := coalesce(
-    (select array(select jsonb_array_elements_text(new.raw_user_meta_data -> 'yetkili_adalar'))),
-    '{}'::text[]
-  );
+  v_ad_soyad text;
+  v_rol text;
+  v_admin boolean := false;
+  v_pm boolean := false;
+  v_adalar text[] := '{}'::text[];
 begin
+  begin
+    if jsonb_typeof(new.raw_user_meta_data -> 'yetkili_adalar') = 'array' then
+      select coalesce(array_agg(deger), '{}'::text[])
+        into v_adalar
+        from jsonb_array_elements_text(new.raw_user_meta_data -> 'yetkili_adalar') as t(deger);
+    elsif jsonb_typeof(new.raw_user_meta_data -> 'yetkili_adalar') = 'string' then
+      select coalesce(array_agg(deger), '{}'::text[])
+        into v_adalar
+        from jsonb_array_elements_text((new.raw_user_meta_data ->> 'yetkili_adalar')::jsonb) as t(deger);
+    end if;
+  exception when others then
+    v_adalar := '{}'::text[];
+  end;
+
+  begin
+    v_admin := coalesce((new.raw_user_meta_data ->> 'admin')::boolean, false);
+  exception when others then
+    v_admin := false;
+  end;
+
+  begin
+    v_pm := coalesce((new.raw_user_meta_data ->> 'proje_muduru')::boolean, false);
+  exception when others then
+    v_pm := false;
+  end;
+
+  v_ad_soyad := coalesce(
+    nullif(btrim(new.raw_user_meta_data ->> 'ad_soyad'), ''),
+    new.email,
+    new.id::text
+  );
+  v_rol := coalesce(nullif(btrim(new.raw_user_meta_data ->> 'rol'), ''), 'Personel');
+
   insert into public.kullanicilar (id, ad_soyad, rol, admin, yetkili_adalar, proje_muduru)
-  values (
-    new.id,
-    coalesce(new.raw_user_meta_data ->> 'ad_soyad', new.email),
-    coalesce(new.raw_user_meta_data ->> 'rol', 'Personel'),
-    coalesce((new.raw_user_meta_data ->> 'admin')::boolean, false),
-    v_adalar,
-    coalesce((new.raw_user_meta_data ->> 'proje_muduru')::boolean, false)
-  )
+  values (new.id, v_ad_soyad, v_rol, v_admin, v_adalar, v_pm)
   on conflict (id) do nothing;
+
   return new;
-end
+end;
 $$;
 
 -- Yetki yukseltme korumasi: admin olmayan kendi rolunu degistiremez
@@ -181,15 +323,16 @@ begin
 end
 $$;
 
--- updated_at tetikleyicisi (blok atamalari)
+-- updated_at tetikleyicisi (blok atamalari); search_path sabitlenmis
 create or replace function public.set_updated_at()
 returns trigger
 language plpgsql
+set search_path = public
 as $$
 begin
   new.updated_at = now();
   return new;
-end
+end;
 $$;
 
 -- Slug uretici (authStore.epostaOlustur ile esdeger)
@@ -201,7 +344,7 @@ set search_path = public
 as $$
   select regexp_replace(
     regexp_replace(
-      lower(translate(p_metin, 'çğıöşüÇĞİÖŞÜâîû', 'cgiosuCGIOSUaiu')),
+      lower(translate(p_metin, 'Ã§ÄŸÄ±Ã¶ÅŸÃ¼Ã‡ÄÄ°Ã–ÅÃœÃ¢Ã®Ã»', 'cgiosuCGIOSUaiu')),
       '[^a-z0-9.]+', '.', 'g'
     ),
     '^\.+|\.+$', '', 'g'
@@ -236,10 +379,10 @@ begin
   end if;
 
   if p_ad_soyad is null or btrim(p_ad_soyad) = '' then
-    raise exception 'Ad soyad boş olamaz';
+    raise exception 'Ad soyad boÅŸ olamaz';
   end if;
   if p_sifre is null or length(p_sifre) < 6 then
-    raise exception 'Şifre en az 6 karakter olmalı';
+    raise exception 'Åifre en az 6 karakter olmalÄ±';
   end if;
 
   select coalesce(config->'marka'->>'emailDomain', 'santiye.com')
@@ -250,10 +393,21 @@ begin
   v_email := public.santiye_slug(p_ad_soyad) || '@' || v_domain;
 
   if exists (select 1 from auth.users where email = v_email) then
-    raise exception 'Bu e-posta zaten kayıtlı: %', v_email;
+    raise exception 'Bu e-posta zaten kayÄ±tlÄ±: %', v_email;
   end if;
 
+  -- Rapor sahipligi ad_soyad uzerinden kuruldugundan ayni isimli ikinci
+  -- kullanici, digerinin raporlarini 'kendi adina' yazabilir. Ad soyad
+  -- benzersizligi hem burada hem asagidaki unique index ile garanti edilir.
   v_user_id := gen_random_uuid();
+
+  if exists (
+    select 1 from public.kullanicilar
+    where lower(btrim(ad_soyad)) = lower(btrim(p_ad_soyad))
+      and id <> v_user_id
+  ) then
+    raise exception 'Bu ad soyad zaten kayÄ±tlÄ±: %', p_ad_soyad;
+  end if;
 
   insert into auth.users (
     instance_id, id, aud, role, email, encrypted_password,
@@ -275,6 +429,20 @@ begin
     '', v_now, false, null
   );
 
+  -- GoTrue'nun bekledigi identity kaydi; provider_id = sub = user_id::text.
+  begin
+    insert into auth.identities (
+      id, provider_id, user_id, identity_data, provider,
+      last_sign_in_at, created_at, updated_at
+    ) values (
+      v_user_id, v_user_id::text, v_user_id,
+      jsonb_build_object('sub', v_user_id::text, 'email', v_email, 'email_verified', true),
+      'email', v_now, v_now, v_now
+    );
+  exception when unique_violation then
+    null;
+  end;
+
   insert into public.kullanicilar (id, ad_soyad, rol, admin, yetkili_adalar, atanan_ada, proje_muduru)
   values (v_user_id, p_ad_soyad, p_rol, p_admin, p_yetkili_adalar, p_atanan_ada, p_proje_muduru)
   on conflict (id) do update set
@@ -286,6 +454,9 @@ begin
     proje_muduru = excluded.proje_muduru;
 
   return json_build_object('id', v_user_id, 'email', v_email);
+exception
+  when unique_violation then
+    raise exception 'Bu e-posta zaten kayÄ±tlÄ±: %', v_email;
 end;
 $$;
 
@@ -300,14 +471,14 @@ begin
     raise exception 'Yetkiniz yok';
   end if;
   if p_yeni_sifre is null or length(p_yeni_sifre) < 6 then
-    raise exception 'Şifre en az 6 karakter olmalı';
+    raise exception 'Åifre en az 6 karakter olmalÄ±';
   end if;
   update auth.users
   set encrypted_password = extensions.crypt(p_yeni_sifre, extensions.gen_salt('bf')),
       updated_at = now()
   where id = p_user_id;
   if not found then
-    raise exception 'Kullanıcı bulunamadı';
+    raise exception 'KullanÄ±cÄ± bulunamadÄ±';
   end if;
 end;
 $$;
@@ -323,7 +494,7 @@ begin
     raise exception 'Yetkiniz yok';
   end if;
   if p_user_id = auth.uid() then
-    raise exception 'Kendi hesabınızı silemezsiniz';
+    raise exception 'Kendi hesabÄ±nÄ±zÄ± silemezsiniz';
   end if;
   delete from public.kullanicilar where id = p_user_id;
   delete from auth.users where id = p_user_id;
@@ -392,18 +563,22 @@ drop policy if exists "Raporlar herkes ekler" on public.raporlar;
 drop policy if exists "Raporlar kendi adina ekler (atandiysa)" on public.raporlar;
 create policy "Raporlar kendi adina ekler (atandiysa)" on public.raporlar
   for insert with check (
-    santiye_is_pm()
-    or santiye_is_admin()
+    (select santiye_is_pm())
     or (
-      raporlayan = santiye_ad_soyad()
+      (select santiye_is_admin())
+      and (coalesce(array_length((select santiye_yetkili_adalar()), 1), 0) = 0 or ada = any((select santiye_yetkili_adalar())))
+    )
+    or (
+      raporlayan = (select santiye_ad_soyad())
       and (
-        ada = (select atanan_ada from public.kullanicilar where id = auth.uid())
+        ada = (select atanan_ada from public.kullanicilar where id = (select auth.uid()))
         or exists (
           select 1 from public.kullanici_ada_atamalari a
-          where a.ad_soyad = santiye_ad_soyad() and a.ada = ada
+          where a.ad_soyad = (select santiye_ad_soyad()) and a.ada = ada
         )
       )
     )
+    and (user_id is null or user_id = (select auth.uid()))
   );
 
 drop policy if exists "Raporlar kendi adina gunceller" on public.raporlar;
@@ -412,29 +587,35 @@ drop policy if exists "Raporlar sahibi gunceller" on public.raporlar;
 drop policy if exists "Raporlar kendi adina gunceller (atandiysa)" on public.raporlar;
 create policy "Raporlar kendi adina gunceller (atandiysa)" on public.raporlar
   for update using (
-    santiye_is_pm()
-    or santiye_is_admin()
+    (select santiye_is_pm())
     or (
-      raporlayan = santiye_ad_soyad()
+      (select santiye_is_admin())
+      and (coalesce(array_length((select santiye_yetkili_adalar()), 1), 0) = 0 or ada = any((select santiye_yetkili_adalar())))
+    )
+    or (
+      raporlayan = (select santiye_ad_soyad())
       and (
-        ada = (select atanan_ada from public.kullanicilar where id = auth.uid())
+        ada = (select atanan_ada from public.kullanicilar where id = (select auth.uid()))
         or exists (
           select 1 from public.kullanici_ada_atamalari a
-          where a.ad_soyad = santiye_ad_soyad() and a.ada = ada
+          where a.ad_soyad = (select santiye_ad_soyad()) and a.ada = ada
         )
       )
     )
   )
   with check (
-    santiye_is_pm()
-    or santiye_is_admin()
+    (select santiye_is_pm())
     or (
-      raporlayan = santiye_ad_soyad()
+      (select santiye_is_admin())
+      and (coalesce(array_length((select santiye_yetkili_adalar()), 1), 0) = 0 or ada = any((select santiye_yetkili_adalar())))
+    )
+    or (
+      raporlayan = (select santiye_ad_soyad())
       and (
-        ada = (select atanan_ada from public.kullanicilar where id = auth.uid())
+        ada = (select atanan_ada from public.kullanicilar where id = (select auth.uid()))
         or exists (
           select 1 from public.kullanici_ada_atamalari a
-          where a.ad_soyad = santiye_ad_soyad() and a.ada = ada
+          where a.ad_soyad = (select santiye_ad_soyad()) and a.ada = ada
         )
       )
     )
@@ -445,7 +626,13 @@ drop policy if exists "Raporlar herkes siler" on public.raporlar;
 drop policy if exists "Raporlar admin siler" on public.raporlar;
 drop policy if exists "Raporlar sef ve PM siler" on public.raporlar;
 create policy "Raporlar sef ve PM siler" on public.raporlar
-  for delete using (santiye_is_admin() or santiye_is_pm());
+  for delete using (
+    (select santiye_is_pm())
+    or (
+      (select santiye_is_admin())
+      and (coalesce(array_length((select santiye_yetkili_adalar()), 1), 0) = 0 or ada = any((select santiye_yetkili_adalar())))
+    )
+  );
 
 -- Ada atamalari
 drop policy if exists "Ada atamalari herkes gorur" on public.kullanici_ada_atamalari;
@@ -456,24 +643,40 @@ drop policy if exists "Ada atamalari herkes ekler" on public.kullanici_ada_atama
 drop policy if exists "Ada atamalari admin/PM ekler" on public.kullanici_ada_atamalari;
 create policy "Ada atamalari admin/PM ekler" on public.kullanici_ada_atamalari
   for insert with check (
-    santiye_is_pm() or (santiye_is_admin() and ada = any(santiye_yetkili_adalar()))
+    (select santiye_is_pm())
+    or (
+      (select santiye_is_admin())
+      and (coalesce(array_length((select santiye_yetkili_adalar()), 1), 0) = 0 or ada = any((select santiye_yetkili_adalar())))
+    )
   );
 
 drop policy if exists "Ada atamalari herkes gunceller" on public.kullanici_ada_atamalari;
 drop policy if exists "Ada atamalari admin/PM gunceller" on public.kullanici_ada_atamalari;
 create policy "Ada atamalari admin/PM gunceller" on public.kullanici_ada_atamalari
   for update using (
-    santiye_is_pm() or (santiye_is_admin() and ada = any(santiye_yetkili_adalar()))
+    (select santiye_is_pm())
+    or (
+      (select santiye_is_admin())
+      and (coalesce(array_length((select santiye_yetkili_adalar()), 1), 0) = 0 or ada = any((select santiye_yetkili_adalar())))
+    )
   )
   with check (
-    santiye_is_pm() or (santiye_is_admin() and ada = any(santiye_yetkili_adalar()))
+    (select santiye_is_pm())
+    or (
+      (select santiye_is_admin())
+      and (coalesce(array_length((select santiye_yetkili_adalar()), 1), 0) = 0 or ada = any((select santiye_yetkili_adalar())))
+    )
   );
 
 drop policy if exists "Ada atamalari herkes siler" on public.kullanici_ada_atamalari;
 drop policy if exists "Ada atamalari admin/PM siler" on public.kullanici_ada_atamalari;
 create policy "Ada atamalari admin/PM siler" on public.kullanici_ada_atamalari
   for delete using (
-    santiye_is_pm() or (santiye_is_admin() and ada = any(santiye_yetkili_adalar()))
+    (select santiye_is_pm())
+    or (
+      (select santiye_is_admin())
+      and (coalesce(array_length((select santiye_yetkili_adalar()), 1), 0) = 0 or ada = any((select santiye_yetkili_adalar())))
+    )
   );
 
 -- Blok atamalari
@@ -485,24 +688,40 @@ drop policy if exists "Blok atamalari herkes ekler" on public.kullanici_blok_ata
 drop policy if exists "Blok atamalari admin/PM ekler" on public.kullanici_blok_atamalari;
 create policy "Blok atamalari admin/PM ekler" on public.kullanici_blok_atamalari
   for insert with check (
-    santiye_is_pm() or (santiye_is_admin() and ada = any(santiye_yetkili_adalar()))
+    (select santiye_is_pm())
+    or (
+      (select santiye_is_admin())
+      and (coalesce(array_length((select santiye_yetkili_adalar()), 1), 0) = 0 or ada = any((select santiye_yetkili_adalar())))
+    )
   );
 
 drop policy if exists "Blok atamalari herkes gunceller" on public.kullanici_blok_atamalari;
 drop policy if exists "Blok atamalari admin/PM gunceller" on public.kullanici_blok_atamalari;
 create policy "Blok atamalari admin/PM gunceller" on public.kullanici_blok_atamalari
   for update using (
-    santiye_is_pm() or (santiye_is_admin() and ada = any(santiye_yetkili_adalar()))
+    (select santiye_is_pm())
+    or (
+      (select santiye_is_admin())
+      and (coalesce(array_length((select santiye_yetkili_adalar()), 1), 0) = 0 or ada = any((select santiye_yetkili_adalar())))
+    )
   )
   with check (
-    santiye_is_pm() or (santiye_is_admin() and ada = any(santiye_yetkili_adalar()))
+    (select santiye_is_pm())
+    or (
+      (select santiye_is_admin())
+      and (coalesce(array_length((select santiye_yetkili_adalar()), 1), 0) = 0 or ada = any((select santiye_yetkili_adalar())))
+    )
   );
 
 drop policy if exists "Blok atamalari herkes siler" on public.kullanici_blok_atamalari;
 drop policy if exists "Blok atamalari admin/PM siler" on public.kullanici_blok_atamalari;
 create policy "Blok atamalari admin/PM siler" on public.kullanici_blok_atamalari
   for delete using (
-    santiye_is_pm() or (santiye_is_admin() and ada = any(santiye_yetkili_adalar()))
+    (select santiye_is_pm())
+    or (
+      (select santiye_is_admin())
+      and (coalesce(array_length((select santiye_yetkili_adalar()), 1), 0) = 0 or ada = any((select santiye_yetkili_adalar())))
+    )
   );
 
 -- Hedef tarihleri
@@ -528,6 +747,14 @@ drop policy if exists "Rapor fotolari yukleme" on storage.objects;
 drop policy if exists "Rapor fotolari herkes okur" on storage.objects;
 drop policy if exists "Rapor fotolari sahibi/admin/PM siler" on storage.objects;
 
+-- Kalinti public bucket kayitlari da silinir
+do $$ begin
+  delete from storage.objects where bucket = 'rapor_fotograflar';
+  delete from storage.buckets where id = 'rapor_fotograflar';
+exception when others then
+  null;
+end $$;
+
 -- ============================================================
 -- 7. INDEXLER
 -- ============================================================
@@ -544,6 +771,28 @@ create index if not exists idx_raporlar_ada_blok_kalem on public.raporlar(ada, b
 create index if not exists idx_raporlar_olusturma_tarihi on public.raporlar(olusturma_tarihi);
 create index if not exists idx_kullanicilar_ada on public.kullanicilar(atanan_ada);
 drop index if exists public.uq_is_kalemi_hedefleri_ada_blok_kalem;
+
+-- Rapor sahipligi ad_soyad esitligine dayandigindan ayni isimli iki
+-- kullanici birbirinin kimligine burunebilir; benzersizlik indeksi
+-- (veri temizse kurulur, degilse uyari loglanir).
+do $$
+begin
+  if not exists (
+    select 1 from pg_indexes
+    where schemaname = 'public' and indexname = 'kullanicilar_ad_soyad_benzersiz'
+  ) then
+    if exists (
+      select 1 from public.kullanicilar
+      group by lower(btrim(ad_soyad))
+      having count(*) > 1
+    ) then
+      raise warning 'kullanicilar tablosunda yinelenen ad_soyad var; benzersizlik indeksi kurulmadi. Once kayitlari ayristirin.';
+    else
+      create unique index kullanicilar_ad_soyad_benzersiz
+        on public.kullanicilar (lower(btrim(ad_soyad)));
+    end if;
+  end if;
+end $$;
 
 -- ============================================================
 -- 8. REALTIME (idempotent)
@@ -611,9 +860,13 @@ grant execute on function public.handle_new_user() to service_role;
 grant execute on function public.kullanicilar_yetki_korumasi() to service_role;
 
 -- anon tablo/sekans erisimi tamamen kapali (offline-first sync yalnizca girisli)
+revoke all on all tables in schema public from anon;
+revoke all on all sequences in schema public from anon;
 revoke usage on schema public from anon;
-revoke select on all tables in schema public from anon;
-revoke select on all sequences in schema public from anon;
+
+-- Sonradan olusturulacak nesnelerde anon'a otomatik yetki verilmesin
+alter default privileges in schema public revoke all on tables from anon;
+alter default privileges in schema public revoke all on sequences from anon;
 
 -- ============================================================
 -- 10. VERI DUZELTMELERI
@@ -632,12 +885,12 @@ where email_change is null
 -- Rol adlari yeni saha personeli setine esitlenir
 update public.kullanicilar
 set rol = case
-  when rol = 'Saha Mühendisi' then 'İnşaat Mühendisi'
-  when rol = 'Saha Mimarı' then 'Mimar'
+  when rol = 'Saha MÃ¼hendisi' then 'Ä°nÅŸaat MÃ¼hendisi'
+  when rol = 'Saha MimarÄ±' then 'Mimar'
   when rol = 'Saha Teknikeri' then 'Tekniker'
   else rol
 end
-where rol in ('Saha Mühendisi', 'Saha Mimarı', 'Saha Teknikeri');
+where rol in ('Saha MÃ¼hendisi', 'Saha MimarÄ±', 'Saha Teknikeri');
 
 -- Santiye config baslangic satiri (tam icerik bundle config'ten gelir)
 insert into public.santiye_config (id, config, version, updated_at)
