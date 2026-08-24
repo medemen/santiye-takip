@@ -12,13 +12,13 @@ const STORAGE_KEY = `${getSiteConfig().marka.localStoragePrefix}_hedefler`;
 const SILME_KUYRUK_KEY = `${getSiteConfig().marka.localStoragePrefix}_hedef_bekleyen_silmeler`;
 const KAYIT_KUYRUK_KEY = `${getSiteConfig().marka.localStoragePrefix}_hedef_bekleyen_kayitlar`;
 
-interface HedefAnahtari {
+export interface HedefAnahtari {
   ada: string;
   blok_no: number;
   is_kalemi: string;
 }
 
-interface BekleyenKayit extends HedefAnahtari {
+export interface BekleyenKayit extends HedefAnahtari {
   hedef_tarih: string;
 }
 
@@ -110,6 +110,27 @@ export function getHedefler(): IsKalemiHedefi[] {
   return _hedefCache;
 }
 
+// Bekleyen yerel islemleri sunucu verisinin uzerine uygular:
+// silme kuyrugundeki satirlar dusurulur, kayit kuyrugu ezerek/ekleyerek
+// birlestirilir. Saf fonksiyon — test edilebilir.
+export function sunucuHedefleriBirlestir(
+  sunucu: IsKalemiHedefi[],
+  bekleyenSilmeler: HedefAnahtari[],
+  bekleyenKayitlar: BekleyenKayit[]
+): IsKalemiHedefi[] {
+  const silmeSeti = new Set(bekleyenSilmeler.map(anahtarMetni));
+  const birlesik = sunucu.filter((h) => !silmeSeti.has(anahtarMetni(h)));
+  for (const bk of bekleyenKayitlar) {
+    const idx = birlesik.findIndex((h) => anahtarMetni(h) === anahtarMetni(bk));
+    if (idx >= 0) {
+      birlesik[idx] = { ...birlesik[idx], hedef_tarih: bk.hedef_tarih };
+    } else {
+      birlesik.push({ id: 0, ...bk });
+    }
+  }
+  return birlesik;
+}
+
 export async function supabaseHedefleriYukle(): Promise<void> {
   if (!isSupabaseReady()) return;
   try {
@@ -119,17 +140,11 @@ export async function supabaseHedefleriYukle(): Promise<void> {
     if (error) throw error;
     const sunucu = (data ?? []) as IsKalemiHedefi[];
 
-    // Bekleyen yerel islemleri sunucu verisinin uzerine uygula
-    const silmeSeti = new Set(kuyrukOku<HedefAnahtari>(SILME_KUYRUK_KEY).map(anahtarMetni));
-    const birlesik = sunucu.filter((h) => !silmeSeti.has(anahtarMetni(h)));
-    for (const bk of kuyrukOku<BekleyenKayit>(KAYIT_KUYRUK_KEY)) {
-      const idx = birlesik.findIndex((h) => anahtarMetni(h) === anahtarMetni(bk));
-      if (idx >= 0) {
-        birlesik[idx] = { ...birlesik[idx], hedef_tarih: bk.hedef_tarih };
-      } else {
-        birlesik.push({ id: 0, ...bk });
-      }
-    }
+    const birlesik = sunucuHedefleriBirlestir(
+      sunucu,
+      kuyrukOku<HedefAnahtari>(SILME_KUYRUK_KEY),
+      kuyrukOku<BekleyenKayit>(KAYIT_KUYRUK_KEY)
+    );
     _hedefCache = birlesik;
     localStorage.setItem(STORAGE_KEY, JSON.stringify(birlesik));
     notifyHedefListeners();
