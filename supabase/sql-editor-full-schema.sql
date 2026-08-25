@@ -571,7 +571,7 @@ create policy "Raporlar kendi adina ekler (atandiysa)" on public.raporlar
       and (coalesce(array_length((select santiye_yetkili_adalar()), 1), 0) = 0 or ada = any((select santiye_yetkili_adalar())))
     )
     or (
-      raporlayan = (select santiye_ad_soyad())
+      user_id = (select auth.uid())
       and (
         ada = (select atanan_ada from public.kullanicilar where id = (select auth.uid()))
         or exists (
@@ -580,7 +580,6 @@ create policy "Raporlar kendi adina ekler (atandiysa)" on public.raporlar
         )
       )
     )
-    and (user_id is null or user_id = (select auth.uid()))
   );
 
 drop policy if exists "Raporlar kendi adina gunceller" on public.raporlar;
@@ -595,7 +594,7 @@ create policy "Raporlar kendi adina gunceller (atandiysa)" on public.raporlar
       and (coalesce(array_length((select santiye_yetkili_adalar()), 1), 0) = 0 or ada = any((select santiye_yetkili_adalar())))
     )
     or (
-      raporlayan = (select santiye_ad_soyad())
+      user_id = (select auth.uid())
       and (
         ada = (select atanan_ada from public.kullanicilar where id = (select auth.uid()))
         or exists (
@@ -612,7 +611,7 @@ create policy "Raporlar kendi adina gunceller (atandiysa)" on public.raporlar
       and (coalesce(array_length((select santiye_yetkili_adalar()), 1), 0) = 0 or ada = any((select santiye_yetkili_adalar())))
     )
     or (
-      raporlayan = (select santiye_ad_soyad())
+      user_id = (select auth.uid())
       and (
         ada = (select atanan_ada from public.kullanicilar where id = (select auth.uid()))
         or exists (

@@ -133,8 +133,7 @@ function raporToSupabase(r: Rapor, includeUserId = true) {
     ilerleme_yuzde: r.ilerleme_yuzde,
     aciklama: r.aciklama || '',
     olusturma_tarihi: r.olusturma_tarihi,
-    // Guncellemede gonderilmez: admin/PM baskasinin raporunu duzenlerken
-    // orijinal yazarin user_id audit izini ezmesin.
+    // INSERT/UPDATE: user_id her zaman dahil edilir (sahiplik dogrulama icin).
     ...(includeUserId ? { user_id: getCurrentUser()?.user_id ?? null } : {}),
   };
 }
@@ -209,7 +208,7 @@ export async function supabaseRaporlariYukle(): Promise<void> {
     const sunucu = await tumKayitlariGetir<Rapor>(async (bastan, kadar) =>
       await getSupabase()
         .from('raporlar')
-        .select('id, tarih, raporlayan, ada, blok_no, is_kalemi, durum, ilerleme_yuzde, aciklama, olusturma_tarihi')
+        .select('id, tarih, raporlayan, ada, blok_no, is_kalemi, durum, ilerleme_yuzde, aciklama, olusturma_tarihi, user_id')
         .order('olusturma_tarihi', { ascending: false })
         .range(bastan, kadar)
     );
@@ -269,11 +268,12 @@ export async function supabaseRaporlariYukle(): Promise<void> {
   }
 }
 
-export function saveRapor(rapor: Omit<Rapor, 'id' | 'olusturma_tarihi'>): Rapor {
+export function saveRapor(rapor: Omit<Rapor, 'id' | 'olusturma_tarihi' | 'user_id'>): Rapor {
   const yeni: Rapor = {
     ...rapor,
     id: yeniRaporId(),
     olusturma_tarihi: new Date().toISOString(),
+    user_id: getCurrentUser()?.user_id ?? null,
   };
   setRaporlar([...getRaporlar(), yeni]);
   if (supabaseOturumAktif()) {
@@ -288,12 +288,14 @@ export function saveRapor(rapor: Omit<Rapor, 'id' | 'olusturma_tarihi'>): Rapor 
 }
 
 export function saveRaporlar(
-  raporlar: Array<Omit<Rapor, 'id' | 'olusturma_tarihi'>>
+  raporlar: Array<Omit<Rapor, 'id' | 'olusturma_tarihi' | 'user_id'>>
 ): Rapor[] {
+  const uid = getCurrentUser()?.user_id ?? null;
   const yeniler: Rapor[] = raporlar.map((r) => ({
     ...r,
     id: yeniRaporId(),
     olusturma_tarihi: new Date().toISOString(),
+    user_id: uid,
   }));
   setRaporlar([...getRaporlar(), ...yeniler]);
   if (supabaseOturumAktif()) {
@@ -331,7 +333,7 @@ export function updateRapor(id: string, guncelleme: Partial<Omit<Rapor, 'id' | '
   yeniListe[idx] = guncel;
   setRaporlar(yeniListe);
   if (supabaseOturumAktif()) {
-    getSupabase().from('raporlar').update(raporToSupabase(guncel, false)).eq('id', id).then(({ error }) => {
+    getSupabase().from('raporlar').update(raporToSupabase(guncel, true)).eq('id', id).then(({ error }) => {
       if (error) {
         console.warn('Supabase rapor güncelleme hatası:', error.message);
         toastGoster('Rapor sunucuya güncellenemedi', 'error');
@@ -371,7 +373,7 @@ function raporDuzenleyebilir(rapor: Rapor): boolean {
   const oturum = getCurrentUser();
   if (!oturum) return false;
   if (oturum.admin || oturum.proje_muduru) return true;
-  return rapor.raporlayan === oturum.ad_soyad;
+  return rapor.user_id != null && rapor.user_id === oturum.user_id;
 }
 
 // Sahip dali icin RLS atama kosulu: kullanici_ada_atamalari veya
@@ -387,7 +389,7 @@ function sunucudaDuzenlemeIzniVar(rapor: Rapor): boolean {
   if (!oturum) return false;
   if (oturum.proje_muduru) return true;
   if (oturum.admin) return sefAdadaYetkiliMi(oturum.yetkili_adalar, rapor.ada);
-  return rapor.raporlayan === oturum.ad_soyad && sahibiAdayaAtanmisMi(oturum.ad_soyad, rapor.ada);
+  return rapor.user_id != null && rapor.user_id === oturum.user_id && sahibiAdayaAtanmisMi(oturum.ad_soyad, rapor.ada);
 }
 
 function sunucudaSilmeIzniVar(rapor: Rapor): boolean {

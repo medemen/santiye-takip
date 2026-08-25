@@ -54,6 +54,7 @@ export interface Rapor {
   ilerleme_yuzde: number;
   aciklama: string;
   olusturma_tarihi: string;
+  user_id: string | null;
 }
 
 export interface IsKalemiHedefi {
