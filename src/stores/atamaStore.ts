@@ -279,3 +279,10 @@ export async function supabaseAtamalariYukle(): Promise<void> {
     console.error('Supabase atama yükleme hatası:', err);
   }
 }
+
+// Baglanti geri geldiginde bekleyen yerel atamalari sunucuya gonder
+if (typeof window !== 'undefined') {
+  window.addEventListener('online', () => {
+    void supabaseAtamalariYukle();
+  });
+}

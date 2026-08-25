@@ -121,7 +121,7 @@ export function YeniKullaniciForm({ onIptal, onKaydedildi }: { onIptal: () => vo
           <div>
             <label style={labelStyle}>Geçici Şifre</label>
             <input
-              type="text"
+              type="password"
               style={inputStyle}
               value={sifre}
               onChange={(e) => setSifre(e.target.value)}

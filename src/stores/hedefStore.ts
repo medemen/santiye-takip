@@ -285,3 +285,10 @@ export function setHedef(
   }
   return true;
 }
+
+// Baglanti geri geldiginde bekleyen yerel hedefleri sunucuya gonder
+if (typeof window !== 'undefined') {
+  window.addEventListener('online', () => {
+    void supabaseHedefleriYukle();
+  });
+}

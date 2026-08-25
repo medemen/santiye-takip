@@ -12,6 +12,7 @@ import { supabaseHedefleriYukle, aboneOlHedefGuncellemeleri, realtimeHedefAbonel
 import { getSiteConfig, subscribeSiteConfig } from './config/site';
 import { isSupabaseReady } from './lib/supabase';
 import { bildirimKontrolunuBaslat, bildirimKontrolunuDurdur } from './stores/notificationStore';
+import { OfflineBanner } from './components/OfflineBanner';
 
 const Dashboard = lazy(() => import('./pages/Dashboard'));
 const HedefTakvim = lazy(() => import('./pages/HedefTakvim'));
@@ -167,6 +168,7 @@ export default function App() {
 
   return (
     <AppRouter basename={resolveAppBasename()}>
+      <OfflineBanner />
       <TrailingSlashDuzenle />
       <ErrorBoundary>
         <>

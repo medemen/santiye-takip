@@ -606,3 +606,10 @@ export function getIstatistikler(raporlar: Rapor[]) {
     toplamRapor: raporlar.length,
   };
 }
+
+// Baglanti geri geldiginde bekleyen yerel verileri sunucuya gonder
+if (typeof window !== 'undefined') {
+  window.addEventListener('online', () => {
+    void supabaseRaporlariYukle();
+  });
+}
