@@ -7,6 +7,7 @@ import { toastGoster } from './toastStore';
 import { getCurrentUser, supabaseOturumAktif, sefAdadaYetkiliMi } from './authStore';
 import { getKullaniciAdaAtamasi } from './atamaStore';
 import { getKullanicilar } from './kullanicilarStore';
+import { tumKayitlariGetir } from '../lib/listeGetir';
 
 const STORAGE_KEY = `${getSiteConfig().marka.localStoragePrefix}_raporlar`;
 
@@ -205,12 +206,13 @@ export async function supabaseRaporlariYukle(): Promise<void> {
   if (!isSupabaseReady()) return;
   try {
     await idbHydrasyonuBaslat();
-    const { data, error } = await getSupabase()
-      .from('raporlar')
-      .select('id, tarih, raporlayan, ada, blok_no, is_kalemi, durum, ilerleme_yuzde, aciklama, olusturma_tarihi')
-      .order('olusturma_tarihi', { ascending: false });
-    if (error) throw error;
-    const sunucu = data ?? [];
+    const sunucu = await tumKayitlariGetir<Rapor>(async (bastan, kadar) =>
+      await getSupabase()
+        .from('raporlar')
+        .select('id, tarih, raporlayan, ada, blok_no, is_kalemi, durum, ilerleme_yuzde, aciklama, olusturma_tarihi')
+        .order('olusturma_tarihi', { ascending: false })
+        .range(bastan, kadar)
+    );
     const sunucuIdleri = new Set(sunucu.map((r) => r.id));
     const yerel = getRaporlar();
     const bekleyen = yerel.filter((r) => !sunucuIdleri.has(r.id));
