@@ -1,5 +1,6 @@
 import { getSupabase, isSupabaseReady } from '../lib/supabase';
 import { getSiteConfig } from '../config/site';
+import { tumKayitlariGetir } from '../lib/listeGetir';
 import type { Personel, SantiyeSefi } from '../types';
 import personelJson from '../../data/personel.json';
 
@@ -88,11 +89,12 @@ export function getKullanicilar(): Kullanici[] {
 export async function supabaseKullanicilariYukle(): Promise<void> {
   if (!isSupabaseReady()) return;
   try {
-    const { data, error } = await getSupabase()
-      .from('kullanicilar')
-      .select('id, ad_soyad, rol, admin, proje_muduru, yetkili_adalar, atanan_ada');
-    if (error) throw error;
-    const sunucu = (data ?? []) as Kullanici[];
+    const sunucu = await tumKayitlariGetir<Kullanici>(async (bastan, kadar) =>
+      await getSupabase()
+        .from('kullanicilar')
+        .select('id, ad_soyad, rol, admin, proje_muduru, yetkili_adalar, atanan_ada')
+        .range(bastan, kadar)
+    );
     _kullaniciCache = sunucu;
     localStorage.setItem(STORAGE_KEY, JSON.stringify(sunucu));
     notifyListeners();

@@ -1,6 +1,7 @@
 import type { KullaniciAtamalari, BlokAtamasi } from '../types';
 import { getSupabase, isSupabaseReady } from '../lib/supabase';
 import { getSiteConfig } from '../config/site';
+import { tumKayitlariGetir } from '../lib/listeGetir';
 import type { RealtimeChannel } from '@supabase/supabase-js';
 import { toastGoster } from './toastStore';
 import { getCurrentUser, supabaseOturumAktif, sefAdadaYetkiliMi } from './authStore';
@@ -203,10 +204,13 @@ export function getKullaniciAdaAtamasi(ad_soyad: string): string | null {
 export async function supabaseAtamalariYukle(): Promise<void> {
   if (!isSupabaseReady() || !supabaseOturumAktif()) return;
   try {
-    const { data: adaRows, error: adaError } = await getSupabase()
-      .from('kullanici_ada_atamalari')
-      .select('ad_soyad, ada');
-    if (adaError) throw adaError;
+    const adaRows = await tumKayitlariGetir<{ ad_soyad: string; ada: string | null }>(
+      async (bastan, kadar) =>
+        await getSupabase()
+          .from('kullanici_ada_atamalari')
+          .select('ad_soyad, ada')
+          .range(bastan, kadar)
+    );
 
     const yerelAda = getAdaAtamalar();
     const sunucuAda: Record<string, string | null> = {};
@@ -228,10 +232,13 @@ export async function supabaseAtamalariYukle(): Promise<void> {
       }
     }
 
-    const { data: blokRows, error: blokError } = await getSupabase()
-      .from('kullanici_blok_atamalari')
-      .select('ad_soyad, ada, blok_nos');
-    if (blokError) throw blokError;
+    const blokRows = await tumKayitlariGetir<{ ad_soyad: string; ada: string; blok_nos: number[] }>(
+      async (bastan, kadar) =>
+        await getSupabase()
+          .from('kullanici_blok_atamalari')
+          .select('ad_soyad, ada, blok_nos')
+          .range(bastan, kadar)
+    );
 
     const yerelBlok = getBlokAtamalar();
     const sunucuBlok: KullaniciAtamalari = {};

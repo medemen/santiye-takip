@@ -1,6 +1,7 @@
 import type { IsKalemiHedefi } from '../types';
 import { getSupabase, isSupabaseReady } from '../lib/supabase';
 import { getSiteConfig } from '../config/site';
+import { tumKayitlariGetir } from '../lib/listeGetir';
 import type { RealtimeChannel } from '@supabase/supabase-js';
 import { toastGoster } from './toastStore';
 import { getCurrentUser, supabaseOturumAktif } from './authStore';
@@ -134,11 +135,12 @@ export function sunucuHedefleriBirlestir(
 export async function supabaseHedefleriYukle(): Promise<void> {
   if (!isSupabaseReady()) return;
   try {
-    const { data, error } = await getSupabase()
-      .from('is_kalemi_hedefleri')
-      .select('id, ada, blok_no, is_kalemi, hedef_tarih');
-    if (error) throw error;
-    const sunucu = (data ?? []) as IsKalemiHedefi[];
+    const sunucu = await tumKayitlariGetir<IsKalemiHedefi>(async (bastan, kadar) =>
+      await getSupabase()
+        .from('is_kalemi_hedefleri')
+        .select('id, ada, blok_no, is_kalemi, hedef_tarih')
+        .range(bastan, kadar)
+    );
 
     const birlesik = sunucuHedefleriBirlestir(
       sunucu,
