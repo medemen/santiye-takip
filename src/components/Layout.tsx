@@ -65,6 +65,8 @@ export default function Layout({ children }: Props) {
             color: temaSecim === s.deger ? 'var(--accent)' : 'var(--text-faint)',
             fontWeight: temaSecim === s.deger ? 600 : 400,
             cursor: 'pointer',
+            minHeight: 44,
+            minWidth: 44,
             boxShadow: temaSecim === s.deger ? 'var(--shadow-card)' : 'none',
           }}
         >
@@ -186,6 +188,7 @@ export default function Layout({ children }: Props) {
                 fontSize: 12,
                 color: 'var(--text-faint)',
                 cursor: 'pointer',
+                minHeight: 44,
               }}
             >
               Çıkış
@@ -241,6 +244,7 @@ export default function Layout({ children }: Props) {
               fontSize: 11,
               color: 'var(--text-faint)',
               cursor: 'pointer',
+              minHeight: 44,
             }}
           >
             Çıkış

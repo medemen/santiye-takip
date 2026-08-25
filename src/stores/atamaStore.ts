@@ -118,7 +118,7 @@ export function setKullaniciBlokAtamasi(ad_soyad: string, atama: BlokAtamasi): v
         supabase.from('kullanici_blok_atamalari').delete().eq('ad_soyad', ad_soyad).eq('ada', ada).then(({ error }) => {
           if (error) {
             console.warn('Supabase blok atama silme hatası:', error.message);
-            toastGoster('Blok ataması sunucuya işlenemedi: ' + error.message, 'error');
+            toastGoster('Blok ataması sunucuya işlenemedi', 'error');
           }
         }, agHatasiYakala('blok atama sil'));
       } else {
@@ -128,7 +128,7 @@ export function setKullaniciBlokAtamasi(ad_soyad: string, atama: BlokAtamasi): v
         ).then(({ error }) => {
           if (error) {
             console.warn('Supabase blok atama hatası:', error.message);
-            toastGoster('Blok ataması sunucuya kaydedilemedi: ' + error.message, 'error');
+            toastGoster('Blok ataması sunucuya kaydedilemedi', 'error');
           }
         }, agHatasiYakala('blok atama kaydet'));
       }
@@ -176,7 +176,7 @@ export function setKullaniciAdaAtamasi(ad_soyad: string, ada: string | null): vo
       getSupabase().from('kullanici_ada_atamalari').delete().eq('ad_soyad', ad_soyad).then(({ error }) => {
         if (error) {
           console.warn('Supabase ada atama silme hatası:', error.message);
-          toastGoster('Ada ataması sunucuya işlenemedi: ' + error.message, 'error');
+          toastGoster('Ada ataması sunucuya işlenemedi', 'error');
         }
       }, agHatasiYakala('ada atama sil'));
     } else {
@@ -186,7 +186,7 @@ export function setKullaniciAdaAtamasi(ad_soyad: string, ada: string | null): vo
       ).then(({ error }) => {
         if (error) {
           console.warn('Supabase ada atama hatası:', error.message);
-          toastGoster('Ada ataması sunucuya kaydedilemedi: ' + error.message, 'error');
+          toastGoster('Ada ataması sunucuya kaydedilemedi', 'error');
         }
       }, agHatasiYakala('ada atama kaydet'));
     }
@@ -227,7 +227,7 @@ export async function supabaseAtamalariYukle(): Promise<void> {
           .upsert({ ad_soyad: ad, ada, updated_at: new Date().toISOString(), user_id: getCurrentUser()?.user_id ?? null }, { onConflict: 'ad_soyad' });
         if (error) {
           console.warn('Supabase yerel ada atama yükleme hatası:', error.message);
-          toastGoster('Yerel ada atamaları sunucuya yüklenemedi: ' + error.message, 'error');
+          toastGoster('Yerel ada atamaları sunucuya yüklenemedi', 'error');
         }
       }
     }
@@ -271,7 +271,7 @@ export async function supabaseAtamalariYukle(): Promise<void> {
         .upsert(bekleyenBlok, { onConflict: 'ad_soyad, ada' });
       if (error) {
         console.warn('Supabase yerel blok atama yükleme hatası:', error.message);
-        toastGoster('Yerel blok atamaları sunucuya yüklenemedi: ' + error.message, 'error');
+        toastGoster('Yerel blok atamaları sunucuya yüklenemedi', 'error');
       }
     }
 

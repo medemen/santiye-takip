@@ -16,6 +16,13 @@ const PAGE_SIZE = 20;
 
 export default function ReportList() {
   const navigate = useNavigate();
+  const [yukleniyor, setYukleniyor] = useState(true);
+
+  useEffect(() => {
+    const t = setTimeout(() => setYukleniyor(false), 800);
+    return () => clearTimeout(t);
+  }, []);
+
   const config = useSiteConfig();
   const raporlar = useRaporlar();
   const [searchParams] = useSearchParams();
@@ -94,6 +101,12 @@ export default function ReportList() {
 
   return (
     <div>
+      {yukleniyor && (
+        <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '50vh', fontSize: 18, opacity: 0.6 }}>
+          Yükleniyor…
+        </div>
+      )}
+      {!yukleniyor && (<>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
         <h1 style={{ fontSize: 20, fontWeight: 700, color: 'var(--text-primary)', margin: 0 }}>Raporlar</h1>
         <button
@@ -108,7 +121,7 @@ export default function ReportList() {
           }}
           style={{
             background: 'none', border: '1px solid var(--border)', borderRadius: 8,
-            padding: '4px 10px', fontSize: 11, color: 'var(--text-faint)', cursor: 'pointer',
+              padding: '4px 10px', fontSize: 11, color: 'var(--text-faint)', cursor: 'pointer', minHeight: 44, minWidth: 44,
           }}
           title="Excel Aktar"
         >
@@ -152,6 +165,7 @@ export default function ReportList() {
               fontSize: 12,
               fontWeight: 600,
               cursor: 'pointer',
+              minHeight: 44,
               backgroundColor: !sadeceBenim ? '#f59e0b' : 'var(--bg-subtle)',
               color: !sadeceBenim ? '#fff' : 'var(--text-muted)',
             }}
@@ -168,6 +182,7 @@ export default function ReportList() {
               fontSize: 12,
               fontWeight: 600,
               cursor: 'pointer',
+              minHeight: 44,
               backgroundColor: sadeceBenim ? '#f59e0b' : 'var(--bg-subtle)',
               color: sadeceBenim ? '#fff' : 'var(--text-muted)',
             }}
@@ -199,6 +214,7 @@ export default function ReportList() {
               borderRadius: 8,
               border: '1px solid var(--border)',
               fontSize: 12,
+              minHeight: 44,
               backgroundColor: 'var(--bg-card)',
             }}
           >
@@ -218,6 +234,7 @@ export default function ReportList() {
               borderRadius: 8,
               border: '1px solid var(--border)',
               fontSize: 12,
+              minHeight: 44,
               backgroundColor: 'var(--bg-card)',
             }}
           >
@@ -242,6 +259,7 @@ export default function ReportList() {
               borderRadius: 8,
               border: '1px solid var(--border)',
               fontSize: 12,
+              minHeight: 44,
               backgroundColor: 'var(--bg-card)',
             }}
           >
@@ -309,6 +327,8 @@ export default function ReportList() {
                       lineHeight: 1,
                       cursor: 'pointer',
                       color: '#ef4444',
+                      minHeight: 44,
+                      minWidth: 44,
                     }}
                     title="Sil"
                     aria-label={`${r.ada} ${r.blok_no === 0 ? 'ada geneli' : `blok ${r.blok_no}`} raporunu sil`}
@@ -336,6 +356,7 @@ export default function ReportList() {
               fontSize: 12,
               color: gecerliSayfa === 1 ? 'var(--border)' : 'var(--text-faint)',
               cursor: gecerliSayfa === 1 ? 'not-allowed' : 'pointer',
+              minHeight: 44,
             }}
           >
             ‹ Önceki
@@ -354,6 +375,7 @@ export default function ReportList() {
               fontSize: 12,
               color: gecerliSayfa === toplamSayfa ? 'var(--border)' : 'var(--text-faint)',
               cursor: gecerliSayfa === toplamSayfa ? 'not-allowed' : 'pointer',
+              minHeight: 44,
             }}
           >
             Sonraki ›
@@ -364,6 +386,7 @@ export default function ReportList() {
       <div style={{ marginTop: 12, fontSize: 12, color: 'var(--text-subtle)', textAlign: 'center' }}>
         Toplam {filtered.length} rapor
       </div>
+      </>)}
     </div>
   );
 }

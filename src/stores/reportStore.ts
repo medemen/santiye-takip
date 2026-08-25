@@ -280,7 +280,7 @@ export function saveRapor(rapor: Omit<Rapor, 'id' | 'olusturma_tarihi'>): Rapor 
     getSupabase().from('raporlar').insert(raporToSupabase(yeni)).then(({ error }) => {
       if (error) {
         console.warn('Supabase rapor kaydetme hatası:', error.message);
-        toastGoster('Rapor sunucuya kaydedilemedi: ' + error.message, 'error');
+        toastGoster('Rapor sunucuya kaydedilemedi', 'error');
       }
     }, agHatasiYakala('rapor kaydet'));
   }
@@ -303,7 +303,7 @@ export function saveRaporlar(
       .then(({ error }) => {
         if (error) {
           console.warn('Supabase toplu rapor kaydetme hatası:', error.message);
-          toastGoster('Raporlar sunucuya kaydedilemedi: ' + error.message, 'error');
+          toastGoster('Raporlar sunucuya kaydedilemedi', 'error');
         }
       }, agHatasiYakala('toplu rapor kaydet'));
   }
@@ -334,7 +334,7 @@ export function updateRapor(id: string, guncelleme: Partial<Omit<Rapor, 'id' | '
     getSupabase().from('raporlar').update(raporToSupabase(guncel, false)).eq('id', id).then(({ error }) => {
       if (error) {
         console.warn('Supabase rapor güncelleme hatası:', error.message);
-        toastGoster('Rapor sunucuya güncellenemedi: ' + error.message, 'error');
+        toastGoster('Rapor sunucuya güncellenemedi', 'error');
       }
     }, agHatasiYakala('rapor guncelle'));
   }
@@ -360,7 +360,7 @@ export function deleteRapor(id: string): boolean {
     getSupabase().from('raporlar').delete().eq('id', id).then(({ error }) => {
       if (error) {
         console.warn('Supabase rapor silme hatası:', error.message);
-        toastGoster('Rapor sunucudan silinemedi: ' + error.message, 'error');
+        toastGoster('Rapor sunucudan silinemedi', 'error');
       }
     }, agHatasiYakala('rapor sil'));
   }

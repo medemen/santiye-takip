@@ -24,6 +24,7 @@ export default function DurumSecimi({ durum, onChange }: Props) {
               borderRadius: 10,
               fontSize: 12,
               fontWeight: 600,
+              minHeight: 44,
               color: durum === key ? '#fff' : 'var(--text-muted)',
               cursor: 'pointer',
             }}

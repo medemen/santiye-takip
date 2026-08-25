@@ -59,6 +59,7 @@ const ReportCard = memo(function ReportCard({ rapor, onClick, showActions }: Pro
               style={{
                 background: 'none', border: '1px solid var(--border)', borderRadius: 6,
                 padding: '6px 10px', fontSize: 13, lineHeight: 1, color: 'var(--text-faint)', cursor: 'pointer',
+                minHeight: 44, minWidth: 44,
               }}
               title="PDF Aktar"
             >

@@ -39,6 +39,7 @@ export async function hedeflerXlsxExport(
   dosyaAdi = 'hedef-takvimi.xlsx',
   meta?: XlsxMeta
 ): Promise<void> {
+  if (hedefler.length === 0) throw new Error('Dışa aktarılacak veri bulunamadı');
   const XLSX = await import('xlsx');
   const satirlar = hedefler
     .slice()
@@ -138,6 +139,7 @@ export async function raporlarXlsxExport(
   hedefBul?: (ada: string, blokNo: number, isKalemi: string) => { hedef_tarih: string } | undefined,
   meta?: XlsxMeta
 ): Promise<void> {
+  if (raporlar.length === 0) throw new Error('Dışa aktarılacak veri bulunamadı');
   const XLSX = await import('xlsx');
   const data = raporlar.map((r) => {
     const hedef = hedefBul?.(r.ada, r.blok_no, r.is_kalemi);

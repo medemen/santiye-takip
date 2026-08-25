@@ -311,12 +311,14 @@ security definer
 set search_path = public
 as $$
 begin
-  if auth.uid() = new.id and not santiye_is_admin() then
-    if new.admin is distinct from old.admin
+  if auth.uid() = new.id and not santiye_is_admin() and not santiye_is_pm() then
+    if new.ad_soyad is distinct from old.ad_soyad
+       or new.atanan_ada is distinct from old.atanan_ada
+       or new.admin is distinct from old.admin
        or new.rol is distinct from old.rol
        or new.yetkili_adalar is distinct from old.yetkili_adalar
        or new.proje_muduru is distinct from old.proje_muduru then
-      raise exception 'Yetki alanlarini degistirme izniniz yok';
+      raise exception 'Yetki ve kimlik alanlarini degistirme izniniz yok';
     end if;
   end if;
   return new;

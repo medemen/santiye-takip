@@ -46,6 +46,7 @@ export default function BlokSecimi({
               fontSize: 11,
               color: adaGeneli ? 'var(--accent-dark)' : 'var(--text-faint)',
               cursor: 'pointer',
+              minHeight: 44,
             }}
             title="Raporu ada geneli (tüm bloklar) olarak kaydet"
           >
@@ -128,4 +129,5 @@ const kucukButon = {
   lineHeight: 1,
   color: 'var(--text-faint)',
   cursor: 'pointer',
+  minHeight: 44,
 } as const;

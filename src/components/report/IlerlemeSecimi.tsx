@@ -21,6 +21,8 @@ export default function IlerlemeSecimi({ ilerleme, onChange }: Props) {
                 fontSize: 11,
                 color: ilerleme === p ? 'var(--accent-dark)' : 'var(--text-faint)',
                 cursor: 'pointer',
+                minHeight: 44,
+                minWidth: 44,
               }}
             >
               %{p}

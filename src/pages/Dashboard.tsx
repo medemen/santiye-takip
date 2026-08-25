@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { getIstatistikler, getAdaGenelIlerleme, getBlokProgress, getGrupAgirlikliAdaIlerleme, getProjeAgirlikliIlerleme, raporEtkinYuzde, getSonRaporHaritasi, getGenelIlerleme } from '../stores/reportStore';
 import { useHedefler } from '../hooks/useHedefler';
@@ -26,6 +26,13 @@ import { card, btnGhost } from '../utils/styles';
 
 export default function Dashboard() {
   const navigate = useNavigate();
+  const [yukleniyor, setYukleniyor] = useState(true);
+
+  useEffect(() => {
+    const t = setTimeout(() => setYukleniyor(false), 800);
+    return () => clearTimeout(t);
+  }, []);
+
   const config = useSiteConfig();
   const isDesktop = useIsDesktop();
   const raporlar = useRaporlar();
@@ -214,6 +221,14 @@ export default function Dashboard() {
   );
 
   const altKartlar = [hedefKart, yaklasanKart, personelAktiviteKart].filter(Boolean);
+
+  if (yukleniyor) {
+    return (
+      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '50vh', fontSize: 18, opacity: 0.6 }}>
+        Yükleniyor…
+      </div>
+    );
+  }
 
   if (isDesktop) {
     return (
