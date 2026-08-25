@@ -25,3 +25,9 @@ export function yerelTarih(metin: string): Date {
   const [y, a, g] = metin.split('-').map(Number);
   return new Date(y || 1970, (a || 1) - 1, g || 1);
 }
+
+// Rapor yapilan isi belgeler; gelecek tarihli kayit trend ve hedef
+// karsilastirmalarini bozar. ISO metin karsilastirmasi kronolojik siraladir.
+export function gelecektekiTarihMi(tarih: string): boolean {
+  return !!tarih && tarih > todayISO();
+}

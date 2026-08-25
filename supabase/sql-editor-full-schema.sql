@@ -986,5 +986,30 @@ create policy "Denetim kaydi sef ve PM gorur" on public.audit_log
   );
 
 -- ============================================================
+-- Rapor tarihi kisiti: gelecek tarihli kayit engellenir.
+-- (migrations/20260825120000_rapor_tarih_kisiti.sql ile ayni)
+-- CHECK CURRENT_DATE ile kullanilamadigindan tetik kullanilir;
+-- Europe/Istanbul takvimi client'in yerel todayISO()'su ile uyumludur.
+-- ============================================================
+create or replace function public.rapor_tarih_dogrula()
+returns trigger
+language plpgsql
+set search_path = public
+as $$
+begin
+  if new.tarih > (now() at time zone 'Europe/Istanbul')::date then
+    raise exception 'Rapor tarihi gelecek bir gun olamaz: %', new.tarih
+      using errcode = 'check_violation';
+  end if;
+  return new;
+end;
+$$;
+
+drop trigger if exists raporlar_tarih_kisiti on public.raporlar;
+create trigger raporlar_tarih_kisiti
+  before insert or update of tarih on public.raporlar
+  for each row execute function public.rapor_tarih_dogrula();
+
+-- ============================================================
 -- BITTI. Hata yoksa sekma tamdir.
 -- ============================================================

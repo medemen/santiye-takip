@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { todayISO, yerelTarih } from './helpers';
+import { todayISO, yerelTarih, gelecektekiTarihMi } from './helpers';
 
 describe('todayISO', () => {
   beforeEach(() => {
@@ -60,5 +60,40 @@ describe('yerelTarih', () => {
     const d = yerelTarih('2026-1-5');
     expect(d.getMonth()).toBe(0);
     expect(d.getDate()).toBe(5);
+  });
+});
+
+describe('gelecektekiTarihMi', () => {
+  beforeEach(() => {
+    vi.useFakeTimers();
+  });
+  afterEach(() => {
+    vi.useRealTimers();
+  });
+
+  it('bugun ve gecmis tarihler kabul edilir', () => {
+    vi.setSystemTime(new Date('2026-08-24T12:00:00+03:00'));
+    expect(gelecektekiTarihMi('2026-08-24')).toBe(false);
+    expect(gelecektekiTarihMi('2026-08-23')).toBe(false);
+    expect(gelecektekiTarihMi('2025-01-01')).toBe(false);
+  });
+
+  it('yarindan sonrasi reddedilir', () => {
+    vi.setSystemTime(new Date('2026-08-24T23:59:00+03:00'));
+    expect(gelecektekiTarihMi('2026-08-25')).toBe(true);
+    expect(gelecektekiTarihMi('2027-01-01')).toBe(true);
+  });
+
+  it('bos/eksik tarih kabul edilir (baska yerde zorunlu alan)', () => {
+    expect(gelecektekiTarihMi('')).toBe(false);
+  });
+
+  it('gun donumunde sinir dogru calisir (yerel gece yarisi)', () => {
+    // 2026-08-24 yerel 23:59 -> yarın reddedilir; ertesi gun 00:30'da
+    // '2026-08-25' artik bugun oldugu icin kabul edilmeli
+    vi.setSystemTime(new Date('2026-08-24T23:59:00+03:00'));
+    expect(gelecektekiTarihMi('2026-08-25')).toBe(true);
+    vi.setSystemTime(new Date('2026-08-25T00:30:00+03:00'));
+    expect(gelecektekiTarihMi('2026-08-25')).toBe(false);
   });
 });

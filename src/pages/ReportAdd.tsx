@@ -8,7 +8,7 @@ import { getCurrentUser } from '../stores/authStore';
 import { getKullaniciAdaAtamasi, getKullaniciBloklari } from '../stores/atamaStore';
 import { useIsDesktop } from '../hooks/useIsDesktop';
 import type { IsDurumu } from '../types';
-import { todayISO } from '../utils/helpers';
+import { todayISO, gelecektekiTarihMi } from '../utils/helpers';
 import { toastGoster } from '../stores/toastStore';
 import { card } from '../utils/styles';
 import AdaSecimi from '../components/report/AdaSecimi';
@@ -231,6 +231,10 @@ export default function ReportAdd() {
 
   const kaydetRapor = (): string | null => {
     if (!ada || !isKalemi || !user) return null;
+    if (gelecektekiTarihMi(tarih)) {
+      toastGoster('Rapor tarihi bugünden ileri bir gün olamaz', 'error');
+      return null;
+    }
     const veri = {
       tarih,
       raporlayan: kullaniciAdi,

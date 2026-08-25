@@ -1,3 +1,5 @@
+import { todayISO } from '../../utils/helpers';
+
 interface Props {
   aciklama: string;
   onAciklamaDegis: (v: string) => void;
@@ -44,6 +46,7 @@ export default function DetaySecimi({
           <input
             type="date"
             value={tarih}
+            max={todayISO()}
             onChange={(e) => onTarihDegis(e.target.value)}
             style={{
               width: '100%',
