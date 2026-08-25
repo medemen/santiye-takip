@@ -7,7 +7,7 @@ import { getAdaList } from '../config/helpers';
 import { getIlerlemeDurumu, hedefKalanGun } from '../data/plan';
 import { getSonRaporHaritasi } from '../stores/reportStore';
 import { hedeflerXlsxExport } from '../utils/exportXlsx';
-import { elementPdfExport } from '../utils/exportPdf';
+import { elementPdfExport, dosyaAdiGuvenli } from '../utils/exportPdf';
 import { toastGoster } from '../stores/toastStore';
 import OzetChipSatiri from '../components/hedef-takvim/OzetChipSatiri';
 import TakvimIzgarasi from '../components/hedef-takvim/TakvimIzgarasi';
@@ -110,7 +110,7 @@ export default function HedefTakvim() {
             onClick={async () => {
               if (!pdfRef.current) return;
               try {
-                await elementPdfExport(pdfRef.current, `hedef-takvimi_${AY_ADLARI[gorunenAy.getMonth()]}_${gorunenAy.getFullYear()}.pdf`);
+                await elementPdfExport(pdfRef.current, `${dosyaAdiGuvenli(`hedef-takvimi_${AY_ADLARI[gorunenAy.getMonth()]}_${gorunenAy.getFullYear()}`)}.pdf`);
                 toastGoster('Hedef takvimi PDF olarak indiriliyor', 'success');
               } catch (err) {
                 console.error('PDF aktarma hatası:', err);

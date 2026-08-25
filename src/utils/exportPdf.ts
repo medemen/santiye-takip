@@ -1,5 +1,18 @@
 import type { Rapor } from '../types';
 
+const TR_KARAKTERLER: Record<string, string> = {
+  'ç': 'c', 'Ç': 'C', 'ğ': 'g', 'Ğ': 'G', 'ı': 'i', 'İ': 'I',
+  'ö': 'o', 'Ö': 'O', 'ş': 's', 'Ş': 'S', 'ü': 'u', 'Ü': 'U',
+};
+
+// Türkçe karakterleri korumadan çevirir; aksi halde ada/kalem adları
+// dosya adında alt çizgi yığınına dönüşür.
+export function dosyaAdiGuvenli(metin: string): string {
+  return metin
+    .replace(/[çÇğĞıİöÖşŞüÜ]/g, (harf) => TR_KARAKTERLER[harf] ?? harf)
+    .replace(/[^a-zA-Z0-9_]/g, '_');
+}
+
 export async function elementPdfExport(element: HTMLElement, dosyaAdi: string): Promise<void> {
   const [{ default: html2canvas }, { jsPDF }] = await Promise.all([
     import('html2canvas'),
@@ -32,7 +45,6 @@ export async function elementPdfExport(element: HTMLElement, dosyaAdi: string): 
 }
 
 export async function raporPdfExport(rapor: Rapor, element: HTMLElement): Promise<void> {
-  const safeName = `${rapor.ada}_Blok${rapor.blok_no}_${rapor.is_kalemi}`
-    .replace(/[^a-zA-Z0-9_]/g, '_');
+  const safeName = dosyaAdiGuvenli(`${rapor.ada}_Blok${rapor.blok_no}_${rapor.is_kalemi}`);
   await elementPdfExport(element, `${safeName}.pdf`);
 }
