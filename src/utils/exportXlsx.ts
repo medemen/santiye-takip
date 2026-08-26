@@ -11,7 +11,7 @@ export interface HedefExportKaynak {
   hedef_tarih: string;
 }
 
-function hedefSatiri(
+export function hedefSatiri(
   h: HedefExportKaynak,
   raporBul: (ada: string, blokNo: number, isKalemi: string) => Rapor | null
 ): Record<string, string | number> {
@@ -95,7 +95,7 @@ function metaSheet(
   return ws;
 }
 
-function adaOzetleri(raporlar: Rapor[]): RaporOzetSatiri[] {
+export function adaOzetleri(raporlar: Rapor[]): RaporOzetSatiri[] {
   const harita = new Map<string, RaporOzetSatiri>();
   for (const r of raporlar) {
     const mevcut = harita.get(r.ada) ?? {
