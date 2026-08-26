@@ -61,19 +61,3 @@ export async function idbGet<T>(store: string, key: string): Promise<T | null> {
     return null;
   }
 }
-
-export async function idbDel(store: string, key: string): Promise<void> {
-  const db = await openDb();
-  if (!db) return;
-  try {
-    await new Promise<void>((resolve, reject) => {
-      const tx = db.transaction(store, 'readwrite');
-      tx.objectStore(store).delete(key);
-      tx.oncomplete = () => resolve();
-      tx.onerror = () => reject(tx.error);
-      tx.onabort = () => reject(tx.error);
-    });
-  } catch {
-    /* yok say */
-  }
-}

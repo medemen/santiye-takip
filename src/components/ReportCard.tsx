@@ -51,8 +51,7 @@ const ReportCard = memo(function ReportCard({ rapor, onClick, showActions }: Pro
               onClick={(e) => {
                 e.stopPropagation();
                 if (!cardRef.current) return;
-                Promise.resolve(raporPdfExport(rapor, cardRef.current)).catch((err) => {
-                  console.error('PDF aktarma hatası:', err);
+                Promise.resolve(raporPdfExport(rapor, cardRef.current)).catch(() => {
                   toastGoster('PDF dosyası oluşturulamadı', 'error');
                 });
               }}

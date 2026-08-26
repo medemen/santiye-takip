@@ -96,8 +96,7 @@ export default function HedefTakvim() {
                   { santiyeAdi: config.genel.santiyeAdi }
                 );
                 toastGoster(`${gorunenHedefler.length} hedef Excel olarak indiriliyor`, 'success');
-              } catch (err) {
-                console.error('Excel aktarma hatası:', err);
+              } catch {
                 toastGoster('Excel dosyası oluşturulamadı', 'error');
               }
             }}
@@ -112,8 +111,7 @@ export default function HedefTakvim() {
               try {
                 await elementPdfExport(pdfRef.current, `${dosyaAdiGuvenli(`hedef-takvimi_${AY_ADLARI[gorunenAy.getMonth()]}_${gorunenAy.getFullYear()}`)}.pdf`);
                 toastGoster('Hedef takvimi PDF olarak indiriliyor', 'success');
-              } catch (err) {
-                console.error('PDF aktarma hatası:', err);
+              } catch {
                 toastGoster('PDF dosyası oluşturulamadı', 'error');
               }
             }}

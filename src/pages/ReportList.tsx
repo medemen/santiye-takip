@@ -114,8 +114,7 @@ export default function ReportList() {
             try {
               await raporlarXlsxExport(filtered, 'raporlar.xlsx', getHedef, { santiyeAdi: config.genel.santiyeAdi });
               toastGoster(`${filtered.length} rapor Excel olarak indiriliyor`, 'success');
-            } catch (err) {
-              console.error('Excel aktarma hatası:', err);
+            } catch {
               toastGoster('Excel dosyası oluşturulamadı', 'error');
             }
           }}

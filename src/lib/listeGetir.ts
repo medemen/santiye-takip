@@ -4,7 +4,7 @@
 const VARSAYILAN_SAYFA_BOYUTU = 1000;
 const VARSAYILAN_MAKS_SAYFA = 200;
 
-export interface SayfaSonucu<T> {
+interface SayfaSonucu<T> {
   data: T[] | null;
   error: { message: string } | null;
 }
