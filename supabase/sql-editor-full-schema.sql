@@ -3,7 +3,7 @@
 -- ============================================================
 -- Bu dosya, supabase/migrations altındaki tüm migration'ların
 -- FINAL durumunu temsil eden idempotent (tekrar çalıştırılabilir)
--- birleşimidir. Son senkron: 20260824120000_denetim_kaydi.
+-- birleşimidir. Son senkron: 20260826090000_rapor_onay_foto.
 -- Yeni projede (szjpnaslernezvjoscag) zaten var olan
 -- tablolara/veriye DOKUNMAZ; yalnızca eksik parçaları kurar.
 --
@@ -46,7 +46,10 @@ create table if not exists public.raporlar (
   aciklama text default '',
   user_id uuid references auth.users(id),
   olusturma_tarihi timestamptz default now(),
-  created_at timestamptz default now()
+  created_at timestamptz default now(),
+  onay_durumu text not null default 'onaylandi' check (onay_durumu in ('beklemede','onaylandi','reddedildi')),
+  revizyon_notu text default '',
+  fotograflar text[] default '{}'
 );
 alter table public.raporlar enable row level security;
 
@@ -79,17 +82,28 @@ create table if not exists public.is_kalemi_hedefleri (
 );
 alter table public.is_kalemi_hedefleri enable row level security;
 
--- Kaldirilan fotograf ozelligi kalintilari temizligi
-alter table public.raporlar drop column if exists fotograflar;
-drop table if exists public.rapor_fotograflar;
-
 -- ============================================================
--- 2. EKSIK KOLONLAR (Faz 4)
+-- 2. EKSIK KOLONLAR (Faz 4 + onay/foto)
 -- ============================================================
 alter table public.kullanicilar add column if not exists proje_muduru boolean not null default false;
 alter table public.raporlar add column if not exists user_id uuid references auth.users(id);
+alter table public.raporlar add column if not exists onay_durumu text not null default 'onaylandi';
+alter table public.raporlar add column if not exists revizyon_notu text default '';
+alter table public.raporlar add column if not exists fotograflar text[] default '{}';
 alter table public.kullanici_ada_atamalari add column if not exists user_id uuid references auth.users(id);
 alter table public.kullanici_blok_atamalari add column if not exists user_id uuid references auth.users(id);
+
+-- onay_durumu CHECK kisiti
+do $$ begin
+  if not exists (
+    select 1 from pg_constraint
+    where conrelid = 'public.raporlar'::regclass and conname = 'raporlar_onay_durumu_check'
+  ) then
+    alter table public.raporlar
+      add constraint raporlar_onay_durumu_check
+      check (onay_durumu in ('beklemede','onaylandi','reddedildi'));
+  end if;
+end $$;
 
 -- ============================================================
 -- 2a. user_id FK'leri: ON DELETE SET NULL
@@ -743,12 +757,27 @@ drop policy if exists "Hedefler admin/PM siler" on public.is_kalemi_hedefleri;
 create policy "Hedefler admin/PM siler" on public.is_kalemi_hedefleri
   for delete using (santiye_is_admin() or santiye_is_pm());
 
--- Storage (rapor fotograflari kaldirildi; kalinti policy'ler temizlenir)
+-- Storage (rapor fotograflari)
+INSERT INTO storage.buckets (id, name, public) VALUES ('rapor-fotolari', 'rapor-fotolari', true)
+ON CONFLICT (id) DO NOTHING;
+
+drop policy if exists "Fotograf okuma" on storage.objects;
+create policy "Fotograf okuma" on storage.objects
+  FOR SELECT USING (bucket_id = 'rapor-fotolari');
+
+drop policy if exists "Fotograf yukleme" on storage.objects;
+create policy "Fotograf yukleme" on storage.objects
+  FOR INSERT WITH CHECK (bucket_id = 'rapor-fotolari' AND auth.role() = 'authenticated');
+
+drop policy if exists "Fotograf silme" on storage.objects;
+create policy "Fotograf silme" on storage.objects
+  FOR DELETE USING (bucket_id = 'rapor-fotolari' AND auth.role() = 'authenticated');
+
+-- Kalinti eski bucket temizligi
 drop policy if exists "Rapor fotolari yukleme" on storage.objects;
 drop policy if exists "Rapor fotolari herkes okur" on storage.objects;
 drop policy if exists "Rapor fotolari sahibi/admin/PM siler" on storage.objects;
 
--- Kalinti public bucket kayitlari da silinir
 do $$ begin
   delete from storage.objects where bucket = 'rapor_fotograflar';
   delete from storage.buckets where id = 'rapor_fotograflar';
@@ -770,6 +799,7 @@ create index if not exists idx_raporlar_durum on public.raporlar(durum);
 create index if not exists idx_raporlar_ada_is_kalemi on public.raporlar(ada, is_kalemi);
 create index if not exists idx_raporlar_ada_blok_kalem on public.raporlar(ada, blok_no, is_kalemi);
 create index if not exists idx_raporlar_olusturma_tarihi on public.raporlar(olusturma_tarihi);
+create index if not exists idx_raporlar_onay_durumu on public.raporlar(onay_durumu) where onay_durumu = 'beklemede';
 create index if not exists idx_kullanicilar_ada on public.kullanicilar(atanan_ada);
 drop index if exists public.uq_is_kalemi_hedefleri_ada_blok_kalem;
 

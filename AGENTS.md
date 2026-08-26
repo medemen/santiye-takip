@@ -82,15 +82,29 @@ eklerken bu üçlüyü (cache + realtime + version-counter) tekrarlayın.
 `localStorage`'daki son bilinen veriyle ve bundle'daki `data/*.json` ile çalışmaya
 devam eder. Yeni bir özellik eklerken bu düşüşü (fallback) kırmamaya dikkat edin.
 
+**Rapor onay akışı:** Yeni raporlar `onay_durumu = 'beklemede'` ile başlar.
+Admin/Proje Müdürü onaylayabilir (`raporOnayla`) veya reddedebilir (`raporReddet`
++ `revizyon_notu`). Dashboard'da "Onay Bekleyen" KPI kartı gösterilir.
+
+**Fotoğraf ekleme:** Raporlara Supabase Storage (`rapor-fotolari` bucket) üzerinden
+fotoğraf eklenir. `FotografEkle` bileşeni 5MB limitli, thumbnail önizlemeli.
+
+**Push bildirimleri:** Yeni rapor eklendiğinde Realtime INSERT tetiklenir;
+diğer kullanıcılara Capacitor Local Notifications veya Web Notification API ile
+bildirim gönderilir. `notificationStore.yeniRaporBildirimiGonder()`.
+
+**Rapor şablon özelleştirme:** `config.raporSablonu` ile iş kalemlerinde açıklama
+zorunluluğu ve varsayılan açıklama metni ayarlanabilir (Settings sayfasından).
+
 ## Route haritası (`src/App.tsx`)
 
 | Path | Sayfa | Koruma |
 |---|---|---|
 | `/login` | `Login` | — |
-| `/` | `Dashboard` | Giriş gerekli |
+| `/` | `Dashboard` | Giriş gerekli (rol bazlı: saha personeli kisisel filtre) |
 | `/hedef-takvim` | `HedefTakvim` | Giriş gerekli |
 | `/adalar`, `/ada/:ada`, `/ada/:ada/blok/:blokNo` | `AdaList`, `AdaDetail`, `BlokDetail` | Giriş gerekli |
-| `/rapor-ekle`, `/raporlar` | `ReportAdd`, `ReportList` | Giriş gerekli |
+| `/rapor-ekle`, `/raporlar` | `ReportAdd`, `ReportList` | Giriş gerekli (onay/foto akışı dahil) |
 | `/toplu-rapor` | `BulkReport` | Admin |
 | `/personel`, `/profil`, `/istatistik` | `Personnel`, `Profile`, `Statistics` | Giriş gerekli |
 | `/ayarlar` | `Settings` | Proje müdürü |

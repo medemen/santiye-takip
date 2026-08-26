@@ -6,6 +6,8 @@ import {
   getGenelIlerleme,
   getSonRaporHaritasi,
   raporEtkinYuzde,
+  raporOnayla,
+  raporReddet,
   saveRapor,
 } from './reportStore';
 import type { Rapor } from '../types';
@@ -125,5 +127,35 @@ describe('getSonRaporHaritasi', () => {
     } finally {
       vi.useRealTimers();
     }
+  });
+});
+
+describe('rapor onay akisi', () => {
+  it('yeni rapor varsayilan olarak beklemede baslar', () => {
+    const r = saveRapor({
+      tarih: '2026-08-26', raporlayan: 'Test', ada: 'A', blok_no: 1,
+      is_kalemi: 'Test', durum: 'devam_ediyor', ilerleme_yuzde: 50, aciklama: '',
+    });
+    expect(r.onay_durumu).toBe('beklemede');
+    expect(r.revizyon_notu).toBe('');
+    expect(r.fotograflar).toEqual([]);
+  });
+
+  it('raporOnayla admin olmadan calismaz', () => {
+    const r = saveRapor({
+      tarih: '2026-08-26', raporlayan: 'Test', ada: 'A', blok_no: 1,
+      is_kalemi: 'Test', durum: 'devam_ediyor', ilerleme_yuzde: 50, aciklama: '',
+    });
+    const sonuc = raporOnayla(r.id);
+    expect(sonuc).toBe(false);
+  });
+
+  it('raporReddet admin olmadan calismaz', () => {
+    const r = saveRapor({
+      tarih: '2026-08-26', raporlayan: 'Test', ada: 'A', blok_no: 1,
+      is_kalemi: 'Test', durum: 'devam_ediyor', ilerleme_yuzde: 50, aciklama: '',
+    });
+    const sonuc = raporReddet(r.id, 'Yetersiz');
+    expect(sonuc).toBe(false);
   });
 });
