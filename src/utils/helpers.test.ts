@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { todayISO, yerelTarih, gelecektekiTarihMi } from './helpers';
+import { todayISO, yerelTarih, gelecektekiTarihMi, formatDateTime, formatDateTimeSabit } from './helpers';
 
 describe('todayISO', () => {
   beforeEach(() => {
@@ -95,5 +95,36 @@ describe('gelecektekiTarihMi', () => {
     expect(gelecektekiTarihMi('2026-08-25')).toBe(true);
     vi.setSystemTime(new Date('2026-08-25T00:30:00+03:00'));
     expect(gelecektekiTarihMi('2026-08-25')).toBe(false);
+  });
+});
+
+describe('formatDateTime', () => {
+  it('gecerli ISO tarihini yerel formatta donusturur', () => {
+    const sonuc = formatDateTime('2026-08-24T14:30:00Z');
+    expect(sonuc).toContain('24');
+    expect(sonuc).toContain('08');
+    expect(sonuc).toContain('2026');
+  });
+
+  it('gecersiz tarihi oldugu gibi dondurur', () => {
+    expect(formatDateTime('bozuk-tarih')).toBe('bozuk-tarih');
+  });
+});
+
+describe('formatDateTimeSabit', () => {
+  it('DD.MM.YYYY HH:MM formatinda dondurur', () => {
+    const sonuc = formatDateTimeSabit('2026-08-24T14:30:00Z');
+    // Sabit format tarayicidan bagimsiz olmali
+    expect(sonuc).toMatch(/^\d{2}\.\d{2}\.\d{4} \d{2}:\d{2}$/);
+  });
+
+  it('gecersiz tarihi oldugu gibi dondurur', () => {
+    expect(formatDateTimeSabit('bozuk')).toBe('bozuk');
+  });
+
+  it('tek haneli ay/gun ve saat/dakikayi padStart ile doldurur', () => {
+    // 2026-01-05T09:05:00Z -> 05.01.2026 09:05 (UTC+offset farki olabilir)
+    const sonuc = formatDateTimeSabit('2026-01-05T09:05:00Z');
+    expect(sonuc).toMatch(/^\d{2}\.\d{2}\.\d{4} \d{2}:\d{2}$/);
   });
 });

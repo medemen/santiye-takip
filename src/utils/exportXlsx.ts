@@ -2,6 +2,7 @@ import type { Rapor } from '../types';
 import { DURUM_LABELLARI } from '../config/defaultConfig';
 import { hedefKalanGun } from '../data/plan';
 import { raporEtkinYuzde } from '../stores/reportStore';
+import { formatDateTimeSabit } from './helpers';
 
 export interface HedefExportKaynak {
   ada: string;
@@ -63,17 +64,6 @@ export interface RaporOzetSatiri {
   'Ortalama İlerleme (%)': number;
 }
 
-function formatDateTime(iso: string): string {
-  const d = new Date(iso);
-  if (isNaN(d.getTime())) return iso;
-  const g = String(d.getDate()).padStart(2, '0');
-  const a = String(d.getMonth() + 1).padStart(2, '0');
-  const y = d.getFullYear();
-  const s = String(d.getHours()).padStart(2, '0');
-  const dk = String(d.getMinutes()).padStart(2, '0');
-  return `${g}.${a}.${y} ${s}:${dk}`;
-}
-
 export interface XlsxMeta {
   santiyeAdi?: string;
 }
@@ -90,7 +80,7 @@ function metaSheet(
   const aoa: (string | number)[][] = [
     ['Şantiye', meta?.santiyeAdi ?? '-'],
     [kayitAdi, kayitSayisi],
-    ['Dışa Aktarma Zamanı', formatDateTime(new Date().toISOString())],
+    ['Dışa Aktarma Zamanı', formatDateTimeSabit(new Date().toISOString())],
     [],
     basliklar,
     ...satirlar.map((s) => basliklar.map((b) => s[b] ?? '')),
@@ -152,7 +142,7 @@ export async function raporlarXlsxExport(
       'Tarih': r.tarih,
       'Raporlayan': r.raporlayan,
       'Açıklama': r.aciklama || '-',
-      'Oluşturma': formatDateTime(r.olusturma_tarihi),
+      'Oluşturma': formatDateTimeSabit(r.olusturma_tarihi),
     };
     if (hedef) {
       const kalanGun = hedefKalanGun(hedef.hedef_tarih);

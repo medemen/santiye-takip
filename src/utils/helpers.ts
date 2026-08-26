@@ -1,5 +1,6 @@
 export function formatDateTime(dateStr: string): string {
   const d = new Date(dateStr);
+  if (isNaN(d.getTime())) return dateStr;
   return d.toLocaleDateString('tr-TR', {
     day: '2-digit',
     month: '2-digit',
@@ -7,6 +8,18 @@ export function formatDateTime(dateStr: string): string {
     hour: '2-digit',
     minute: '2-digit',
   });
+}
+
+// Sabit format: tarayici/OS bagimsiz DD.MM.YYYY HH:MM (Excel export icin)
+export function formatDateTimeSabit(dateStr: string): string {
+  const d = new Date(dateStr);
+  if (isNaN(d.getTime())) return dateStr;
+  const g = String(d.getDate()).padStart(2, '0');
+  const a = String(d.getMonth() + 1).padStart(2, '0');
+  const y = d.getFullYear();
+  const s = String(d.getHours()).padStart(2, '0');
+  const dk = String(d.getMinutes()).padStart(2, '0');
+  return `${g}.${a}.${y} ${s}:${dk}`;
 }
 
 // toISOString UTC dondurur; yerel saat 00:00-03:00 arasinda onceki gunu
