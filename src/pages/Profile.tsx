@@ -25,7 +25,9 @@ export default function Profile() {
   const [ayarlar, setAyarlar] = useState(() => bildirimAyarlariGetir());
 
   useEffect(() => {
-    bildirimIzniDurumu().then(setIzinDurumu);
+    let mounted = true;
+    bildirimIzniDurumu().then((d) => { if (mounted) setIzinDurumu(d); });
+    return () => { mounted = false; };
   }, []);
 
   if (!user) return null;
