@@ -33,6 +33,12 @@ export default function Settings() {
   const [gruplar, setGruplar] = useState<ImalatGrubu[]>(() =>
     JSON.parse(JSON.stringify(config.isKalemleri.gruplar))
   );
+  const [varsayilanAciklama, setVarsayilanAciklama] = useState(
+    config.raporSablonu?.varsayilanAciklama ?? ''
+  );
+  const [aciklamaZorunluKalemler, setAciklamaZorunluKalemler] = useState<string[]>(
+    config.raporSablonu?.aciklamaZorunluKalemler ?? []
+  );
   const [kaydediliyor, setKaydediliyor] = useState(false);
   const [dogrulama, setDogrulama] = useState<string[]>([]);
 
@@ -74,6 +80,11 @@ export default function Settings() {
         gruplar,
       },
       durumTespit: durumTespitUret({ ...config, yapi: yeniYapi }),
+      raporSablonu: {
+        baslikOnEkleri: config.raporSablonu?.baslikOnEkleri ?? {},
+        aciklamaZorunluKalemler,
+        varsayilanAciklama,
+      },
     };
 
     const sorunlar = configValidate(taslak);
@@ -235,6 +246,88 @@ export default function Settings() {
           Gruplar ve kalemler buradan düzenlenebilir; her satıra bir kalem yazın.
         </p>
         <KalemGrupEditor gruplar={gruplar} onChange={setGruplar} />
+      </div>
+
+      <div style={{ ...card, marginBottom: 16 }}>
+        <h3 style={{ fontSize: 14, fontWeight: 600, color: 'var(--text-secondary)', margin: 0, marginBottom: 12 }}>
+          Rapor Şablonu
+        </h3>
+        <p style={{ fontSize: 11, color: 'var(--text-subtle)', margin: 0, marginBottom: 10 }}>
+          Rapor formunda kullanılacak şablon ayarları.
+        </p>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+          <div>
+            <label style={labelStyle}>Varsayılan Açıklama</label>
+            <textarea
+              style={{ ...inputStyle, minHeight: 60, resize: 'vertical' }}
+              value={varsayilanAciklama}
+              onChange={(e) => setVarsayilanAciklama(e.target.value)}
+              placeholder="Son raporu kopyalarken kullanılacak metin"
+            />
+          </div>
+          <div>
+            <label style={labelStyle}>
+              Açıklama Zorunlu İş Kalemleri
+            </label>
+            <p style={{ fontSize: 11, color: 'var(--text-subtle)', margin: 0, marginBottom: 6 }}>
+              Bu kalemler için rapor girerken açıklama alanı zorunlu olur.
+            </p>
+            <div
+              style={{
+                display: 'flex',
+                flexWrap: 'wrap',
+                gap: 6,
+                maxHeight: 120,
+                overflowY: 'auto',
+                padding: 8,
+                borderRadius: 10,
+                border: '1px solid var(--border)',
+                backgroundColor: 'var(--bg-card)',
+              }}
+            >
+              {gruplar.flatMap((g) => g.kalemler).map((kalem) => (
+                <label
+                  key={kalem}
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 4,
+                    fontSize: 12,
+                    color: 'var(--text-primary)',
+                    cursor: 'pointer',
+                    padding: '3px 8px',
+                    borderRadius: 6,
+                    border: aciklamaZorunluKalemler.includes(kalem)
+                      ? '1px solid #f59e0b'
+                      : '1px solid var(--border)',
+                    backgroundColor: aciklamaZorunluKalemler.includes(kalem)
+                      ? 'var(--bg-accent-soft)'
+                      : 'transparent',
+                  }}
+                >
+                  <input
+                    type="checkbox"
+                    checked={aciklamaZorunluKalemler.includes(kalem)}
+                    onChange={(e) => {
+                      setAciklamaZorunluKalemler((prev) =>
+                        e.target.checked
+                          ? [...prev, kalem]
+                          : prev.filter((x) => x !== kalem)
+                      );
+                    }}
+                    style={{ width: 14, height: 14, margin: 0 }}
+                  />
+                  {kalem}
+                </label>
+              ))}
+            </div>
+            {aciklamaZorunluKalemler.length > 0 && (
+              <div style={{ marginTop: 6, fontSize: 11, color: 'var(--text-muted)' }}>
+                {aciklamaZorunluKalemler.length} kalem seçili
+              </div>
+            )}
+          </div>
+        </div>
       </div>
 
       {dogrulama.length > 0 && (

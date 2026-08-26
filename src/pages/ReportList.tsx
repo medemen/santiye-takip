@@ -1,11 +1,12 @@
-import { useMemo, useState, useEffect } from 'react';
+import { useMemo, useState, useEffect, useCallback } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { deleteRapor } from '../stores/reportStore';
+import { deleteRapor, getRaporlar, raporOnayla, raporReddet } from '../stores/reportStore';
 import { useRaporlar } from '../hooks/useRaporlar';
 import { getCurrentUser, isSahaPersoneli } from '../stores/authStore';
 import { useSiteConfig } from '../hooks/useSiteConfig';
 import { getAdaList } from '../config/helpers';
 import ReportCard from '../components/ReportCard';
+import FotografEkle from '../components/report/FotografEkle';
 import { DURUM_LABELLARI } from '../config/defaultConfig';
 import { toastGoster } from '../stores/toastStore';
 import { raporlarXlsxExport } from '../utils/exportXlsx';
@@ -37,6 +38,23 @@ export default function ReportList() {
   const [searchTerm, setSearchTerm] = useState('');
   const [debouncedTerm, setDebouncedTerm] = useState('');
   const [sayfa, setSayfa] = useState(1);
+  const [acikFotoRapor, setAcikFotoRapor] = useState<string | null>(null);
+  const [raporFotograflari, setRaporFotograflari] = useState<Record<string, string[]>>({});
+
+  const fotoGuncelle = useCallback((raporId: string, yeniFotograflar: string[]) => {
+    setRaporFotograflari((prev) => ({ ...prev, [raporId]: yeniFotograflar }));
+  }, []);
+
+  useEffect(() => {
+    const sonRaporlar = getRaporlar();
+    const harita: Record<string, string[]> = {};
+    for (const r of sonRaporlar) {
+      if (r.fotograflar && r.fotograflar.length > 0) {
+        harita[r.id] = r.fotograflar;
+      }
+    }
+    setRaporFotograflari(harita);
+  }, [raporlar]);
 
   useEffect(() => {
     const id = setTimeout(() => setDebouncedTerm(searchTerm), 250);
@@ -55,8 +73,6 @@ export default function ReportList() {
     if (isAdmin) return true;
     return isSahaPersoneli(user.rol) && user.ad_soyad === raporlayan;
   };
-
-  const canDeleteReport = () => isAdmin;
 
   const filtered = useMemo(() => {
     const kaynak = sadeceBenim && user
@@ -304,7 +320,7 @@ export default function ReportList() {
               style={{ cursor: editable ? 'pointer' : 'default', position: 'relative' }}
             >
               <ReportCard rapor={r} showActions />
-              {canDeleteReport() && (
+              {isAdmin && (
               <div
                 onClick={(e) => e.stopPropagation()}
                 style={{
@@ -315,6 +331,56 @@ export default function ReportList() {
                   gap: 4,
                 }}
               >
+                  {r.onay_durumu === 'beklemede' && (
+                    <>
+                      <button
+                        onClick={(e) => { e.stopPropagation(); raporOnayla(r.id); toastGoster('Rapor onaylandı', 'success'); }}
+                        style={{ background: '#dcfce7', border: 'none', borderRadius: 6, padding: '6px 10px', fontSize: 13, lineHeight: 1, cursor: 'pointer', color: '#16a34a', minHeight: 44, minWidth: 44 }}
+                        title="Onayla"
+                      >
+                        ✓
+                      </button>
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          const not = window.prompt('Red nedeni (isteğe bağlı):');
+                          raporReddet(r.id, not ?? '');
+                          toastGoster('Rapor reddedildi', 'success');
+                        }}
+                        style={{ background: '#fee2e2', border: 'none', borderRadius: 6, padding: '6px 10px', fontSize: 13, lineHeight: 1, cursor: 'pointer', color: '#dc2626', minHeight: 44, minWidth: 44 }}
+                        title="Reddet"
+                      >
+                        ✗
+                      </button>
+                    </>
+                  )}
+                  {r.onay_durumu === 'reddedildi' && r.revizyon_notu && (
+                    <span
+                      style={{ fontSize: 11, color: '#ef4444', maxWidth: 120, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', padding: '6px 8px', backgroundColor: '#fee2e2', borderRadius: 6 }}
+                      title={r.revizyon_notu}
+                    >
+                      {r.revizyon_notu}
+                    </span>
+                  )}
+                  <button
+                    onClick={(e) => { e.stopPropagation(); setAcikFotoRapor(acikFotoRapor === r.id ? null : r.id); }}
+                    style={{
+                      background: acikFotoRapor === r.id ? '#fef3c7' : 'none',
+                      border: '1px solid var(--border)',
+                      borderRadius: 6,
+                      padding: '6px 10px',
+                      fontSize: 13,
+                      lineHeight: 1,
+                      cursor: 'pointer',
+                      color: acikFotoRapor === r.id ? '#f59e0b' : 'var(--text-faint)',
+                      minHeight: 44,
+                      minWidth: 44,
+                    }}
+                    title="Fotoğraf Ekle"
+                    aria-label={`${r.ada} raporuna fotoğraf ekle`}
+                  >
+                    📷
+                  </button>
                   <button
                     onClick={(e) => { e.stopPropagation(); handleDelete(r.id); }}
                     style={{
@@ -335,6 +401,25 @@ export default function ReportList() {
                     🗑️
                   </button>
               </div>
+              )}
+              {acikFotoRapor === r.id && (
+                <div
+                  onClick={(e) => e.stopPropagation()}
+                  style={{
+                    marginTop: 8,
+                    padding: 12,
+                    backgroundColor: 'var(--bg-subtle)',
+                    borderRadius: 8,
+                    border: '1px solid var(--border-soft)',
+                  }}
+                >
+                  <FotografEkle
+                    raporId={r.id}
+                    fotograflar={raporFotograflari[r.id] ?? r.fotograflar ?? []}
+                    onUpdate={(yeni) => fotoGuncelle(r.id, yeni)}
+                    disabled={!canEditReport(r.raporlayan)}
+                  />
+                </div>
               )}
             </div>
             );

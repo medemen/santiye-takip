@@ -9,6 +9,13 @@ export interface SantiyeConfig {
   isKalemleri: IsKalemleriBilgi;
   durumTespit: DurumTespitBilgi;
   hakedis?: HakedisBilgi;
+  raporSablonu?: RaporSablonu;
+}
+
+export interface RaporSablonu {
+  baslikOnEkleri: Record<string, string>;
+  aciklamaZorunluKalemler: string[];
+  varsayilanAciklama: string;
 }
 
 export interface HakedisBilgi {

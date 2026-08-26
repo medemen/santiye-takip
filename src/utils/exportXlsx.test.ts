@@ -4,9 +4,9 @@ import type { Rapor } from '../types';
 
 describe('adaOzetleri', () => {
   const raporlar: Rapor[] = [
-    { id: '1', tarih: '2026-08-01', raporlayan: 'A', ada: 'Ada1', blok_no: 1, is_kalemi: 'Sıva', durum: 'tamamlandi', ilerleme_yuzde: 100, aciklama: '', olusturma_tarihi: '2026-08-01T10:00:00Z', user_id: null },
-    { id: '2', tarih: '2026-08-02', raporlayan: 'B', ada: 'Ada1', blok_no: 2, is_kalemi: 'Sıva', durum: 'devam_ediyor', ilerleme_yuzde: 50, aciklama: '', olusturma_tarihi: '2026-08-02T10:00:00Z', user_id: null },
-    { id: '3', tarih: '2026-08-03', raporlayan: 'C', ada: 'Ada2', blok_no: 1, is_kalemi: 'Sıva', durum: 'planlandi', ilerleme_yuzde: 0, aciklama: '', olusturma_tarihi: '2026-08-03T10:00:00Z', user_id: null },
+    { id: '1', tarih: '2026-08-01', raporlayan: 'A', ada: 'Ada1', blok_no: 1, is_kalemi: 'Sıva', durum: 'tamamlandi', ilerleme_yuzde: 100, aciklama: '', olusturma_tarihi: '2026-08-01T10:00:00Z', user_id: null, onay_durumu: 'onaylandi', revizyon_notu: '', fotograflar: [] },
+    { id: '2', tarih: '2026-08-02', raporlayan: 'B', ada: 'Ada1', blok_no: 2, is_kalemi: 'Sıva', durum: 'devam_ediyor', ilerleme_yuzde: 50, aciklama: '', olusturma_tarihi: '2026-08-02T10:00:00Z', user_id: null, onay_durumu: 'onaylandi', revizyon_notu: '', fotograflar: [] },
+    { id: '3', tarih: '2026-08-03', raporlayan: 'C', ada: 'Ada2', blok_no: 1, is_kalemi: 'Sıva', durum: 'planlandi', ilerleme_yuzde: 0, aciklama: '', olusturma_tarihi: '2026-08-03T10:00:00Z', user_id: null, onay_durumu: 'onaylandi', revizyon_notu: '', fotograflar: [] },
   ];
 
   it('raporlari adalara gore gruplar', () => {
@@ -36,8 +36,8 @@ describe('adaOzetleri', () => {
 
   it('ada adina gore siralar', () => {
     const karisik: Rapor[] = [
-      { id: '1', tarih: '2026-01-01', raporlayan: 'X', ada: 'Z_Ada', blok_no: 1, is_kalemi: 'K', durum: 'tamamlandi', ilerleme_yuzde: 100, aciklama: '', olusturma_tarihi: '', user_id: null },
-      { id: '2', tarih: '2026-01-01', raporlayan: 'Y', ada: 'A_Ada', blok_no: 1, is_kalemi: 'K', durum: 'devam_ediyor', ilerleme_yuzde: 30, aciklama: '', olusturma_tarihi: '', user_id: null },
+      { id: '1', tarih: '2026-01-01', raporlayan: 'X', ada: 'Z_Ada', blok_no: 1, is_kalemi: 'K', durum: 'tamamlandi', ilerleme_yuzde: 100, aciklama: '', olusturma_tarihi: '', user_id: null, onay_durumu: 'onaylandi', revizyon_notu: '', fotograflar: [] },
+      { id: '2', tarih: '2026-01-01', raporlayan: 'Y', ada: 'A_Ada', blok_no: 1, is_kalemi: 'K', durum: 'devam_ediyor', ilerleme_yuzde: 30, aciklama: '', olusturma_tarihi: '', user_id: null, onay_durumu: 'onaylandi', revizyon_notu: '', fotograflar: [] },
     ];
     const sonuc = adaOzetleri(karisik);
     expect(sonuc[0].Ada).toBe('A_Ada');
@@ -59,6 +59,7 @@ describe('hedefSatiri', () => {
       id: '1', tarih: '2026-08-01', raporlayan: 'A', ada: 'Ada1', blok_no: 2,
       is_kalemi: 'Sıva', durum: 'devam_ediyor', ilerleme_yuzde: 65,
       aciklama: '', olusturma_tarihi: '2026-08-01T10:00:00Z', user_id: null,
+      onay_durumu: 'onaylandi', revizyon_notu: '', fotograflar: [],
     };
     const satir = hedefSatiri(hedef, () => mockRapor);
     expect(satir['İlerleme (%)']).toBe(65);
@@ -70,6 +71,7 @@ describe('hedefSatiri', () => {
       id: '1', tarih: '2026-08-01', raporlayan: 'A', ada: 'Ada1', blok_no: 2,
       is_kalemi: 'Sıva', durum: 'tamamlandi', ilerleme_yuzde: 80,
       aciklama: '', olusturma_tarihi: '2026-08-01T10:00:00Z', user_id: null,
+      onay_durumu: 'onaylandi', revizyon_notu: '', fotograflar: [],
     };
     const satir = hedefSatiri(hedef, () => mockRapor);
     expect(satir['İlerleme (%)']).toBe(100);

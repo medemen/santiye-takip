@@ -16,14 +16,15 @@ interface BildirimAyarlari {
   uyariAcik: boolean;
   gunlukOzet: boolean;
   gunlukSaat: string;
+  yeniRapor: boolean;
 }
 
 export function bildirimAyarlariGetir(): BildirimAyarlari {
   try {
     const data = localStorage.getItem(onEk + '_ayarlar');
-    if (data) return { uyariAcik: true, gunlukOzet: true, gunlukSaat: '08:00', ...JSON.parse(data) };
+    if (data) return { uyariAcik: true, gunlukOzet: true, gunlukSaat: '08:00', yeniRapor: true, ...JSON.parse(data) };
   } catch { /* yok say */ }
-  return { uyariAcik: true, gunlukOzet: true, gunlukSaat: '08:00' };
+  return { uyariAcik: true, gunlukOzet: true, gunlukSaat: '08:00', yeniRapor: true };
 }
 
 export function bildirimAyarlariKaydet(ayarlar: BildirimAyarlari): void {
@@ -229,6 +230,30 @@ export async function testBildirimGonder(): Promise<boolean> {
   } catch {
     return false;
   }
+}
+
+export function yeniRaporBildirimiGonder(raporlayan: string, ada: string, blokNo: number): void {
+  const ayarlar = bildirimAyarlariGetir();
+  if (!ayarlar.yeniRapor) return;
+
+  const yer = blokNo === 0 ? `${ada} Ada Geneli` : `${ada} Blok ${blokNo}`;
+  const baslik = '📋 Yeni Rapor';
+  const govde = `${raporlayan} — ${yer}`;
+
+  try {
+    if (nativeBildirimVarMi()) {
+      void LocalNotifications.schedule({
+        notifications: [{
+          id: Date.now() % 100000,
+          title: baslik,
+          body: govde,
+          schedule: { at: new Date() },
+        }],
+      });
+    } else if (typeof Notification !== 'undefined' && Notification.permission === 'granted') {
+      new Notification(baslik, { body: govde, tag: `yeni-rapor-${raporlayan}-${ada}` });
+    }
+  } catch { /* yok say */ }
 }
 
 let kontrolZamani: ReturnType<typeof setInterval> | null = null;

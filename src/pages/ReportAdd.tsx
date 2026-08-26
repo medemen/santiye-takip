@@ -80,6 +80,9 @@ export default function ReportAdd() {
   const [tarih, setTarih] = useState(todayISO());
   const [kaydediliyor, setKaydediliyor] = useState(false);
 
+  const configSablon = config.raporSablonu;
+  const aciklamaZorunlu = configSablon?.aciklamaZorunluKalemler?.includes(isKalemi) ?? false;
+
   useEffect(() => {
     if (editId) {
       const rapor = getRaporById(editId);
@@ -163,7 +166,7 @@ export default function ReportAdd() {
     setIsKalemi(r.is_kalemi);
     setDurum(r.durum);
     setIlerleme(r.ilerleme_yuzde);
-    setAciklama(r.aciklama);
+    setAciklama(r.aciklama || configSablon?.varsayilanAciklama || '');
     setTarih(todayISO());
   };
 
@@ -233,6 +236,10 @@ export default function ReportAdd() {
     if (!ada || !isKalemi || !user) return null;
     if (gelecektekiTarihMi(tarih)) {
       toastGoster('Rapor tarihi bugünden ileri bir gün olamaz', 'error');
+      return null;
+    }
+    if (aciklamaZorunlu && !aciklama.trim()) {
+      toastGoster('Bu iş kalemi için açıklama zorunludur', 'error');
       return null;
     }
     const veri = {

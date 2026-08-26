@@ -25,7 +25,7 @@ function kaydet(kismi: Partial<Rapor>): Rapor {
     ilerleme_yuzde: 50,
     aciklama: '',
     ...kismi,
-  } as Omit<Rapor, 'id' | 'olusturma_tarihi'>);
+  } as Omit<Rapor, 'id' | 'olusturma_tarihi' | 'user_id' | 'onay_durumu' | 'revizyon_notu' | 'fotograflar'>);
 }
 
 beforeEach(() => {

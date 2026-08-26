@@ -8,6 +8,7 @@ import { adaDurumSayilari, durumDonutVerisi, BOS_ADA_SAYISI } from '../data/ista
 import { useSiteConfig } from '../hooks/useSiteConfig';
 import { useIsDesktop } from '../hooks/useIsDesktop';
 import { getAdaList, getAllKalemler } from '../config/helpers';
+import { getCurrentUser } from '../stores/authStore';
 import DonutChart from '../components/DonutChart';
 import BarChart from '../components/BarChart';
 import BlokMatrisi from '../components/BlokMatrisi';
@@ -36,24 +37,35 @@ export default function Dashboard() {
   const config = useSiteConfig();
   const isDesktop = useIsDesktop();
   const raporlar = useRaporlar();
-  const stats = useMemo(() => getIstatistikler(raporlar), [raporlar]);
+
+  const user = getCurrentUser();
+  const isAdminOrPM = user?.admin || user?.proje_muduru;
+
+  const filtrelenmisRaporlar = useMemo(() => {
+    if (isAdminOrPM) return raporlar;
+    if (!user) return raporlar;
+    return raporlar.filter((r) => r.user_id === user.user_id || r.raporlayan === user.ad_soyad);
+  }, [raporlar, isAdminOrPM, user]);
+
+  const stats = useMemo(() => getIstatistikler(filtrelenmisRaporlar), [filtrelenmisRaporlar]);
   const sonRaporlar = useMemo(
     () =>
-      raporlar
+      filtrelenmisRaporlar
         .filter((r) => r.raporlayan !== 'DURUM TESPİT')
         .sort((a, b) => new Date(b.olusturma_tarihi).getTime() - new Date(a.olusturma_tarihi).getTime())
         .slice(0, 6),
-    [raporlar]
+    [filtrelenmisRaporlar]
   );
-  const gecikenIsler = useMemo(() => raporlar.filter((r) => r.durum === 'gecikme'), [raporlar]);
+  const gecikenIsler = useMemo(() => filtrelenmisRaporlar.filter((r) => r.durum === 'gecikme'), [filtrelenmisRaporlar]);
+  const onayBekleyenSayisi = useMemo(() => raporlar.filter((r) => r.onay_durumu === 'beklemede').length, [raporlar]);
 
   const hedefler = useHedefler();
 
   // raporlar dep'de: store icindeki harita degistiginde yeniden hesapla
   const sonRaporlarMap = useMemo(() => {
-    void raporlar;
+    void filtrelenmisRaporlar;
     return getSonRaporHaritasi();
-  }, [raporlar]);
+  }, [filtrelenmisRaporlar]);
 
   const hedefOzeti = useMemo(
     () => getHedefOzeti(hedefler, (a, b, ik) => sonRaporlarMap.get(`${a}|${b}|${ik}`) ?? null),
@@ -75,18 +87,18 @@ export default function Dashboard() {
   const adalar = useMemo(() => getAdaList(config), [config]);
 
   const adaProgress = useMemo(() => {
-    void raporlar;
+    void filtrelenmisRaporlar;
     return adalar.map((a) => ({
       name: a.ada,
       value: getAdaGenelIlerleme(a.ada, a.bloklar, isKalemleri),
       color: '#f59e0b',
     }));
-  }, [raporlar, adalar, isKalemleri]);
+  }, [filtrelenmisRaporlar, adalar, isKalemleri]);
 
   const genelIlerleme = getGenelIlerleme(adalar, isKalemleri);
 
   const adaDetay = useMemo(() => {
-    const sayilar = adaDurumSayilari(raporlar);
+    const sayilar = adaDurumSayilari(filtrelenmisRaporlar);
     return adalar.map((a) => {
       const s = sayilar.get(a.ada) ?? BOS_ADA_SAYISI;
       return {
@@ -95,10 +107,10 @@ export default function Dashboard() {
         ilerleme: getAdaGenelIlerleme(a.ada, a.bloklar, isKalemleri),
       };
     });
-  }, [raporlar, adalar, isKalemleri]);
+  }, [filtrelenmisRaporlar, adalar, isKalemleri]);
 
   const blokVerisi = useMemo(() => {
-    void raporlar;
+    void filtrelenmisRaporlar;
     const kalemToplam = new Map<string, number>();
     const kalemSayac = new Map<string, number>();
     const adaBlokMap: Record<string, Record<number, number>> = {};
@@ -137,7 +149,7 @@ export default function Dashboard() {
         }))
         .sort((x, y) => x.ortalama - y.ortalama),
     };
-  }, [raporlar, adalar, isKalemleri]);
+  }, [filtrelenmisRaporlar, adalar, isKalemleri]);
 
   const hakedisVerisi = useMemo(() => {
     const hk = config.hakedis;
@@ -162,7 +174,7 @@ export default function Dashboard() {
 
   const trendData = useMemo(() => {
     const sayilar = new Map<string, number>();
-    for (const r of raporlar) {
+    for (const r of filtrelenmisRaporlar) {
       sayilar.set(r.tarih, (sayilar.get(r.tarih) ?? 0) + 1);
     }
     const formatter = new Intl.DateTimeFormat('tr-TR', { day: '2-digit', month: '2-digit' });
@@ -175,7 +187,7 @@ export default function Dashboard() {
       gunler.push({ label: formatter.format(d), value: sayilar.get(iso) ?? 0 });
     }
     return gunler;
-  }, [raporlar]);
+  }, [filtrelenmisRaporlar]);
 
   const yaklasanHedefler = useMemo(
     () =>
@@ -280,6 +292,7 @@ export default function Dashboard() {
           <KpiCard label="Devam Ediyor" value={stats.devamEdenIsler} color="#3b82f6" />
           <KpiCard label="Planlandı" value={stats.planlananIsler} color="#f59e0b" />
           <KpiCard label="Gecikme" value={stats.gecikenIsler} color="#ef4444" />
+          {isAdminOrPM && <KpiCard label="Onay Bekleyen" value={onayBekleyenSayisi} color="#f59e0b" />}
         </div>
 
         {gecikenIsler.length > 0 && <GecikenKart isler={gecikenIsler} onNavigate={blokNavigate} />}
@@ -346,6 +359,28 @@ export default function Dashboard() {
         </p>
       </div>
 
+      {!isAdminOrPM && user && (
+        <div style={{ ...card, padding: 16, marginBottom: 16, background: 'linear-gradient(135deg, #f0f9ff 0%, #eff6ff 100%)' }}>
+          <h3 style={{ fontSize: 13, fontWeight: 600, color: '#3b82f6', margin: 0, marginBottom: 10 }}>
+            Kişisel Rapor Özeti
+          </h3>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 10 }}>
+            <div style={{ textAlign: 'center' }}>
+              <div style={{ fontSize: 22, fontWeight: 700, color: 'var(--text-primary)' }}>{filtrelenmisRaporlar.length}</div>
+              <div style={{ fontSize: 11, color: 'var(--text-faint)' }}>Toplam Rapor</div>
+            </div>
+            <div style={{ textAlign: 'center' }}>
+              <div style={{ fontSize: 22, fontWeight: 700, color: '#f59e0b' }}>{filtrelenmisRaporlar.filter((r) => r.onay_durumu === 'beklemede').length}</div>
+              <div style={{ fontSize: 11, color: 'var(--text-faint)' }}>Onay Bekleyen</div>
+            </div>
+            <div style={{ textAlign: 'center' }}>
+              <div style={{ fontSize: 22, fontWeight: 700, color: '#3b82f6' }}>{filtrelenmisRaporlar.filter((r) => r.durum === 'devam_ediyor').length}</div>
+              <div style={{ fontSize: 11, color: 'var(--text-faint)' }}>Aktif İş</div>
+            </div>
+          </div>
+        </div>
+      )}
+
       <button
         onClick={() => navigate('/hedef-takvim')}
         style={{
@@ -368,6 +403,13 @@ export default function Dashboard() {
         </div>
         <ProgressBar value={genelIlerleme} height={10} />
       </div>
+
+      {isAdminOrPM && onayBekleyenSayisi > 0 && (
+        <div style={{ ...card, padding: 14, marginBottom: 16, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <span style={{ fontSize: 14, fontWeight: 600, color: 'var(--text-muted)' }}>Onay Bekleyen</span>
+          <span style={{ fontSize: 20, fontWeight: 700, color: '#f59e0b' }}>{onayBekleyenSayisi}</span>
+        </div>
+      )}
 
       <div style={{ ...card, marginBottom: 16 }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>

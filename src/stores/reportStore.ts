@@ -5,6 +5,7 @@ import { idbGet, idbSet } from '../lib/db';
 import type { RealtimeChannel } from '@supabase/supabase-js';
 import { toastGoster } from './toastStore';
 import { getCurrentUser, supabaseOturumAktif, sefAdadaYetkiliMi } from './authStore';
+import { yeniRaporBildirimiGonder } from './notificationStore';
 import { getKullaniciAdaAtamasi } from './atamaStore';
 import { getKullanicilar } from './kullanicilarStore';
 import { tumKayitlariGetir } from '../lib/listeGetir';
@@ -133,7 +134,9 @@ function raporToSupabase(r: Rapor, includeUserId = true) {
     ilerleme_yuzde: r.ilerleme_yuzde,
     aciklama: r.aciklama || '',
     olusturma_tarihi: r.olusturma_tarihi,
-    // INSERT/UPDATE: user_id her zaman dahil edilir (sahiplik dogrulama icin).
+    onay_durumu: r.onay_durumu || 'onaylandi',
+    revizyon_notu: r.revizyon_notu || '',
+    fotograflar: r.fotograflar || [],
     ...(includeUserId ? { user_id: getCurrentUser()?.user_id ?? null } : {}),
   };
 }
@@ -173,6 +176,10 @@ export function aboneOlRaporGuncellemeleri(onChannelStatus?: (status: string) =>
           if (!getRaporlar().find(r => r.id === yeni.id)) {
             setRaporlar([...getRaporlar(), yeni]);
           }
+          const mevcutKullanici = getCurrentUser();
+          if (mevcutKullanici && yeni.raporlayan !== mevcutKullanici.ad_soyad) {
+            yeniRaporBildirimiGonder(yeni.raporlayan, yeni.ada, yeni.blok_no);
+          }
         } else if (payload.eventType === 'UPDATE') {
           const guncel = payload.new as Rapor;
           setRaporlar(getRaporlar().map((r) => r.id === guncel.id ? guncel : r));
@@ -208,7 +215,7 @@ export async function supabaseRaporlariYukle(): Promise<void> {
     const sunucu = await tumKayitlariGetir<Rapor>(async (bastan, kadar) =>
       await getSupabase()
         .from('raporlar')
-        .select('id, tarih, raporlayan, ada, blok_no, is_kalemi, durum, ilerleme_yuzde, aciklama, olusturma_tarihi, user_id')
+        .select('id, tarih, raporlayan, ada, blok_no, is_kalemi, durum, ilerleme_yuzde, aciklama, olusturma_tarihi, user_id, onay_durumu, revizyon_notu, fotograflar')
         .order('olusturma_tarihi', { ascending: false })
         .range(bastan, kadar)
     );
@@ -268,12 +275,15 @@ export async function supabaseRaporlariYukle(): Promise<void> {
   }
 }
 
-export function saveRapor(rapor: Omit<Rapor, 'id' | 'olusturma_tarihi' | 'user_id'>): Rapor {
+export function saveRapor(rapor: Omit<Rapor, 'id' | 'olusturma_tarihi' | 'user_id' | 'onay_durumu' | 'revizyon_notu' | 'fotograflar'>): Rapor {
   const yeni: Rapor = {
     ...rapor,
     id: yeniRaporId(),
     olusturma_tarihi: new Date().toISOString(),
     user_id: getCurrentUser()?.user_id ?? null,
+    onay_durumu: 'beklemede',
+    revizyon_notu: '',
+    fotograflar: [],
   };
   setRaporlar([...getRaporlar(), yeni]);
   if (supabaseOturumAktif()) {
@@ -288,7 +298,7 @@ export function saveRapor(rapor: Omit<Rapor, 'id' | 'olusturma_tarihi' | 'user_i
 }
 
 export function saveRaporlar(
-  raporlar: Array<Omit<Rapor, 'id' | 'olusturma_tarihi' | 'user_id'>>
+  raporlar: Array<Omit<Rapor, 'id' | 'olusturma_tarihi' | 'user_id' | 'onay_durumu' | 'revizyon_notu' | 'fotograflar'>>
 ): Rapor[] {
   const uid = getCurrentUser()?.user_id ?? null;
   const yeniler: Rapor[] = raporlar.map((r) => ({
@@ -296,6 +306,9 @@ export function saveRaporlar(
     id: yeniRaporId(),
     olusturma_tarihi: new Date().toISOString(),
     user_id: uid,
+    onay_durumu: 'beklemede',
+    revizyon_notu: '',
+    fotograflar: [],
   }));
   setRaporlar([...getRaporlar(), ...yeniler]);
   if (supabaseOturumAktif()) {
@@ -610,6 +623,72 @@ export function getIstatistikler(raporlar: Rapor[]) {
 }
 
 // Baglanti geri geldiginde bekleyen yerel verileri sunucuya gonder
+export function raporOnayla(id: string): boolean {
+  return raporOnayGuncelle(id, 'onaylandi', '');
+}
+
+export function raporReddet(id: string, revizyonNotu: string): boolean {
+  return raporOnayGuncelle(id, 'reddedildi', revizyonNotu);
+}
+
+function raporOnayGuncelle(id: string, durum: import('../types').OnayDurumu, not: string): boolean {
+  const raporlar = getRaporlar();
+  const idx = raporlar.findIndex((r) => r.id === id);
+  if (idx === -1) return false;
+  const oturum = getCurrentUser();
+  if (!oturum || !(oturum.admin || oturum.proje_muduru)) {
+    toastGoster('Bu işlem için yetkiniz yok.', 'error');
+    return false;
+  }
+  const guncel = { ...raporlar[idx], onay_durumu: durum, revizyon_notu: not };
+  const yeniListe = [...raporlar];
+  yeniListe[idx] = guncel;
+  setRaporlar(yeniListe);
+  if (supabaseOturumAktif()) {
+    getSupabase().from('raporlar').update({ onay_durumu: durum, revizyon_notu: not }).eq('id', id).then(({ error }) => {
+      if (error) {
+        console.warn('Supabase onay guncelleme hatasi:', error.message);
+        toastGoster('Onay durumu güncellenemedi', 'error');
+      }
+    }, agHatasiYakala('onay guncelle'));
+  }
+  return true;
+}
+
+export async function fotografYukle(raporId: string, dosya: File): Promise<string | null> {
+  try {
+    const dosyaYolu = `raporlar/${raporId}/${Date.now()}_${dosya.name.replace(/[^a-zA-Z0-9._-]/g, '_')}`;
+    const { error } = await getSupabase().storage.from('rapor-fotolari').upload(dosyaYolu, dosya, {
+      cacheControl: '3600',
+      upsert: false,
+    });
+    if (error) throw error;
+    const { data: urlData } = getSupabase().storage.from('rapor-fotolari').getPublicUrl(dosyaYolu);
+    return urlData.publicUrl;
+  } catch (err) {
+    const mesaj = err instanceof Error ? err.message : String(err);
+    console.warn('Fotograf yukleme hatasi:', mesaj);
+    toastGoster('Fotoğraf yüklenemedi', 'error');
+    return null;
+  }
+}
+
+export function raporFotografEkle(id: string, fotografUrl: string): boolean {
+  const raporlar = getRaporlar();
+  const idx = raporlar.findIndex((r) => r.id === id);
+  if (idx === -1) return false;
+  const guncel = { ...raporlar[idx], fotograflar: [...(raporlar[idx].fotograflar || []), fotografUrl] };
+  const yeniListe = [...raporlar];
+  yeniListe[idx] = guncel;
+  setRaporlar(yeniListe);
+  if (supabaseOturumAktif()) {
+    getSupabase().from('raporlar').update({ fotograflar: guncel.fotograflar }).eq('id', id).then(({ error }) => {
+      if (error) console.warn('Supabase fotograf guncelleme hatasi:', error.message);
+    }, agHatasiYakala('fotograf guncelle'));
+  }
+  return true;
+}
+
 if (typeof window !== 'undefined') {
   window.addEventListener('online', () => {
     void supabaseRaporlariYukle();

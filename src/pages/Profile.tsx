@@ -196,6 +196,19 @@ export default function Profile() {
           />
         </div>
 
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '8px 0', borderTop: '1px solid #f3f4f6' }}>
+          <div>
+            <div style={{ fontSize: 13, color: 'var(--text-secondary)', fontWeight: 500 }}>Yeni rapor bildirimi</div>
+            <div style={{ fontSize: 11, color: 'var(--text-subtle)' }}>Başka kullanıcı rapor eklediğinde haberiniz olsun</div>
+          </div>
+          <input
+            type="checkbox"
+            checked={ayarlar.yeniRapor}
+            onChange={(e) => ayarlariGuncelle({ ...ayarlar, yeniRapor: e.target.checked })}
+            style={{ transform: 'scale(1.4)', cursor: 'pointer' }}
+          />
+        </div>
+
         {nativeBildirimVarMi() && (
           <div style={{ padding: '8px 0', borderTop: '1px solid #f3f4f6' }}>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>

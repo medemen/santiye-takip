@@ -46,6 +46,15 @@ const ReportCard = memo(function ReportCard({ rapor, onClick, showActions }: Pro
           )}
         </div>
         <div style={{ display: 'flex', gap: 4, alignItems: 'center' }}>
+          {rapor.onay_durumu === 'beklemede' && (
+            <span style={{ fontSize: 10, fontWeight: 600, color: '#f59e0b', backgroundColor: '#fef3c7', padding: '2px 6px', borderRadius: 6, whiteSpace: 'nowrap' }}>Onay Bekliyor</span>
+          )}
+          {rapor.onay_durumu === 'onaylandi' && (
+            <span style={{ fontSize: 11, fontWeight: 700, color: '#22c55e' }}>✓</span>
+          )}
+          {rapor.onay_durumu === 'reddedildi' && (
+            <span style={{ fontSize: 10, fontWeight: 600, color: '#ef4444', backgroundColor: '#fee2e2', padding: '2px 6px', borderRadius: 6, whiteSpace: 'nowrap' }}>Reddedildi</span>
+          )}
           {showActions && (
             <button
               onClick={(e) => {
@@ -83,6 +92,31 @@ const ReportCard = memo(function ReportCard({ rapor, onClick, showActions }: Pro
         <span>{rapor.raporlayan}</span>
         <span>{formatDateTime(rapor.olusturma_tarihi)}</span>
       </div>
+      {rapor.fotograflar && rapor.fotograflar.length > 0 && (
+        <div style={{ display: 'flex', gap: 4, marginTop: 8 }}>
+          {rapor.fotograflar.slice(0, 3).map((url, i) => (
+            <a key={i} href={url} target="_blank" rel="noopener noreferrer" onClick={(e) => e.stopPropagation()}>
+              <img
+                src={url}
+                alt={`Fotoğraf ${i + 1}`}
+                style={{
+                  width: 40, height: 40, objectFit: 'cover',
+                  borderRadius: 6, border: '1px solid var(--border-soft)',
+                }}
+              />
+            </a>
+          ))}
+          {rapor.fotograflar.length > 3 && (
+            <span style={{
+              width: 40, height: 40, display: 'flex', alignItems: 'center', justifyContent: 'center',
+              borderRadius: 6, border: '1px solid var(--border-soft)',
+              fontSize: 10, color: 'var(--text-faint)',
+            }}>
+              +{rapor.fotograflar.length - 3}
+            </span>
+          )}
+        </div>
+      )}
     </div>
   );
 });

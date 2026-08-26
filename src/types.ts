@@ -42,6 +42,8 @@ export type IsDurumu =
   | 'tamamlandi'
   | 'gecikme';
 
+export type OnayDurumu = 'beklemede' | 'onaylandi' | 'reddedildi';
+
 export interface Rapor {
   id: string;
   tarih: string;
@@ -55,6 +57,9 @@ export interface Rapor {
   aciklama: string;
   olusturma_tarihi: string;
   user_id: string | null;
+  onay_durumu: OnayDurumu;
+  revizyon_notu: string;
+  fotograflar: string[];
 }
 
 export interface IsKalemiHedefi {
