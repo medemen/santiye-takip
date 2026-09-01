@@ -33,6 +33,7 @@ export default function ReportList() {
   const [filterAda, setFilterAda] = useState(preAda);
   const [filterBlok, setFilterBlok] = useState(preBlok);
   const [filterDurum, setFilterDurum] = useState('');
+  const [filterOnay, setFilterOnay] = useState('');
   const [sadeceBenim, setSadeceBenim] = useState(false);
   const [sistemRaporlariDahil, setSistemRaporlariDahil] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
@@ -63,7 +64,7 @@ export default function ReportList() {
 
   useEffect(() => {
     setSayfa(1);
-  }, [filterAda, filterBlok, filterDurum, sadeceBenim, sistemRaporlariDahil, debouncedTerm]);
+  }, [filterAda, filterBlok, filterDurum, filterOnay, sadeceBenim, sistemRaporlariDahil, debouncedTerm]);
 
   const user = getCurrentUser();
   const isAdmin = (user?.admin ?? false) || (user?.proje_muduru ?? false);
@@ -87,6 +88,7 @@ export default function ReportList() {
         if (filterAda && r.ada !== filterAda) return false;
         if (filterBlok && r.blok_no !== parseInt(filterBlok)) return false;
         if (filterDurum && r.durum !== filterDurum) return false;
+        if (filterOnay && r.onay_durumu !== filterOnay) return false;
         if (debouncedTerm) {
           const q = debouncedTerm.toLowerCase();
           if (!r.ada.toLowerCase().includes(q) &&
@@ -99,7 +101,7 @@ export default function ReportList() {
         }
         return true;
       });
-  }, [raporlar, user, sadeceBenim, sistemRaporlariDahil, filterAda, filterBlok, filterDurum, debouncedTerm]);
+  }, [raporlar, user, sadeceBenim, sistemRaporlariDahil, filterAda, filterBlok, filterDurum, filterOnay, debouncedTerm]);
 
   const adaList = getAdaList(config);
 
@@ -203,6 +205,60 @@ export default function ReportList() {
             }}
           >
             Raporlarım
+          </button>
+        </div>
+
+        <div style={{ display: 'flex', gap: 8, marginBottom: 8 }}>
+          <button
+            onClick={() => setFilterOnay('')}
+            style={{
+              flex: 1,
+              padding: '8px 10px',
+              borderRadius: 8,
+              border: 'none',
+              fontSize: 12,
+              fontWeight: 600,
+              cursor: 'pointer',
+              minHeight: 44,
+              backgroundColor: filterOnay === '' ? '#f59e0b' : 'var(--bg-subtle)',
+              color: filterOnay === '' ? '#fff' : 'var(--text-muted)',
+            }}
+          >
+            Tüm Onaylar
+          </button>
+          <button
+            onClick={() => setFilterOnay('beklemede')}
+            style={{
+              flex: 1,
+              padding: '8px 10px',
+              borderRadius: 8,
+              border: 'none',
+              fontSize: 12,
+              fontWeight: 600,
+              cursor: 'pointer',
+              minHeight: 44,
+              backgroundColor: filterOnay === 'beklemede' ? '#d97706' : 'var(--bg-subtle)',
+              color: filterOnay === 'beklemede' ? '#fff' : 'var(--text-muted)',
+            }}
+          >
+            ⏳ Bekleyen
+          </button>
+          <button
+            onClick={() => setFilterOnay('reddedildi')}
+            style={{
+              flex: 1,
+              padding: '8px 10px',
+              borderRadius: 8,
+              border: 'none',
+              fontSize: 12,
+              fontWeight: 600,
+              cursor: 'pointer',
+              minHeight: 44,
+              backgroundColor: filterOnay === 'reddedildi' ? '#dc2626' : 'var(--bg-subtle)',
+              color: filterOnay === 'reddedildi' ? '#fff' : 'var(--text-muted)',
+            }}
+          >
+            ✗ Reddedilen
           </button>
         </div>
 
@@ -353,14 +409,6 @@ export default function ReportList() {
                         ✗
                       </button>
                     </>
-                  )}
-                  {r.onay_durumu === 'reddedildi' && r.revizyon_notu && (
-                    <span
-                      style={{ fontSize: 11, color: '#ef4444', maxWidth: 120, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', padding: '6px 8px', backgroundColor: '#fee2e2', borderRadius: 6 }}
-                      title={r.revizyon_notu}
-                    >
-                      {r.revizyon_notu}
-                    </span>
                   )}
                   <button
                     onClick={(e) => { e.stopPropagation(); setAcikFotoRapor(acikFotoRapor === r.id ? null : r.id); }}

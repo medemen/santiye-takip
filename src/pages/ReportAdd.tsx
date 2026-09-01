@@ -36,6 +36,7 @@ export default function ReportAdd() {
   const [searchParams] = useSearchParams();
   const preAda = searchParams.get('ada') || '';
   const preBlok = searchParams.get('blok') || '';
+  const preKalem = searchParams.get('kalem') || '';
   const editId = searchParams.get('edit') || '';
 
   const user = getCurrentUser();
@@ -72,7 +73,7 @@ export default function ReportAdd() {
     preBlok && parseInt(preBlok) > 0 ? [parseInt(preBlok)] : []
   );
   const [adaGeneli, setAdaGeneli] = useState(false);
-  const [isKalemi, setIsKalemi] = useState('');
+  const [isKalemi, setIsKalemi] = useState(preKalem || '');
   const [kalemArama, setKalemArama] = useState('');
   const [durum, setDurum] = useState<IsDurumu>('devam_ediyor');
   const [ilerleme, setIlerleme] = useState(50);

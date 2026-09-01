@@ -4,11 +4,14 @@ import { getIstatistikler, getAdaGenelIlerleme, getBlokProgress, getGrupAgirlikl
 import { useHedefler } from '../hooks/useHedefler';
 import { useRaporlar } from '../hooks/useRaporlar';
 import { getHedefOzeti, hedefKalanGun } from '../data/plan';
+import { bugunGirilecekler } from '../data/bugunGirilecek';
+import { todayISO } from '../utils/helpers';
 import { adaDurumSayilari, durumDonutVerisi, BOS_ADA_SAYISI } from '../data/istatistik';
 import { useSiteConfig } from '../hooks/useSiteConfig';
 import { useIsDesktop } from '../hooks/useIsDesktop';
 import { getAdaList, getAllKalemler } from '../config/helpers';
 import { getCurrentUser } from '../stores/authStore';
+import { getKullaniciAdaAtamasi } from '../stores/atamaStore';
 import DonutChart from '../components/DonutChart';
 import BarChart from '../components/BarChart';
 import BlokMatrisi from '../components/BlokMatrisi';
@@ -23,6 +26,7 @@ import TrendKart from '../components/dashboard/TrendKart';
 import AdaDetayTablo from '../components/dashboard/AdaDetayTablo';
 import SonRaporlarKart from '../components/dashboard/SonRaporlarKart';
 import HakedisKarsilastirmaKart from '../components/dashboard/HakedisKarsilastirmaKart';
+import BugunGirilecekKart from '../components/dashboard/BugunGirilecekKart';
 import { card, btnGhost } from '../utils/styles';
 
 export default function Dashboard() {
@@ -85,6 +89,17 @@ export default function Dashboard() {
 
   const isKalemleri = useMemo(() => getAllKalemler(config), [config]);
   const adalar = useMemo(() => getAdaList(config), [config]);
+
+  const bugunGirilecek = useMemo(() => {
+    const kaynak = isAdminOrPM
+      ? raporlar
+      : filtrelenmisRaporlar;
+    const atananAda = !isAdminOrPM ? getKullaniciAdaAtamasi(user?.ad_soyad ?? '') : null;
+    const kapsam = atananAda
+      ? adalar.filter((a) => a.ada === atananAda)
+      : adalar;
+    return bugunGirilecekler(kaynak, kapsam, isKalemleri, todayISO());
+  }, [isAdminOrPM, raporlar, filtrelenmisRaporlar, adalar, isKalemleri, user]);
 
   const adaProgress = useMemo(() => {
     void filtrelenmisRaporlar;
@@ -295,6 +310,17 @@ export default function Dashboard() {
           {isAdminOrPM && <KpiCard label="Onay Bekleyen" value={onayBekleyenSayisi} color="#f59e0b" />}
         </div>
 
+        {bugunGirilecek.length > 0 && (
+          <div style={{ marginBottom: 16 }}>
+            <BugunGirilecekKart
+              ogeler={bugunGirilecek}
+              onRaporEkle={(ada, isKalemi) =>
+                navigate(`/rapor-ekle?ada=${encodeURIComponent(ada)}&kalem=${encodeURIComponent(isKalemi)}`)
+              }
+            />
+          </div>
+        )}
+
         {gecikenIsler.length > 0 && <GecikenKart isler={gecikenIsler} onNavigate={blokNavigate} />}
 
         {hakedisVerisi && (
@@ -378,6 +404,17 @@ export default function Dashboard() {
               <div style={{ fontSize: 11, color: 'var(--text-faint)' }}>Aktif İş</div>
             </div>
           </div>
+        </div>
+      )}
+
+      {bugunGirilecek.length > 0 && (
+        <div style={{ marginBottom: 16 }}>
+          <BugunGirilecekKart
+            ogeler={bugunGirilecek}
+            onRaporEkle={(ada, isKalemi) =>
+              navigate(`/rapor-ekle?ada=${encodeURIComponent(ada)}&kalem=${encodeURIComponent(isKalemi)}`)
+            }
+          />
         </div>
       )}
 

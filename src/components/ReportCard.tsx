@@ -88,6 +88,21 @@ const ReportCard = memo(function ReportCard({ rapor, onClick, showActions }: Pro
           {rapor.aciklama}
         </div>
       )}
+      {rapor.onay_durumu === 'reddedildi' && rapor.revizyon_notu && (
+        <div
+          style={{
+            fontSize: 12,
+            color: '#dc2626',
+            backgroundColor: '#fee2e2',
+            padding: '6px 8px',
+            borderRadius: 6,
+            marginBottom: 6,
+            lineHeight: 1.4,
+          }}
+        >
+          <strong>⚑ Reddedilme nedeni:</strong> {rapor.revizyon_notu}
+        </div>
+      )}
       <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 11, color: 'var(--text-subtle)' }}>
         <span>{rapor.raporlayan}</span>
         <span>{formatDateTime(rapor.olusturma_tarihi)}</span>

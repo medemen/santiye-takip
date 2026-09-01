@@ -17,6 +17,7 @@ import {
 } from '../stores/notificationStore';
 import { toastGoster } from '../stores/toastStore';
 import { onayla } from '../utils/dialog';
+import appInfo from '../../package.json';
 
 export default function Profile() {
   const navigate = useNavigate();
@@ -318,6 +319,56 @@ export default function Profile() {
               👥 Personel Yönetimi
             </button>
           )}
+        </div>
+      </div>
+
+      <div
+        style={{
+          backgroundColor: 'var(--bg-card)',
+          borderRadius: 16,
+          padding: 16,
+          marginBottom: 16,
+          border: '1px solid var(--border-soft)',
+        }}
+      >
+        <h3 style={{ fontSize: 14, fontWeight: 600, color: 'var(--text-muted)', margin: 0, marginBottom: 12 }}>
+          ℹ️ Hakkında
+        </h3>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 13 }}>
+            <span style={{ color: 'var(--text-faint)' }}>Uygulama</span>
+            <span style={{ color: 'var(--text-primary)', fontWeight: 600 }}>Şantiye Takip</span>
+          </div>
+          <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 13 }}>
+            <span style={{ color: 'var(--text-faint)' }}>Sürüm</span>
+            <span style={{ color: 'var(--text-primary)', fontWeight: 500 }}>v{appInfo.version}</span>
+          </div>
+          <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 13 }}>
+            <span style={{ color: 'var(--text-faint)' }}>Yapımcı</span>
+            <span style={{ color: 'var(--text-primary)', fontWeight: 500 }}>Medemen Yazılım</span>
+          </div>
+          <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginTop: 4 }}>
+            <span style={{
+              fontSize: 11, padding: '3px 8px', borderRadius: 999, backgroundColor: 'var(--bg-subtle)',
+              color: 'var(--text-muted)', fontWeight: 500,
+            }}>React 19</span>
+            <span style={{
+              fontSize: 11, padding: '3px 8px', borderRadius: 999, backgroundColor: 'var(--bg-subtle)',
+              color: 'var(--text-muted)', fontWeight: 500,
+            }}>Vite</span>
+            <span style={{
+              fontSize: 11, padding: '3px 8px', borderRadius: 999, backgroundColor: 'var(--bg-subtle)',
+              color: 'var(--text-muted)', fontWeight: 500,
+            }}>Supabase</span>
+            <span style={{
+              fontSize: 11, padding: '3px 8px', borderRadius: 999, backgroundColor: 'var(--bg-subtle)',
+              color: 'var(--text-muted)', fontWeight: 500,
+            }}>Capacitor</span>
+          </div>
+          <p style={{ fontSize: 12, color: 'var(--text-subtle)', margin: 0, lineHeight: 1.5 }}>
+            İnşaat şantiyelerinde ada/blok bazlı iş kalemi ilerlemesini takip etmek için geliştirilmiş mobil uyumlu bir
+            saha takip uygulamasıdır.
+          </p>
         </div>
       </div>
 
