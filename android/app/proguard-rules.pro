@@ -19,3 +19,12 @@
 # If you keep the line number information, uncomment this to
 # hide the original source file name.
 #-renamesourcefileattribute SourceFile
+
+# --- R8 / Shrink optimizasyonu guclendirme ---
+# Capacitor JS bridge: WebView'e acilan native metodlar kırpilmamali.
+-keep class com.getcapacitor.** { *; }
+-keep class com.getcapacitor.plugin.** { *; }
+-keepclassmembers class * {
+    @android.webkit.JavascriptInterface <methods>;
+}
+-keepattributes JavascriptInterface
