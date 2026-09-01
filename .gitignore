@@ -41,3 +41,6 @@ sites
 *.njsproj
 *.sln
 *.sw?
+
+# Supabase CLI gecici dosyalari
+supabase/.temp/

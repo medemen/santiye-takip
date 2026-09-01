@@ -56,6 +56,12 @@ const durumTespit = {
   tahmin: durumSrc.tahmin ?? [],
 };
 
+const raporSablonu = {
+  baslikOnEkleri: basics.raporSablonu?.baslikOnEkleri ?? {},
+  aciklamaZorunluKalemler: basics.raporSablonu?.aciklamaZorunluKalemler ?? [],
+  varsayilanAciklama: basics.raporSablonu?.varsayilanAciklama ?? '',
+};
+
 const config = {
   version: 2,
   genel: basics.genel,
@@ -63,6 +69,7 @@ const config = {
   roller: basics.roller,
   yapi: { adalar },
   isKalemleri: basics.isKalemleri,
+  raporSablonu,
   durumTespit,
   ...(hakedis ? { hakedis } : {}),
 };
