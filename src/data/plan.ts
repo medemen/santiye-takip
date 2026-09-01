@@ -1,13 +1,14 @@
 import type { Rapor } from '../types';
 import { DURUM_RENKLERI } from '../config/defaultConfig';
-import { yerelTarih } from '../utils/helpers';
+import { todayISO, yerelTarih } from '../utils/helpers';
 
+// Bugun Europe/Istanbul takvimine gore alinir (todayISO) ve yerelTarih ile
+// gece yarisi olarak kurulur; boylece makinenin timezone'u (CI'daki UTC dahil)
+// sonucu etkilemez.
 export function hedefKalanGun(hedefTarih: string): number {
-  const bugun = new Date();
-  bugun.setHours(0, 0, 0, 0);
+  const bugun = yerelTarih(todayISO());
   // new Date('YYYY-MM-DD') UTC parse eder; yerel kurulum icin ayristir
   const hedef = yerelTarih(hedefTarih);
-  hedef.setHours(0, 0, 0, 0);
   return Math.round((hedef.getTime() - bugun.getTime()) / (1000 * 60 * 60 * 24));
 }
 

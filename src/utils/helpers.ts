@@ -23,12 +23,22 @@ export function formatDateTimeSabit(dateStr: string): string {
 }
 
 // toISOString UTC dondurur; yerel saat 00:00-03:00 arasinda onceki gunu
-// verir. Yerel tarih parçalarindan ISO uret.
+// verir. Santiye takvimi Europe/Istanbul'a baglidir (DB trigger ile ayni);
+// makinenin yerel timezone'u burayi etkilememelidir — aksi halde UTC
+// sunucularinda (CI) gun kaymasi yasanir. Buradan sabit parcalarla uretilir.
+const _istanbulBiçim = new Intl.DateTimeFormat('tr-TR', {
+  timeZone: 'Europe/Istanbul',
+  year: 'numeric',
+  month: '2-digit',
+  day: '2-digit',
+});
+
 export function todayISO(): string {
-  const d = new Date();
-  const ay = String(d.getMonth() + 1).padStart(2, '0');
-  const gun = String(d.getDate()).padStart(2, '0');
-  return `${d.getFullYear()}-${ay}-${gun}`;
+  const p: Record<string, string> = {};
+  for (const parca of _istanbulBiçim.formatToParts(new Date())) {
+    if (parca.type !== 'literal') p[parca.type] = parca.value;
+  }
+  return `${p.year}-${p.month}-${p.day}`;
 }
 
 // 'YYYY-MM-DD' metnini UTC yerine YEREL gece yarisi olarak kurar;
