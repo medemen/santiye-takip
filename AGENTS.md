@@ -124,3 +124,7 @@ Native (Capacitor/Android) derlemede `HashRouter`, web'de `BrowserRouter` kullan
   var olan migrasyonlar düzenlenmez.
 - `SUPABASE_SERVICE_ROLE_KEY` yalnızca yerel `scripts/*.mjs` seed script'lerinde kullanılır,
   asla client koduna (`src/`) veya `.env` dışında bir yere sızdırılmaz.
+- APK/AAB (`assemble*`/`bundle*`) her derlendiğinde `android/app/version.properties`
+  Gradle tarafından otomatik artırılır (versionCode +1, versionName son hane +1). Bu değişiklik
+  commit edilmeden bırakılmaz — AAB üretiminden hemen sonra `git add android/app/version.properties`
+  ile commit edilir.
