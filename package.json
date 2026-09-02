@@ -39,15 +39,11 @@
     "xlsx": "^0.18.5"
   },
   "devDependencies": {
-    "@babel/core": "^8.0.1",
     "@capacitor/cli": "^8.4.2",
-    "@rolldown/plugin-babel": "^0.2.3",
-    "@types/babel__core": "^7.20.5",
     "@types/node": "^24.13.2",
     "@types/react": "^19.2.17",
     "@types/react-dom": "^19.2.3",
     "@vitejs/plugin-react": "^6.0.3",
-    "babel-plugin-react-compiler": "^1.0.0",
     "oxlint": "^1.71.0",
     "playwright-core": "^1.62.1",
     "rollup-plugin-visualizer": "^7.0.1",
