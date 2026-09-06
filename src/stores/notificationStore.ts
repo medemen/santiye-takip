@@ -249,7 +249,7 @@ export function yeniRaporBildirimiGonder(raporlayan: string, ada: string, blokNo
           body: govde,
           schedule: { at: new Date() },
         }],
-      });
+      }).catch(() => { /* izin yoksa/schedu hata: sessiz gec */ });
     } else if (typeof Notification !== 'undefined' && Notification.permission === 'granted') {
       new Notification(baslik, { body: govde, tag: `yeni-rapor-${raporlayan}-${ada}` });
     }
@@ -287,7 +287,7 @@ function bildirimKuyrugunuBosalt(): void {
     if (nativeBildirimVarMi()) {
       void LocalNotifications.schedule({
         notifications: [{ id: OZET_BILDIRIM_ID, title: baslik, body: govde, schedule: { at: new Date() } }],
-      });
+      }).catch(() => { /* izin yoksa/schedu hata: sessiz gec */ });
     } else if (typeof Notification !== 'undefined' && Notification.permission === 'granted') {
       new Notification(baslik, { body: govde, tag: 'yeni-rapor-ozet' });
     }

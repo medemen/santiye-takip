@@ -1,16 +1,45 @@
 import { useEffect, useState } from 'react';
 
+const SUPABASE_URL = (import.meta.env.VITE_SUPABASE_URL as string | undefined) || '';
+
+// Android WebView'da navigator.onLine cihazin gercek baglantisini dogru
+// yansitmaz (offline iken bile true doner). Bu nedenle salt istemci olayi
+// + periyodik sunucu yoklamasi birlikte kullanilir.
 export function OfflineBanner() {
-  const [cevrimdisi, setCevrimdisi] = useState(!navigator.onLine);
+  const [cevrimdisi, setCevrimdisi] = useState(false);
 
   useEffect(() => {
-    const cevrimdisiOldu = () => setCevrimdisi(true);
-    const cevrimiciOldu = () => setCevrimdisi(false);
-    window.addEventListener('offline', cevrimdisiOldu);
-    window.addEventListener('online', cevrimiciOldu);
+    if (!SUPABASE_URL) return;
+    let iptal = false;
+    let aralik = 0;
+
+    const sunucuErisilebilir = async (): Promise<boolean> => {
+      try {
+        const c = new AbortController();
+        const zamanlayici = setTimeout(() => c.abort(), 6000);
+        await fetch(`${SUPABASE_URL}/rest/v1/`, { method: 'GET', signal: c.signal, cache: 'no-store' });
+        clearTimeout(zamanlayici);
+        return true;
+      } catch {
+        return false;
+      }
+    };
+
+    const kontrol = async () => {
+      const online = (navigator.onLine || !('onLine' in navigator)) && (await sunucuErisilebilir());
+      if (!iptal) setCevrimdisi(!online);
+    };
+
+    void kontrol();
+    aralik = window.setInterval(() => void kontrol(), 15000);
+    const olay = () => void kontrol();
+    window.addEventListener('online', olay);
+    window.addEventListener('offline', olay);
     return () => {
-      window.removeEventListener('offline', cevrimdisiOldu);
-      window.removeEventListener('online', cevrimiciOldu);
+      iptal = true;
+      window.clearInterval(aralik);
+      window.removeEventListener('online', olay);
+      window.removeEventListener('offline', olay);
     };
   }, []);
 

@@ -1,5 +1,6 @@
 import { BrowserRouter, HashRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { Capacitor } from '@capacitor/core';
+import { App as CapacitorApp } from '@capacitor/app';
 import { lazy, Suspense, useEffect, useState, useSyncExternalStore } from 'react';
 import Layout from './components/Layout';
 import ErrorBoundary from './components/ErrorBoundary';
@@ -108,6 +109,20 @@ export default function App() {
 
   useEffect(() => { supabaseAuthInit(); }, []);
   useEffect(() => subscribeAuthChanges(() => setAuthTick(t => t + 1)), []);
+
+  useEffect(() => {
+    if (!Capacitor.isNativePlatform()) return;
+    const geriTusu = ({ canGoBack }: { canGoBack: boolean }) => {
+      if (canGoBack) {
+        window.history.back();
+      } else {
+        void CapacitorApp.exitApp();
+      }
+    };
+    let handle: { remove: () => void } | undefined;
+    void CapacitorApp.addListener('backButton', geriTusu).then((h) => { handle = h; });
+    return () => { void handle?.remove(); };
+  }, []);
 
   useEffect(() => {
     if (!isLoggedIn() || !isSupabaseReady()) return;

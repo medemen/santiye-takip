@@ -90,6 +90,8 @@ export default function ReportAdd() {
       if (rapor) {
         setAda(rapor.ada);
         setBlokNo(rapor.blok_no);
+        setSeciliBloklar(rapor.blok_no > 0 ? [rapor.blok_no] : []);
+        setAdaGeneli(rapor.blok_no === 0);
         setIsKalemi(rapor.is_kalemi);
         setDurum(rapor.durum);
         setIlerleme(rapor.ilerleme_yuzde);
