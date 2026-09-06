@@ -25,7 +25,7 @@ const durum = config.durumTespit;
 const adalar = durum.adalar;
 const tarih = new Date().toISOString().slice(0, 10);
 const raporlayan = 'DURUM TESPİT';
-const aciklama = 'DURUM TESPİT RAPORU 26/07/29 aktarımı';
+const aciklama = 'DURUM TESPİT aktarımı (ada geneli baz durumu)';
 
 const yeniKalemler = new Set(durum.satirlar.map((s) => s[1]));
 for (const t of durum.tahmin) yeniKalemler.add(t.kalem);
