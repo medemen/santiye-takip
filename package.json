@@ -23,7 +23,8 @@
     "cap:sync": "npx cap sync",
     "cap:open:android": "npx cap open android",
     "cap:build": "npm run build && npx cap sync",
-    "cap:build:apk": "vite build --base=/ && npx cap sync"
+    "cap:build:apk": "vite build --base=/ && npx cap sync",
+    "saha:aktar": "node scripts/saha-aktar.mjs"
   },
   "dependencies": {
     "@capacitor/android": "^8.4.2",
