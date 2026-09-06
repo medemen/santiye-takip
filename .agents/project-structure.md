@@ -6,8 +6,9 @@ eksiksiz döküm içindir.
 **Stack:** React 19 + TypeScript 6 + Vite 8 + Supabase + Capacitor 8
 **Router:** react-router-dom v7
 **State:** Kütüphanesiz — `src/stores/` modül seviyesi durum + `useSyncExternalStore`
-**Charts:** Recharts
+**Charts:** El yapımı SVG (`BarChart`, `DonutChart`, `TrendChart`, `GroupedBarChart` — Recharts kaldırıldı)
 **Export:** jsPDF, xlsx, html2canvas
+**Test:** Vitest (birim, `*.test.ts`) + headless Chrome smoke (`scripts/browser-test.mjs`)
 **Lint:** Oxlint
 **Platform:** Web + Android (Capacitor)
 
@@ -63,16 +64,36 @@ Global stiller.
 | Dosya | Açıklama |
 |---|---|
 | `AdaCard.tsx` | Ada kartı |
-| `BarChart.tsx` | Bar chart (Recharts) |
+| `BarChart.tsx` | Bar chart (el yapımı SVG, Recharts yok) |
 | `BlokCard.tsx` | Blok kartı |
-| `DonutChart.tsx` | Donut chart (Recharts) |
+| `BlokMatrisi.tsx` | Dashboard Ada × Blok ilerleme matrisi |
+| `DonutChart.tsx` | Donut chart (el yapımı SVG) |
 | `ErrorBoundary.tsx` | React hata sınırı |
+| `GroupedBarChart.tsx` | Gruplu bar chart (el yapımı SVG) |
 | `KullaniciYonetim.tsx` | Kullanıcı yönetim paneli (ekle/düzenle/rol ata) |
 | `Layout.tsx` | Ana layout (sidebar + içerik) |
-| `ProgressBar.tsx` | İlerleme çubuğu |
-| `ReportCard.tsx` | Rapor kartı |
+| `OfflineBanner.tsx` | Çevrimdışı durum bandı |
+| `ProgressBar.tsx` | İlerleme çubuğu (NaN/taşma korumalı) |
+| `ReportCard.tsx` | Rapor kartı (onay durumu + revizyon notu gösterir) |
 | `StatusBadge.tsx` | Durum rozeti |
 | `Toast.tsx` | Toast bildirimi |
+| `TrendChart.tsx` | Zaman trendi (el yapımı SVG) |
+
+### `src/components/blok/` — `BlokDetail` sayfası alt bileşenleri
+
+`AdaGeneliRaporUyari.tsx`, `BlokBilgiKart.tsx`, `BlokEylemler.tsx`,
+`IsKalemleriDurumu.tsx`, `RaporGecmisi.tsx`.
+
+### `src/components/report/` — `ReportAdd` formu alt bileşenleri
+
+`AdaSecimi.tsx`, `BlokSecimi.tsx`, `DetaySecimi.tsx`, `DurumSecimi.tsx`,
+`FotografEkle.tsx` (Supabase Storage yükleme + thumbnail), `IlerlemeSecimi.tsx`,
+`IsKalemiSecimi.tsx`, `SectionTitle.tsx`.
+
+### `src/components/hedef-takvim/` — `HedefTakvim` sayfası alt bileşenleri
+
+`AyHedefleriKart.tsx`, `aylar.ts`, `HedefTakvimPdf.tsx`, `OzetChipSatiri.tsx`,
+`TakvimIzgarasi.tsx`, `types.ts`.
 
 ### `src/components/config/`
 
@@ -97,9 +118,9 @@ Global stiller.
 | `AdaList.tsx` | `/adalar` | Ada listesi |
 | `AdaDetail.tsx` | `/ada/:ada` | Ada detay (blok listesi) |
 | `BlokDetail.tsx` | `/ada/:ada/blok/:blokNo` | Blok detay (iş kalemi ilerlemeleri) |
-| `ReportAdd.tsx` | `/rapor-ekle` | Tekil ilerleme raporu ekleme |
-| `ReportList.tsx` | `/raporlar` | Rapor listesi/geçmişi |
-| `BulkReport.tsx` | `/toplu-rapor` | Toplu rapor girişi (admin) |
+| `ReportAdd.tsx` | `/rapor-ekle` | Tekil/çoklu-blok ilerleme raporu ekleme + düzenleme (`?edit=`) |
+| `ReportList.tsx` | `/raporlar` | Rapor listesi/geçmişi (onay durumu filtreleri, sayfalama) |
+| `Hakedis.tsx` | `/hakedis` | Uygulama vs resmi pursantaj karşılaştırması + kalem düzenleme |
 | `Personnel.tsx` | `/personel` | Personel/kullanıcı listesi |
 | `Profile.tsx` | `/profil` | Kullanıcı profili |
 | `Statistics.tsx` | `/istatistik` | İstatistik ve grafikler |
@@ -116,7 +137,7 @@ version-counter tabanlı değişiklik bildirimi. Bkz. [`AGENTS.md`](../AGENTS.md
 | Dosya | Açıklama |
 |---|---|
 | `authStore.ts` | Oturum durumu, giriş/çıkış, `isAdmin`/`isProjeMuduruSession` |
-| `reportStore.ts` | Rapor durumu (Supabase CRUD + realtime + cache) |
+| `reportStore.ts` | Rapor durumu (Supabase CRUD + realtime + cache; onay akışı `raporOnayla`/`raporReddet`, fotoğraf, `raporEtkinYuzde` merkezi yüzde hesabı) |
 | `atamaStore.ts` | Ada/blok atama durumu (Supabase CRUD + realtime) |
 | `hedefStore.ts` | İş kalemi hedef tarihleri (Supabase CRUD + realtime) |
 | `kullanicilarStore.ts` | Personel/kullanıcı listesi, rol tespiti (`isSantiyeSefi`, `isProjeMuduru`) |
@@ -133,6 +154,8 @@ version-counter tabanlı değişiklik bildirimi. Bkz. [`AGENTS.md`](../AGENTS.md
 | `useRaporlar.ts` | `reportStore`'a abone olur |
 | `useHedefler.ts` | `hedefStore`'a abone olur |
 | `useSiteConfig.ts` | `config/site.ts`'e abone olur, açılışta DB override'ini yükler |
+| `useIsDesktop.ts` | Masaüstü/mobil kırılım kontrolü |
+| `useTema.ts` | Tema (açık/koyu) durumu |
 
 ### `src/config/`
 
@@ -151,12 +174,16 @@ version-counter tabanlı değişiklik bildirimi. Bkz. [`AGENTS.md`](../AGENTS.md
 | Dosya | Açıklama |
 |---|---|
 | `supabase.ts` | Supabase client factory; env yoksa `null` (`isSupabaseReady()` ile kontrol edilir) |
+| `db.ts` | IndexedDB yardımcıları (büyük veri localStorage sınırını aşınca) |
+| `listeGetir.ts` | PostgREST 1000 satır limitine karşı sayfalı (`range`) toplu çekme |
 
 ### `src/data/`
 
 | Dosya | Açıklama |
 |---|---|
-| `plan.ts` | Hedef tarihine kalan gün, ilerleme durumu ve hedef özeti hesaplamaları |
+| `plan.ts` | Hedef tarihine kalan gün, ilerleme durumu ve hedef özeti hesaplamaları (Europe/Istanbul sabitli) |
+| `istatistik.ts` | İstatistik sayfası türev hesapları |
+| `bugunGirilecek.ts` | "Bugün Girilecek" öneri kartı hesabı |
 
 ### `src/utils/`
 
@@ -164,8 +191,16 @@ version-counter tabanlı değişiklik bildirimi. Bkz. [`AGENTS.md`](../AGENTS.md
 |---|---|
 | `exportPdf.ts` | PDF dışa aktarma (jsPDF + html2canvas) |
 | `exportXlsx.ts` | Excel dışa aktarma (xlsx) |
-| `helpers.ts` | Genel yardımcı fonksiyonlar |
+| `helpers.ts` | Genel yardımcı fonksiyonlar (`todayISO`, `yerelTarih`, `gelecektekiTarihMi`, `formatDateTime*`) |
 | `styles.ts` | Paylaşılan stil/sınıf yardımcıları |
+| `dialog.ts` | Native uyumlu onay/metin dialogları (`onayla`, `metinIste` — `alert()` yerine) |
+| `audit.ts` | Denetim logu yardımcıları |
+
+### Birim testleri (`npm test` — Vitest)
+
+Her kritik modülün yanında `*.test.ts` bulunur: `reportStore`, `hedefStore`,
+`plan`, `istatistik`, `bugunGirilecek`, `helpers`, `exportXlsx`, `exportPdf`,
+`sablon`, `listeGetir`, `audit`.
 
 ---
 

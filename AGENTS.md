@@ -14,8 +14,10 @@ yöneticileri hedef takvimi ve istatistikleri izler. Tek kod tabanı `data/santi
 ## Stack
 
 React 19 + TypeScript + Vite 8 · Supabase (Postgres + RLS + Realtime + Storage) ·
-Capacitor 8 (Android paketleme) · react-router-dom v7 · Recharts · jsPDF/xlsx (dışa aktarma) ·
-Oxlint. Global state kütüphanesi yok — bkz. "Mimari" altında store deseni.
+Capacitor 8 (Android paketleme) · react-router-dom v7 · el yapımı SVG grafikler
+(`BarChart`, `DonutChart`, `TrendChart`, `GroupedBarChart` — Recharts kaldırıldı) ·
+jsPDF/xlsx (dışa aktarma) · Vitest (birim testleri) · Oxlint.
+Global state kütüphanesi yok — bkz. "Mimari" altında store deseni.
 
 ## Hızlı komutlar
 
@@ -25,6 +27,7 @@ cp .env.example .env      # VITE_SUPABASE_URL / VITE_SUPABASE_ANON_KEY
 npm run dev                # http://localhost:5173 (predev: porttaki yabanci vite'i kapatir)
 npm run build               # tsc -b && vite build -> dist/
 npm run lint                 # oxlint
+npm run test                 # vitest birim testleri
 npm run test:browser         # headless Chrome smoke testi (dev server ayaktayken; --auto-start ile kendisi baslatir)
 ```
 
@@ -105,8 +108,9 @@ zorunluluğu ve varsayılan açıklama metni ayarlanabilir (Settings sayfasında
 | `/hedef-takvim` | `HedefTakvim` | Giriş gerekli |
 | `/adalar`, `/ada/:ada`, `/ada/:ada/blok/:blokNo` | `AdaList`, `AdaDetail`, `BlokDetail` | Giriş gerekli |
 | `/rapor-ekle`, `/raporlar` | `ReportAdd`, `ReportList` | Giriş gerekli (onay/foto akışı dahil) |
-| `/toplu-rapor` | `BulkReport` | Admin |
+| `/toplu-rapor` | `/rapor-ekle`'ye yönlenir (eski `BulkReport` kaldırıldı) | Giriş gerekli |
 | `/personel`, `/profil`, `/istatistik` | `Personnel`, `Profile`, `Statistics` | Giriş gerekli |
+| `/hakedis` | `Hakedis` (uygulama vs resmi pursantaj karşılaştırması) | Giriş gerekli |
 | `/ayarlar` | `Settings` | Proje müdürü |
 | `/yeni-santiye` | `NewSantiyeWizard` | Proje müdürü |
 

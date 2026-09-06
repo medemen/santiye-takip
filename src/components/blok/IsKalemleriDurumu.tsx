@@ -192,6 +192,7 @@ export default function IsKalemleriDurumu({ ada, blokNum, gruplar, kalemIlerleme
                                       setDuzenlenenTarih(hedef.hedef_tarih);
                                       setDuzenlenenKalem(isKalemi);
                                     }}
+                                    aria-label={`${isKalemi} hedef tarihini düzenle`}
                                     style={{
                                       fontSize: 13,
                                       padding: '6px 10px',

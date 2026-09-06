@@ -321,6 +321,7 @@ export default function AdaBlokEditor({ adalar, onChange }: Props) {
                               bloklar: x.bloklar.filter((_, i) => i !== blokIdx),
                             }))
                           }
+                          aria-label={`${a.ada} blok ${b.blok_no} sil`}
                           style={{
                             background: 'none',
                             border: '1px solid #fecaca',

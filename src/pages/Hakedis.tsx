@@ -212,7 +212,7 @@ export default function Hakedis() {
           <div>
             <h1 style={{ ...pageTitle, marginBottom: 4 }}>Hakediş Karşılaştırma</h1>
             <p style={{ fontSize: 13, color: 'var(--text-faint)', margin: 0 }}>
-              {hakedis.hakedisNo}. hakediş · Uygulama (saha) vs Resmi ({hakedis.kaynak})
+              {hakedis.hakedisNo}. hakediş · Uygulama (saha, pursantaj ağırlıklı) vs Resmi ({hakedis.kaynak})
             </p>
           </div>
         </div>
@@ -385,7 +385,7 @@ export default function Hakedis() {
     <div>
       <h1 style={{ ...pageTitle, marginBottom: 4 }}>Hakediş</h1>
       <p style={{ fontSize: 13, color: 'var(--text-faint)', margin: 0, marginBottom: 16 }}>
-        {hakedis.hakedisNo}. hakediş · Uygulama vs Resmi
+        {hakedis.hakedisNo}. hakediş · Uygulama (pursantaj ağırlıklı) vs Resmi
       </p>
 
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, marginBottom: 16 }}>

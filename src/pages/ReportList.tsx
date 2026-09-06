@@ -69,10 +69,13 @@ export default function ReportList() {
   const user = getCurrentUser();
   const isAdmin = (user?.admin ?? false) || (user?.proje_muduru ?? false);
 
-  const canEditReport = (raporlayan: string) => {
+  // Store'daki raporDuzenleyebilir ile ayni kural (user_id tabanli):
+  // isim karsilastirmasi ayni isimli iki kullaniciyi karistirir.
+  const canEditReport = (rapor: { user_id: string | null; raporlayan: string }) => {
     if (!user) return false;
     if (isAdmin) return true;
-    return isSahaPersoneli(user.rol) && user.ad_soyad === raporlayan;
+    if (!isSahaPersoneli(user.rol)) return false;
+    return rapor.user_id != null && user.user_id != null && rapor.user_id === user.user_id;
   };
 
   const filtered = useMemo(() => {
@@ -359,7 +362,7 @@ export default function ReportList() {
           </div>
         ) : (
           gorunenRaporlar.map((r) => {
-            const editable = canEditReport(r.raporlayan);
+            const editable = canEditReport(r);
             return (
             <div
               key={r.id}
@@ -465,7 +468,7 @@ export default function ReportList() {
                     raporId={r.id}
                     fotograflar={raporFotograflari[r.id] ?? r.fotograflar ?? []}
                     onUpdate={(yeni) => fotoGuncelle(r.id, yeni)}
-                    disabled={!canEditReport(r.raporlayan)}
+                    disabled={!canEditReport(r)}
                   />
                 </div>
               )}

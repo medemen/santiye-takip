@@ -124,11 +124,11 @@ export default function HedefTakvim() {
       </div>
 
       <div style={{ display: 'flex', gap: 8, alignItems: 'center', marginBottom: 12 }}>
-        <button onClick={ayOnce} style={{ background: 'none', border: '1px solid var(--border)', borderRadius: 8, width: 32, height: 32, cursor: 'pointer', fontSize: 14, color: 'var(--text-muted)' }}>◀</button>
+        <button onClick={ayOnce} aria-label="Önceki ay" style={{ background: 'none', border: '1px solid var(--border)', borderRadius: 8, width: 32, height: 32, cursor: 'pointer', fontSize: 14, color: 'var(--text-muted)' }}>◀</button>
         <div style={{ flex: 1, textAlign: 'center', fontSize: 15, fontWeight: 600, color: 'var(--text-secondary)' }}>
           {AY_ADLARI[gorunenAy.getMonth()]} {gorunenAy.getFullYear()}
         </div>
-        <button onClick={aySonra} style={{ background: 'none', border: '1px solid var(--border)', borderRadius: 8, width: 32, height: 32, cursor: 'pointer', fontSize: 14, color: 'var(--text-muted)' }}>▶</button>
+        <button onClick={aySonra} aria-label="Sonraki ay" style={{ background: 'none', border: '1px solid var(--border)', borderRadius: 8, width: 32, height: 32, cursor: 'pointer', fontSize: 14, color: 'var(--text-muted)' }}>▶</button>
       </div>
 
       {adalar.length > 1 && (

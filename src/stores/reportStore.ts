@@ -5,7 +5,7 @@ import { idbGet, idbSet } from '../lib/db';
 import type { RealtimeChannel } from '@supabase/supabase-js';
 import { toastGoster } from './toastStore';
 import { getCurrentUser, supabaseOturumAktif, sefAdadaYetkiliMi } from './authStore';
-import { yeniRaporBildirimiGonder } from './notificationStore';
+import { yeniRaporBildirimleriniKuyrugaEkle } from './notificationStore';
 import { getKullaniciAdaAtamasi } from './atamaStore';
 import { getKullanicilar } from './kullanicilarStore';
 import { tumKayitlariGetir } from '../lib/listeGetir';
@@ -178,7 +178,8 @@ export function aboneOlRaporGuncellemeleri(onChannelStatus?: (status: string) =>
           }
           const mevcutKullanici = getCurrentUser();
           if (mevcutKullanici && yeni.raporlayan !== mevcutKullanici.ad_soyad) {
-            yeniRaporBildirimiGonder(yeni.raporlayan, yeni.ada, yeni.blok_no);
+            // Toplu girislerde spam olmamasi icin kuyrukta biriktirilir
+            yeniRaporBildirimleriniKuyrugaEkle(yeni.raporlayan, yeni.ada, yeni.blok_no);
           }
         } else if (payload.eventType === 'UPDATE') {
           const guncel = payload.new as Rapor;
@@ -198,12 +199,10 @@ export function realtimeRaporAboneliktenCik(): void {
   }
 }
 
-function upsertHataMesajlari(basarisiz: Rapor[]): string {
-  const mesajlar = new Set<string>();
-  for (const r of basarisiz) {
-    if (r.raporlayan) mesajlar.add(r.raporlayan);
-  }
-  return Array.from(mesajlar).join(', ');
+// Konsola PII (kisi adi) yazilmaz; teshis icin rapor id listesi yeterli.
+// Kullaniciya gosterilen toast'ta isim/ada bilgisi kalabilir.
+function upsertHataIdleri(basarisiz: Rapor[]): string {
+  return basarisiz.map((r) => r.id).join(', ');
 }
 
 let _yuklemeHataBildirildi = false;
@@ -255,7 +254,7 @@ export async function supabaseRaporlariYukle(): Promise<void> {
     }
     if (basarisiz.length > 0) {
       const ilk = basarisiz[0];
-      console.warn('Supabase yerel rapor yukleme hatasi,', basarisiz.length, 'rapor:', upsertHataMesajlari(basarisiz));
+      console.warn('Supabase yerel rapor yukleme hatasi,', basarisiz.length, 'rapor:', upsertHataIdleri(basarisiz));
       // Oturum basina tek bildirim: her yukleme denemesinde toast yiginini
       // engelle (kalici reddedilen kayitlarin durum isareti Faz 3'te).
       if (!_yuklemeHataBildirildi) {
@@ -325,7 +324,26 @@ export function saveRaporlar(
   return yeniler;
 }
 
-export function updateRapor(id: string, guncelleme: Partial<Omit<Rapor, 'id' | 'olusturma_tarihi'>>): boolean {
+export type RaporGuncelleme = Partial<Omit<Rapor, 'id' | 'olusturma_tarihi'>>;
+
+const ICERIK_ALANLARI = ['tarih', 'ada', 'blok_no', 'is_kalemi', 'durum', 'ilerleme_yuzde', 'aciklama', 'fotograflar'] as const;
+
+// Icerik degisince onceki onay hukumsuz kalir: yeniden degerlendirme icin
+// beklemeye alinir (aksi halde onayli veri sessizce degisirdi). Sunucu
+// tarafinda rapor_onay_korumasi trigger'i ayni kurali zorlar.
+export function onaySifirlamaUygula(
+  eski: Pick<Rapor, 'onay_durumu' | 'revizyon_notu'>,
+  guncelleme: RaporGuncelleme
+): Pick<Rapor, 'onay_durumu' | 'revizyon_notu'> {
+  const anahtarlar = Object.keys(guncelleme);
+  const icerikDegisti = anahtarlar.some((k) => (ICERIK_ALANLARI as readonly string[]).includes(k));
+  if (icerikDegisti && eski.onay_durumu !== 'beklemede') {
+    return { onay_durumu: 'beklemede', revizyon_notu: '' };
+  }
+  return { onay_durumu: eski.onay_durumu, revizyon_notu: eski.revizyon_notu };
+}
+
+export function updateRapor(id: string, guncelleme: RaporGuncelleme): boolean {
   const raporlar = getRaporlar();
   const idx = raporlar.findIndex((r) => r.id === id);
   if (idx === -1) return false;
@@ -341,12 +359,25 @@ export function updateRapor(id: string, guncelleme: Partial<Omit<Rapor, 'id' | '
     toastGoster('Bu raporu düzenleme yetkiniz yok (ada/atama kapsamı dışında).', 'error');
     return false;
   }
-  const guncel = { ...raporlar[idx], ...guncelleme };
+  // Onay alanlari yalnizca onay akisindan (raporOnayGuncelle) degisir;
+  // icerik guncellemeleri bu alanlari tasiyamaz (self-onay engeli).
+  const { onay_durumu: _o, revizyon_notu: _r, user_id: _u, ...icerik } = guncelleme;
+  const sifirlama = onaySifirlamaUygula(raporlar[idx], icerik);
+  const guncel = { ...raporlar[idx], ...icerik, ...sifirlama };
   const yeniListe = [...raporlar];
   yeniListe[idx] = guncel;
   setRaporlar(yeniListe);
   if (supabaseOturumAktif()) {
-    getSupabase().from('raporlar').update(raporToSupabase(guncel, true)).eq('id', id).then(({ error }) => {
+    // user_id yalnizca eski kayitta bos VE duzenleyen isim-eslesen yazarsa
+    // doldurulur; admin baskasinin satirini duzenlerken yazar bilgisi
+    // korunur (sahiplik calinmaz).
+    const duzenleyen = getCurrentUser();
+    const userIdDahil =
+      raporlar[idx].user_id == null &&
+      duzenleyen != null &&
+      !duzenleyen.admin && !duzenleyen.proje_muduru &&
+      duzenleyen.ad_soyad === raporlar[idx].raporlayan;
+    getSupabase().from('raporlar').update(raporToSupabase(guncel, userIdDahil)).eq('id', id).then(({ error }) => {
       if (error) {
         console.warn('Supabase rapor güncelleme hatası:', error.message);
         toastGoster('Rapor sunucuya güncellenemedi', 'error');
@@ -376,6 +407,19 @@ export function deleteRapor(id: string): boolean {
       if (error) {
         console.warn('Supabase rapor silme hatası:', error.message);
         toastGoster('Rapor sunucudan silinemedi', 'error');
+        return;
+      }
+      // Satir silindi: ekli fotograflar yetim kalmasin (best-effort)
+      const yollar = (rapor.fotograflar || [])
+        .map((u) => fotoYoluCikar(u))
+        .filter((y): y is string => y !== null);
+      if (yollar.length > 0) {
+        getSupabase().storage.from('rapor-fotolari').remove(yollar).then(
+          ({ error: dosyaError }) => {
+            if (dosyaError) console.warn('Silinen raporun fotograflari kaldi:', dosyaError.message);
+          },
+          (err: unknown) => console.warn('Silinen raporun fotograflari kaldi:', err instanceof Error ? err.message : err)
+        );
       }
     }, agHatasiYakala('rapor sil'));
   }
@@ -640,7 +684,16 @@ function raporOnayGuncelle(id: string, durum: import('../types').OnayDurumu, not
     toastGoster('Bu işlem için yetkiniz yok.', 'error');
     return false;
   }
-  const guncel = { ...raporlar[idx], onay_durumu: durum, revizyon_notu: not };
+  // RLS ile ayni ada-scope: sef yalnizca yetkili adalarda onaylar
+  // (bos dizi = sinirsiz); PM sinirsiz. Offline modda yerel serbest.
+  if (supabaseOturumAktif() && oturum.admin && !oturum.proje_muduru) {
+    if (!sefAdadaYetkiliMi(oturum.yetkili_adalar, raporlar[idx].ada)) {
+      toastGoster('Bu adadaki raporları onaylama yetkiniz yok.', 'error');
+      return false;
+    }
+  }
+  const onceki = raporlar[idx];
+  const guncel = { ...onceki, onay_durumu: durum, revizyon_notu: not };
   const yeniListe = [...raporlar];
   yeniListe[idx] = guncel;
   setRaporlar(yeniListe);
@@ -649,6 +702,8 @@ function raporOnayGuncelle(id: string, durum: import('../types').OnayDurumu, not
       if (error) {
         console.warn('Supabase onay guncelleme hatasi:', error.message);
         toastGoster('Onay durumu güncellenemedi', 'error');
+        // Sunucu reddettiyse iyimser yerel yazimi geri al (ayrisma kalmasin)
+        setRaporlar(getRaporlar().map((r) => (r.id === id ? onceki : r)));
       }
     }, agHatasiYakala('onay guncelle'));
   }
@@ -677,14 +732,74 @@ export function raporFotografEkle(id: string, fotografUrl: string): boolean {
   const raporlar = getRaporlar();
   const idx = raporlar.findIndex((r) => r.id === id);
   if (idx === -1) return false;
-  const guncel = { ...raporlar[idx], fotograflar: [...(raporlar[idx].fotograflar || []), fotografUrl] };
+  if (!raporDuzenleyebilir(raporlar[idx])) {
+    toastGoster('Bu rapora fotoğraf ekleme yetkiniz yok.', 'error');
+    return false;
+  }
+  const mevcut = raporlar[idx];
+  // Fotograf icerik degisikligidir: onayli rapora eklenirse onay duser
+  const guncel = {
+    ...mevcut,
+    fotograflar: [...(mevcut.fotograflar || []), fotografUrl],
+    ...(mevcut.onay_durumu !== 'beklemede'
+      ? { onay_durumu: 'beklemede' as const, revizyon_notu: '' }
+      : {}),
+  };
   const yeniListe = [...raporlar];
   yeniListe[idx] = guncel;
   setRaporlar(yeniListe);
   if (supabaseOturumAktif()) {
-    getSupabase().from('raporlar').update({ fotograflar: guncel.fotograflar }).eq('id', id).then(({ error }) => {
+    getSupabase().from('raporlar').update({ fotograflar: guncel.fotograflar, onay_durumu: guncel.onay_durumu, revizyon_notu: guncel.revizyon_notu }).eq('id', id).then(({ error }) => {
       if (error) console.warn('Supabase fotograf guncelleme hatasi:', error.message);
     }, agHatasiYakala('fotograf guncelle'));
+  }
+  return true;
+}
+
+// Public URL'den bucket-ici yol cikar; harici URL'lerde null doner.
+function fotoYoluCikar(url: string): string | null {
+  const isaret = '/rapor-fotolari/';
+  const i = url.indexOf(isaret);
+  if (i < 0) return null;
+  const yol = url.slice(i + isaret.length).split('?')[0].replace(/^\/+/, '');
+  return yol || null;
+}
+
+export async function fotografSil(raporId: string, url: string): Promise<boolean> {
+  const raporlar = getRaporlar();
+  const idx = raporlar.findIndex((r) => r.id === raporId);
+  if (idx === -1) return false;
+  if (!raporDuzenleyebilir(raporlar[idx])) {
+    toastGoster('Bu fotoğrafı silme yetkiniz yok.', 'error');
+    return false;
+  }
+  const guncel = {
+    ...raporlar[idx],
+    fotograflar: (raporlar[idx].fotograflar || []).filter((u) => u !== url),
+  };
+  const yeniListe = [...raporlar];
+  yeniListe[idx] = guncel;
+  setRaporlar(yeniListe);
+  if (supabaseOturumAktif()) {
+    try {
+      // Once satir (dogru kaynak), sonra dosya (best-effort)
+      const { error: satirError } = await getSupabase()
+        .from('raporlar')
+        .update({ fotograflar: guncel.fotograflar })
+        .eq('id', raporId);
+      if (satirError) throw satirError;
+      const yol = fotoYoluCikar(url);
+      if (yol) {
+        const { error: dosyaError } = await getSupabase().storage
+          .from('rapor-fotolari')
+          .remove([yol]);
+        if (dosyaError) console.warn('Fotograf dosyasi silinemedi:', dosyaError.message);
+      }
+    } catch (err) {
+      console.warn('Supabase fotograf silme hatasi:', err instanceof Error ? err.message : err);
+      toastGoster('Fotoğraf sunucudan silinemedi', 'error');
+      return false;
+    }
   }
   return true;
 }

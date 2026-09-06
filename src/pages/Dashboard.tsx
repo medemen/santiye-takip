@@ -300,7 +300,7 @@ export default function Dashboard() {
         </div>
 
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))', gap: 12, marginBottom: 16 }}>
-          <KpiCard label="Genel İlerleme" value={`%${genelIlerleme}`} color={genelIlerleme === 100 ? '#22c55e' : '#f59e0b'} progress={genelIlerleme} />
+          <KpiCard label="Genel İlerleme" value={`%${genelIlerleme}`} color={genelIlerleme === 100 ? '#22c55e' : '#f59e0b'} progress={genelIlerleme} aciklama="Ada ortalamalarının ortalaması (rapor bazlı)" />
           <KpiCard label="Rapor Kapsamı" value={`%${blokVerisi.kapsam}`} color="#6366f1" progress={blokVerisi.kapsam} />
           <KpiCard label="Toplam Rapor" value={stats.toplamRapor} color="#6b7280" />
           <KpiCard label="Tamamlandı" value={stats.tamamlananIsler} color="#22c55e" />
@@ -439,6 +439,9 @@ export default function Dashboard() {
           </span>
         </div>
         <ProgressBar value={genelIlerleme} height={10} />
+        <div style={{ fontSize: 11, color: 'var(--text-subtle)', marginTop: 6 }}>
+          Ada ortalamalarının ortalaması (rapor bazlı; pursantaj ağırlıklı değer için Hakediş)
+        </div>
       </div>
 
       {isAdminOrPM && onayBekleyenSayisi > 0 && (

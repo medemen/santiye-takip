@@ -256,6 +256,52 @@ export function yeniRaporBildirimiGonder(raporlayan: string, ada: string, blokNo
   } catch { /* yok say */ }
 }
 
+// Toplu rapor girisinde N blok = N realtime INSERT = N bildirim spam'i
+// olur. Kuyruk 15 sn pencerede birikir, tek ozet bildirim gonderilir.
+interface KuyrukRapor {
+  raporlayan: string;
+  ada: string;
+  blokNo: number;
+}
+
+let raporKuyrugu: KuyrukRapor[] = [];
+let kuyrukZamanlayici: ReturnType<typeof setTimeout> | null = null;
+const OZET_BILDIRIM_ID = 9001;
+
+function bildirimKuyrugunuBosalt(): void {
+  kuyrukZamanlayici = null;
+  const liste = raporKuyrugu;
+  raporKuyrugu = [];
+  if (liste.length === 0) return;
+
+  const baslik = liste.length === 1 ? '📋 Yeni Rapor' : `📋 ${liste.length} Yeni Rapor`;
+  const govde =
+    liste.length === 1
+      ? `${liste[0].raporlayan} — ${liste[0].blokNo === 0 ? `${liste[0].ada} Ada Geneli` : `${liste[0].ada} Blok ${liste[0].blokNo}`}`
+      : liste
+          .slice(0, 3)
+          .map((r) => `${r.raporlayan} (${r.ada})`)
+          .join(', ') + (liste.length > 3 ? ` ve ${liste.length - 3} diğer` : '');
+
+  try {
+    if (nativeBildirimVarMi()) {
+      void LocalNotifications.schedule({
+        notifications: [{ id: OZET_BILDIRIM_ID, title: baslik, body: govde, schedule: { at: new Date() } }],
+      });
+    } else if (typeof Notification !== 'undefined' && Notification.permission === 'granted') {
+      new Notification(baslik, { body: govde, tag: 'yeni-rapor-ozet' });
+    }
+  } catch { /* yok say */ }
+}
+
+export function yeniRaporBildirimleriniKuyrugaEkle(raporlayan: string, ada: string, blokNo: number): void {
+  if (!bildirimAyarlariGetir().yeniRapor) return;
+  raporKuyrugu.push({ raporlayan, ada, blokNo });
+  if (!kuyrukZamanlayici) {
+    kuyrukZamanlayici = setTimeout(bildirimKuyrugunuBosalt, 15000);
+  }
+}
+
 let kontrolZamani: ReturnType<typeof setInterval> | null = null;
 
 export function bildirimKontrolunuBaslat(): void {

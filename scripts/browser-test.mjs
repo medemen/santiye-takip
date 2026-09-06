@@ -225,7 +225,7 @@ async function main() {
     await gez('/personel', ['Personel'], 'Personel');
     await gez('/istatistik', ['İstatistikler'], 'İstatistikler');
     await gez('/profil', ['Profil'], 'Profil');
-    await gez('/hakedis', ['hakediş · Uygulama vs Resmi'], 'Hakediş');
+    await gez('/hakedis', ['hakediş · Uygulama (pursantaj ağırlıklı) vs Resmi'], 'Hakediş');
 
     await adim('Rapor ekleme akışı (tek sayfa + kaydet)', async () => {
       await spaGez('/rapor-ekle');

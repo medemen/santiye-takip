@@ -5,6 +5,7 @@ import {
   getBlokProgress,
   getGenelIlerleme,
   getSonRaporHaritasi,
+  onaySifirlamaUygula,
   raporEtkinYuzde,
   raporOnayla,
   raporReddet,
@@ -157,5 +158,39 @@ describe('rapor onay akisi', () => {
     });
     const sonuc = raporReddet(r.id, 'Yetersiz');
     expect(sonuc).toBe(false);
+  });
+});
+
+describe('onaySifirlamaUygula', () => {
+  it('onayli raporun icerigi degisince beklemeye alinir, not temizlenir', () => {
+    const sonuc = onaySifirlamaUygula(
+      { onay_durumu: 'onaylandi', revizyon_notu: '' },
+      { aciklama: 'yeni aciklama' }
+    );
+    expect(sonuc).toEqual({ onay_durumu: 'beklemede', revizyon_notu: '' });
+  });
+
+  it('reddedilen rapor duzeltilince kilit acilir', () => {
+    const sonuc = onaySifirlamaUygula(
+      { onay_durumu: 'reddedildi', revizyon_notu: 'eksik foto' },
+      { ilerleme_yuzde: 70 }
+    );
+    expect(sonuc).toEqual({ onay_durumu: 'beklemede', revizyon_notu: '' });
+  });
+
+  it('zaten beklemede olan rapor degismez', () => {
+    const sonuc = onaySifirlamaUygula(
+      { onay_durumu: 'beklemede', revizyon_notu: '' },
+      { ilerleme_yuzde: 70 }
+    );
+    expect(sonuc).toEqual({ onay_durumu: 'beklemede', revizyon_notu: '' });
+  });
+
+  it('icerik disi guncelleme onayi etkilemez', () => {
+    const sonuc = onaySifirlamaUygula(
+      { onay_durumu: 'onaylandi', revizyon_notu: '' },
+      {}
+    );
+    expect(sonuc).toEqual({ onay_durumu: 'onaylandi', revizyon_notu: '' });
   });
 });

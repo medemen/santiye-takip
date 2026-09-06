@@ -31,6 +31,7 @@ export default function IsKalemiSecimi({
       <input
         type="text"
         placeholder="İş kalemi ara..."
+        aria-label="İş kalemi ara"
         value={arama}
         onChange={(e) => onAramaDegis(e.target.value)}
         style={{

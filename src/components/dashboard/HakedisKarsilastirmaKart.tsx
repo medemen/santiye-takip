@@ -29,7 +29,7 @@ export default function HakedisKarsilastirmaKart({ satirlar, hakedisNo, ozet }: 
         </button>
       </div>
       <p style={{ fontSize: 11, color: 'var(--text-subtle)', margin: 0, marginBottom: 10 }}>
-        Saha (uygulama) ile hakediş (resmi) ilerleme karşılaştırması
+        Saha (uygulama) ile hakediş (resmi) ilerleme karşılaştırması · Uygulama pursantaj ağırlıklıdır
       </p>
 
       {ozet.uygulama !== null && ozet.resmi !== null && (
