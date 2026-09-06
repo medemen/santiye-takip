@@ -10,6 +10,7 @@ import {
   raporOnayla,
   raporReddet,
   saveRapor,
+  sunucuRaporlariniBirlestir,
 } from './reportStore';
 import type { Rapor } from '../types';
 
@@ -158,6 +159,52 @@ describe('rapor onay akisi', () => {
     });
     const sonuc = raporReddet(r.id, 'Yetersiz');
     expect(sonuc).toBe(false);
+  });
+});
+
+describe('sunucuRaporlariniBirlestir (dirilme engeli)', () => {
+  function raporSrB(id: string): Rapor {
+    return { id, tarih: '2026-08-24', raporlayan: 'Test', ada: 'A', blok_no: 1, is_kalemi: 'Sıva', durum: 'devam_ediyor', ilerleme_yuzde: 50, aciklama: '' } as Rapor;
+  }
+
+  it('sunucudaki raporlar korunur', () => {
+    const { birlestirilmis, bekleyen } = sunucuRaporlariniBirlestir(
+      [raporSrB('a')],
+      [raporSrB('a')],
+      new Set(['a'])
+    );
+    expect(birlestirilmis.map((r) => r.id)).toEqual(['a']);
+    expect(bekleyen.map((r) => r.id)).toEqual([]);
+  });
+
+  it('offline olusturulmus (sunucuda hic gorulmemis) rapor bekleyen kalir', () => {
+    const { birlestirilmis, bekleyen } = sunucuRaporlariniBirlestir(
+      [raporSrB('a'), raporSrB('yeni')],
+      [raporSrB('a')],
+      new Set(['a'])
+    );
+    expect(bekleyen.map((r) => r.id)).toEqual(['yeni']);
+    expect(birlestirilmis.map((r) => r.id)).toEqual(['a', 'yeni']);
+  });
+
+  it('sunucudan silinmis (daha once gorulmus) rapor dirilmez', () => {
+    const { birlestirilmis, bekleyen } = sunucuRaporlariniBirlestir(
+      [raporSrB('a'), raporSrB('silah')],
+      [raporSrB('a')],
+      new Set(['a', 'silah'])
+    );
+    expect(birlestirilmis.map((r) => r.id)).toEqual(['a']);
+    expect(bekleyen.map((r) => r.id)).toEqual([]);
+  });
+
+  it('ilk senkronizasyon (bilinen bos): yerel farklar bekleyen sayilir', () => {
+    const { birlestirilmis, bekleyen } = sunucuRaporlariniBirlestir(
+      [raporSrB('a'), raporSrB('eski')],
+      [raporSrB('a')],
+      new Set<string>()
+    );
+    expect(bekleyen.map((r) => r.id)).toEqual(['eski']);
+    expect(birlestirilmis.map((r) => r.id)).toEqual(['a', 'eski']);
   });
 });
 

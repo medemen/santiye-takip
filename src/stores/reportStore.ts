@@ -11,6 +11,12 @@ import { getKullanicilar } from './kullanicilarStore';
 import { tumKayitlariGetir } from '../lib/listeGetir';
 
 const STORAGE_KEY = `${getSiteConfig().marka.localStoragePrefix}_raporlar`;
+// Son basarili tam senkronizasyonda sunucuda gorulen rapor id'leri. Tam
+// senkronizasyonda yerelde var olup sunucuda olmayan satir iki durumdan
+// biri olabilir: (a) bu cihazda olusturulup hiz yuklenmemis (bekleyen) ya
+// da (b) sunucudan silinmis (baska kisi/script). (b) yeniden yuklenirse
+// sunucudaki silme "dirilir"; bu ozet ayristirmayi saglar.
+const BILINEN_SUNUCU_KEY = `${STORAGE_KEY}_bilinen_sunucu_idleri`;
 
 type Listener = () => void;
 const _raporListeners = new Set<Listener>();
@@ -207,6 +213,41 @@ function upsertHataIdleri(basarisiz: Rapor[]): string {
 
 let _yuklemeHataBildirildi = false;
 
+let _bilinenSunucuIds: Set<string> | null = null;
+function bilinenSunucuIds(): Set<string> {
+  if (!_bilinenSunucuIds) {
+    try {
+      const data = localStorage.getItem(BILINEN_SUNUCU_KEY);
+      _bilinenSunucuIds = new Set(data ? (JSON.parse(data) as string[]) : []);
+    } catch {
+      _bilinenSunucuIds = new Set();
+    }
+  }
+  return _bilinenSunucuIds;
+}
+function bilinenSunucuIdsniGuncelle(sunucuIdleri: Set<string>): void {
+  _bilinenSunucuIds = sunucuIdleri;
+  try {
+    localStorage.setItem(BILINEN_SUNUCU_KEY, JSON.stringify([...sunucuIdleri]));
+  } catch {
+    /* localStorage dolu/engelli olabilir */
+  }
+}
+
+// Saf fonksiyon — dirilme engeli. Sunucuda hic gorulmemis yerel satir =
+// bu cihazda olusturulup henuz yuklenmemis (bekleyen) kabul edilir ve
+// yuklenir; daha once gorulup artik sunucuda olmayan satir = sunucudan
+// silinmis — birlestirilmis listeye girmez (yeniden yuklenince dirilmez).
+export function sunucuRaporlariniBirlestir(
+  yerel: Rapor[],
+  sunucu: Rapor[],
+  bilinenSunucu: ReadonlySet<string>
+): { birlestirilmis: Rapor[]; bekleyen: Rapor[] } {
+  const sunucuIdleri = new Set(sunucu.map((r) => r.id));
+  const bekleyen = yerel.filter((r) => !sunucuIdleri.has(r.id) && !bilinenSunucu.has(r.id));
+  return { birlestirilmis: [...sunucu, ...bekleyen], bekleyen };
+}
+
 export async function supabaseRaporlariYukle(): Promise<void> {
   if (!isSupabaseReady()) return;
   try {
@@ -218,11 +259,10 @@ export async function supabaseRaporlariYukle(): Promise<void> {
         .order('olusturma_tarihi', { ascending: false })
         .range(bastan, kadar)
     );
-    const sunucuIdleri = new Set(sunucu.map((r) => r.id));
     const yerel = getRaporlar();
-    const bekleyen = yerel.filter((r) => !sunucuIdleri.has(r.id));
-    const birlestirilmis = [...sunucu, ...bekleyen];
+    const { birlestirilmis, bekleyen } = sunucuRaporlariniBirlestir(yerel, sunucu, bilinenSunucuIds());
     setRaporlar(birlestirilmis);
+    bilinenSunucuIdsniGuncelle(new Set(sunucu.map((r) => r.id)));
     // Tek tek upsert: tek bir yetkisiz/uyumsuz rapor kalan tum raporlarin
     // yuklenmesini bloke etmesin. RLS INSERT politikasinin client aynasi:
     // PM sinirsiz; sef ada-scope'lu (bos dizi = sinirsiz); sahip yalnizca
