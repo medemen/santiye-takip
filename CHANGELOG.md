@@ -1,5 +1,26 @@
 # Değişiklik Notları
 
+## [1.1.40] - 2026-09-06
+
+### Yeni özellikler
+
+- Yeni **Hakediş** sayfası: uygulama ilerlemesi ile resmi pursantaj karşılaştırması ve kalem düzenleme.
+- Raporlara **fotoğraf ekleme** (Supabase Storage, thumbnail önizlemeli).
+- Rapor **onay/red akışı**: revizyon notu, onay durumu filtreleri ve sayfalama.
+- Toplu rapor girişinde bildirimler 15 sn kuyrukta birleşir, tek özet bildirim gönderilir.
+
+### İyileştirmeler
+
+- Recharts kaldırıldı; grafikler el yapımı SVG bileşenlere (`BarChart`, `DonutChart`, `TrendChart`, `GroupedBarChart`) taşındı — daha hızlı ve küçük boyut.
+- Rapor şablonu: açıklama zorunluluğu ve varsayılan açıklama metni ayarları.
+
+### Hata düzeltmeleri
+
+- Rapor düzenlemede blok/ada-geneli seçimi doldurulmuyordu — "Güncelle" butonu kilitli kalıyordu.
+- Android geri tuşu yalnızca uygulamadan çıkıyordu; artık SPA içinde geri, ana sayfada çıkış yapıyor.
+- Çevrimdışı durum bandı Android WebView'da gösterilmiyordu; aktif sunucu yoklamasıyla düzeltildi.
+- Bildirim izni yokken `LocalNotifications` hataları sessizce yutuluyor.
+
 ## [1.1.34] - 2026-09-03
 
 ### Altyapı
