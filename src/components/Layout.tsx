@@ -168,6 +168,7 @@ export default function Layout({ children }: Props) {
           backgroundColor: 'var(--bg-card)',
           borderTop: '1px solid var(--border)',
           display: 'flex',
+          justifyContent: 'space-around',
           alignItems: 'center',
           padding: '6px 0',
           paddingBottom: 'env(safe-area-inset-bottom, 6px)',
@@ -175,85 +176,63 @@ export default function Layout({ children }: Props) {
           boxShadow: '0 -1px 3px rgba(0,0,0,0.05)',
         }}
       >
-        {(() => {
-          const fabIx = mobilNav.findIndex((item) => item.fab);
-          const sol = mobilNav.slice(0, fabIx === -1 ? mobilNav.length : fabIx);
-          const sag = fabIx === -1 ? [] : mobilNav.slice(fabIx + 1);
-          const fab = fabIx === -1 ? null : mobilNav[fabIx];
-          const altNavItem = (item: (typeof navItems)[number]) =>
-            item.fab ? (
-              <NavLink
-                key={item.to}
-                to={item.to}
+        {mobilNav.map((item) =>
+          item.fab ? (
+            <NavLink
+              key={item.to}
+              to={item.to}
+              style={{
+                position: 'absolute',
+                left: '50%',
+                transform: 'translateX(-50%)',
+                bottom: 'calc(env(safe-area-inset-bottom, 6px) + 86px)',
+                display: 'flex',
+                alignItems: 'center',
+                textDecoration: 'none',
+                zIndex: 101,
+              }}
+            >
+              <div
                 style={{
-                  position: 'absolute',
-                  left: '50%',
-                  transform: 'translate(-50%, -20px)',
-                  bottom: 'env(safe-area-inset-bottom, 6px)',
                   display: 'flex',
-                  flexDirection: 'column',
                   alignItems: 'center',
-                  justifyContent: 'center',
-                  textDecoration: 'none',
-                  color: 'var(--text-faint)',
-                  fontSize: 10,
-                  gap: 2,
+                  gap: 6,
+                  height: 56,
+                  padding: '0 18px',
+                  borderRadius: 28,
+                  backgroundColor: '#f59e0b',
+                  boxShadow: '0 4px 14px rgba(245,158,11,0.45)',
+                  fontSize: 14,
+                  fontWeight: 600,
+                  color: '#fff',
+                  minWidth: 44,
                 }}
               >
-                <div
-                  style={{
-                    width: 52,
-                    height: 52,
-                    borderRadius: '50%',
-                    backgroundColor: '#f59e0b',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    fontSize: 22,
-                    boxShadow: '0 2px 8px rgba(245,158,11,0.4)',
-                    color: '#fff',
-                  }}
-                >
-                  {item.icon}
-                </div>
-                <span style={{ fontWeight: 600, color: 'var(--text-muted)' }}>{item.label}</span>
-              </NavLink>
-            ) : (
-              <NavLink
-                key={item.to}
-                to={item.to}
-                style={({ isActive }) => ({
-                  display: 'flex',
-                  flexDirection: 'column',
-                  alignItems: 'center',
-                  textDecoration: 'none',
-                  color: isActive ? '#f59e0b' : 'var(--text-subtle)',
-                  fontSize: 10,
-                  gap: 2,
-                  padding: '4px 0',
-                  fontWeight: isActive ? 600 : 400,
-                })}
-              >
-                <span style={{ fontSize: 20 }}>{item.icon}</span>
-                <span>{item.label}</span>
-              </NavLink>
-            );
-          return (
-            <>
-              {sol.length > 0 && (
-                <div style={{ flex: 1, display: 'flex', justifyContent: 'space-around', alignItems: 'center' }}>
-                  {sol.map(altNavItem)}
-                </div>
-              )}
-              {fab && altNavItem(fab)}
-              {sag.length > 0 && (
-                <div style={{ flex: 1, display: 'flex', justifyContent: 'space-around', alignItems: 'center' }}>
-                  {sag.map(altNavItem)}
-                </div>
-              )}
-            </>
-          );
-        })()}
+                <span style={{ fontSize: 18 }}>{item.icon}</span>
+                <span>Rapor</span>
+              </div>
+            </NavLink>
+          ) : (
+            <NavLink
+              key={item.to}
+              to={item.to}
+              style={({ isActive }) => ({
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                textDecoration: 'none',
+                color: isActive ? '#f59e0b' : 'var(--text-subtle)',
+                fontSize: 10,
+                gap: 2,
+                padding: '4px 0',
+                fontWeight: isActive ? 600 : 400,
+              })}
+            >
+              <span style={{ fontSize: 20 }}>{item.icon}</span>
+              <span>{item.label}</span>
+            </NavLink>
+          )
+        )}
       </nav>
     </div>
   );
