@@ -4,7 +4,7 @@
  *
  * Urettigi dosyalar:
  *   data/pursantaj.json          (ada x 26 hakedis grubu agirliklari)
- *   data/hakedis.json            (9. hakedis resmi ilerlemeleri: ILERLEME ICMALI + grup bazli)
+ *   data/hakedis.json            (N. hakedis resmi ilerlemeleri: ILERLEME ICMALI + grup bazli, N dosya adindan okunur)
  *   data/kalem_grup_eslesme.json (uygulama is kalemi -> hakedis grubu)
  *
  * Kaynak:  ILERLEME ICMALI + ADA1-6 INS/MEK/ELK YA. IS. LI. sayfalari
@@ -27,6 +27,10 @@ if (!existsSync(xlsxYolu)) {
   console.error('Dosya bulunamadi:', xlsxYolu);
   process.exit(1);
 }
+
+const basename = xlsxYolu.split(/[\\/]/).pop() ?? '';
+const noMatch = basename.match(/(\d{1,2})\s*nolu/i) ?? basename.match(/(\d{1,2})\.\s*hakedi/i);
+const hakedisNo = noMatch ? parseInt(noMatch[1], 10) : 9;
 
 const wb = XLSX.read(readFileSync(xlsxYolu), { type: 'buffer' });
 
@@ -170,16 +174,16 @@ const genelToplam = Object.values(pursantajAdalar).reduce((s, a) => s + a.genel,
 console.log(`GENEL pursantaj toplam: %${genelToplam.toFixed(4)}`);
 
 const pursantaj = {
-  kaynak: xlsxYolu.split(/[\\/]/).pop(),
-  hakedisNo: 9,
+  kaynak: basename,
+  hakedisNo,
   toplam: genelToplam,
   gruplar: GRUP_META,
   adalar: pursantajAdalar,
 };
 
 const hakedis = {
-  hakedisNo: 9,
-  kaynak: xlsxYolu.split(/[\\/]/).pop(),
+  hakedisNo,
+  kaynak: basename,
   ilerlemeIcmal,
   gruplar: hakedisGruplar,
 };

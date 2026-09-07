@@ -1,150 +1,150 @@
 {
-  "hakedisNo": 9,
-  "kaynak": "güneyşehir 9 nolu hakediş.xlsx",
+  "hakedisNo": 10,
+  "kaynak": "güneyşehir 10 nolu hakediş.xlsx",
   "ilerlemeIcmal": {
     "adalar": {
       "ADA-1": {
         "İNŞ": {
-          "imalat": 72,
-          "adaBazli": 66.56,
-          "hk9": 0.64,
-          "kum": 5.3617,
-          "kumToplam": 5.94
+          "imalat": 81,
+          "adaBazli": 76.76,
+          "hk9": 0.67,
+          "kum": 6.0361,
+          "kumToplam": 6.85
         },
         "MEK": {
-          "imalat": 36,
+          "imalat": 56,
           "adaBazli": null,
-          "hk9": 0.09,
-          "kum": 0.2625,
+          "hk9": 0.14,
+          "kum": 0.405,
           "kumToplam": null
         },
         "ELK": {
-          "imalat": 41,
+          "imalat": 52,
           "adaBazli": null,
-          "hk9": 0.06,
-          "kum": 0.3185,
+          "hk9": 0.09,
+          "kum": 0.4122,
           "kumToplam": null
         }
       },
       "ADA-2": {
         "İNŞ": {
-          "imalat": 84,
-          "adaBazli": 77.27,
-          "hk9": 0.61,
-          "kum": 9.3636,
-          "kumToplam": 10.29
+          "imalat": 89,
+          "adaBazli": 85.03,
+          "hk9": 0.58,
+          "kum": 9.945,
+          "kumToplam": 11.32
         },
         "MEK": {
-          "imalat": 39,
+          "imalat": 67,
           "adaBazli": null,
-          "hk9": 0.1,
-          "kum": 0.4134,
+          "hk9": 0.29,
+          "kum": 0.701,
           "kumToplam": null
         },
         "ELK": {
-          "imalat": 45,
+          "imalat": 60,
           "adaBazli": null,
-          "hk9": 0.12,
-          "kum": 0.5103,
+          "hk9": 0.16,
+          "kum": 0.6741,
           "kumToplam": null
         }
       },
       "ADA-3": {
         "İNŞ": {
-          "imalat": 88,
-          "adaBazli": 80.06,
-          "hk9": 1.29,
-          "kum": 10.6948,
-          "kumToplam": 11.69
+          "imalat": 92,
+          "adaBazli": 85.56,
+          "hk9": 0.5,
+          "kum": 11.1935,
+          "kumToplam": 12.49
         },
         "MEK": {
-          "imalat": 37,
+          "imalat": 58,
           "adaBazli": null,
-          "hk9": 0.16,
-          "kum": 0.4242,
+          "hk9": 0.24,
+          "kum": 0.6665,
           "kumToplam": null
         },
         "ELK": {
-          "imalat": 46,
+          "imalat": 51,
           "adaBazli": null,
-          "hk9": 0.03,
-          "kum": 0.5719,
+          "hk9": 0.06,
+          "kum": 0.6334,
           "kumToplam": null
         }
       },
       "ADA-4": {
         "İNŞ": {
-          "imalat": 63,
-          "adaBazli": 57.6,
-          "hk9": 1.7,
-          "kum": 12.1438,
-          "kumToplam": 13.15
+          "imalat": 75,
+          "adaBazli": 68.46,
+          "hk9": 2.16,
+          "kum": 14.2996,
+          "kumToplam": 15.63
         },
         "MEK": {
-          "imalat": 22,
+          "imalat": 34,
           "adaBazli": null,
-          "hk9": 0.09,
-          "kum": 0.3774,
+          "hk9": 0.22,
+          "kum": 0.5944,
           "kumToplam": null
         },
         "ELK": {
-          "imalat": 33,
+          "imalat": 39,
           "adaBazli": null,
-          "hk9": 0.12,
-          "kum": 0.6305,
+          "hk9": 0.11,
+          "kum": 0.7359,
           "kumToplam": null
         }
       },
       "ADA-5": {
         "İNŞ": {
-          "imalat": 67,
-          "adaBazli": 60.45,
-          "hk9": 2.88,
-          "kum": 13.7224,
-          "kumToplam": 14.94
+          "imalat": 76,
+          "adaBazli": 70.14,
+          "hk9": 1.87,
+          "kum": 15.5959,
+          "kumToplam": 17.34
         },
         "MEK": {
-          "imalat": 29,
+          "imalat": 47,
           "adaBazli": null,
-          "hk9": 0.21,
-          "kum": 0.582,
+          "hk9": 0.37,
+          "kum": 0.9486,
           "kumToplam": null
         },
         "ELK": {
-          "imalat": 30,
+          "imalat": 38,
           "adaBazli": null,
-          "hk9": 0.15,
-          "kum": 0.6395,
+          "hk9": 0.16,
+          "kum": 0.7951,
           "kumToplam": null
         }
       },
       "ADA-6": {
         "İNŞ": {
-          "imalat": 84,
-          "adaBazli": 76.82,
-          "hk9": 0.83,
-          "kum": 10.9461,
-          "kumToplam": 11.99
+          "imalat": 89,
+          "adaBazli": 83.1,
+          "hk9": 0.62,
+          "kum": 11.5673,
+          "kumToplam": 12.97
         },
         "MEK": {
-          "imalat": 38,
+          "imalat": 64,
           "adaBazli": null,
-          "hk9": 0.16,
-          "kum": 0.4657,
+          "hk9": 0.32,
+          "kum": 0.7828,
           "kumToplam": null
         },
         "ELK": {
-          "imalat": 42,
+          "imalat": 45,
           "adaBazli": null,
-          "hk9": 0.03,
-          "kum": 0.5765,
+          "hk9": 0.04,
+          "kum": 0.6175,
           "kumToplam": null
         }
       }
     },
     "toplam": {
-      "hk9": 9.26,
-      "kum": 68
+      "hk9": 8.6,
+      "kum": 76.6
     }
   },
   "gruplar": {
@@ -156,58 +156,58 @@
       },
       "ins-betonarme": {
         "pursantaj": 2.7751,
-        "gerceklesen": 2.7708,
-        "imalat_yuzde": 99.84505062880616
+        "gerceklesen": 2.7751,
+        "imalat_yuzde": 100
       },
       "ins-doseme": {
         "pursantaj": 0.4721,
-        "gerceklesen": 0.2595,
-        "imalat_yuzde": 54.9671679728871
+        "gerceklesen": 0.3595,
+        "imalat_yuzde": 76.14912094895149
       },
       "ins-duvar": {
         "pursantaj": 0.9977,
-        "gerceklesen": 0.7642,
-        "imalat_yuzde": 76.5961711937456
+        "gerceklesen": 0.9192,
+        "imalat_yuzde": 92.13190337776886
       },
       "ins-tavan": {
         "pursantaj": 0.1458,
-        "gerceklesen": 0.0478,
-        "imalat_yuzde": 32.78463648834019
+        "gerceklesen": 0.0993,
+        "imalat_yuzde": 68.10699588477365
       },
       "ins-pencere": {
         "pursantaj": 0.2271,
-        "gerceklesen": 0.1274,
-        "imalat_yuzde": 56.09863496257156
+        "gerceklesen": 0.198,
+        "imalat_yuzde": 87.18626155878468
       },
       "ins-kapi": {
         "pursantaj": 1.0131,
-        "gerceklesen": 0.0545,
-        "imalat_yuzde": 5.379528180831112
+        "gerceklesen": 0.0791,
+        "imalat_yuzde": 7.807718882637451
       },
       "ins-dis-cephe": {
         "pursantaj": 0.6491,
-        "gerceklesen": 0.5072,
-        "imalat_yuzde": 78.13896163919273
+        "gerceklesen": 0.644,
+        "imalat_yuzde": 99.21429671853336
       },
       "ins-cati": {
         "pursantaj": 0.2372,
-        "gerceklesen": 0.2081,
-        "imalat_yuzde": 87.7318718381113
+        "gerceklesen": 0.2195,
+        "imalat_yuzde": 92.53794266441821
       },
       "ins-altyapi": {
         "pursantaj": 0.0173,
-        "gerceklesen": 0.016,
-        "imalat_yuzde": 92.48554913294798
+        "gerceklesen": 0.017,
+        "imalat_yuzde": 98.26589595375724
       },
       "ins-merdiven": {
         "pursantaj": 0.3257,
-        "gerceklesen": 0.1598,
-        "imalat_yuzde": 49.063555419097334
+        "gerceklesen": 0.2596,
+        "imalat_yuzde": 79.70525023027326
       },
       "ins-cevre": {
         "pursantaj": 0.2182,
-        "gerceklesen": 0.1445,
-        "imalat_yuzde": 66.22364802933089
+        "gerceklesen": 0.1639,
+        "imalat_yuzde": 75.11457378551786
       },
       "ins-cocuk": {
         "pursantaj": 0.0331,
@@ -216,8 +216,8 @@
       },
       "mek-dogalgaz": {
         "pursantaj": 0.132,
-        "gerceklesen": 0.035,
-        "imalat_yuzde": 26.515151515151516
+        "gerceklesen": 0.101,
+        "imalat_yuzde": 76.51515151515152
       },
       "mek-havalandirma": {
         "pursantaj": 0.0422,
@@ -226,18 +226,18 @@
       },
       "mek-sihhi": {
         "pursantaj": 0.3792,
-        "gerceklesen": 0.185,
-        "imalat_yuzde": 48.78691983122363
+        "gerceklesen": 0.212,
+        "imalat_yuzde": 55.9071729957806
       },
       "mek-kalorifer": {
         "pursantaj": 0.175,
-        "gerceklesen": 0.0425,
-        "imalat_yuzde": 24.28571428571429
+        "gerceklesen": 0.092,
+        "imalat_yuzde": 52.57142857142857
       },
       "elk-linye": {
         "pursantaj": 0.3655,
-        "gerceklesen": 0.172,
-        "imalat_yuzde": 47.05882352941176
+        "gerceklesen": 0.2174,
+        "imalat_yuzde": 59.48016415868673
       },
       "elk-diyafon": {
         "pursantaj": 0.0292,
@@ -261,8 +261,8 @@
       },
       "elk-solar": {
         "pursantaj": 0.0288,
-        "gerceklesen": 0.0025,
-        "imalat_yuzde": 8.680555555555557
+        "gerceklesen": 0.01,
+        "imalat_yuzde": 34.72222222222223
       },
       "elk-kolon": {
         "pursantaj": 0.0466,
@@ -276,8 +276,8 @@
       },
       "elk-asansor": {
         "pursantaj": 0.2272,
-        "gerceklesen": 0.0773,
-        "imalat_yuzde": 34.02288732394366
+        "gerceklesen": 0.1181,
+        "imalat_yuzde": 51.9806338028169
       }
     },
     "ADA-2": {
@@ -293,53 +293,53 @@
       },
       "ins-doseme": {
         "pursantaj": 0.691,
-        "gerceklesen": 0.613,
-        "imalat_yuzde": 88.71201157742404
+        "gerceklesen": 0.6442,
+        "imalat_yuzde": 93.22720694645442
       },
       "ins-duvar": {
         "pursantaj": 1.469,
-        "gerceklesen": 1.3755,
-        "imalat_yuzde": 93.6351259360109
+        "gerceklesen": 1.389,
+        "imalat_yuzde": 94.55411844792376
       },
       "ins-tavan": {
         "pursantaj": 0.214,
-        "gerceklesen": 0.1813,
-        "imalat_yuzde": 84.7196261682243
+        "gerceklesen": 0.1842,
+        "imalat_yuzde": 86.07476635514018
       },
       "ins-pencere": {
         "pursantaj": 0.3293,
-        "gerceklesen": 0.2363,
-        "imalat_yuzde": 71.75827512906166
+        "gerceklesen": 0.2807,
+        "imalat_yuzde": 85.24142119647739
       },
       "ins-kapi": {
         "pursantaj": 1.4652,
-        "gerceklesen": 0.5901,
-        "imalat_yuzde": 40.27436527436527
+        "gerceklesen": 1.0006,
+        "imalat_yuzde": 68.29101829101828
       },
       "ins-dis-cephe": {
         "pursantaj": 0.9443,
-        "gerceklesen": 0.9078,
-        "imalat_yuzde": 96.13470295456953
+        "gerceklesen": 0.9271,
+        "imalat_yuzde": 98.17854495393414
       },
       "ins-cati": {
         "pursantaj": 0.3285,
-        "gerceklesen": 0.2995,
-        "imalat_yuzde": 91.17199391171992
+        "gerceklesen": 0.2997,
+        "imalat_yuzde": 91.23287671232877
       },
       "ins-altyapi": {
         "pursantaj": 0.0281,
-        "gerceklesen": 0.0214,
-        "imalat_yuzde": 76.15658362989323
+        "gerceklesen": 0.0262,
+        "imalat_yuzde": 93.23843416370107
       },
       "ins-merdiven": {
         "pursantaj": 0.4669,
-        "gerceklesen": 0.3425,
-        "imalat_yuzde": 73.35617905333048
+        "gerceklesen": 0.3896,
+        "imalat_yuzde": 83.44399228956951
       },
       "ins-cevre": {
         "pursantaj": 0.6891,
-        "gerceklesen": 0.3404,
-        "imalat_yuzde": 49.39776520098679
+        "gerceklesen": 0.3479,
+        "imalat_yuzde": 50.486141343781746
       },
       "ins-cocuk": {
         "pursantaj": 0.0524,
@@ -348,8 +348,8 @@
       },
       "mek-dogalgaz": {
         "pursantaj": 0.1885,
-        "gerceklesen": 0,
-        "imalat_yuzde": 0
+        "gerceklesen": 0.1858,
+        "imalat_yuzde": 98.56763925729443
       },
       "mek-havalandirma": {
         "pursantaj": 0.0585,
@@ -358,18 +358,18 @@
       },
       "mek-sihhi": {
         "pursantaj": 0.552,
-        "gerceklesen": 0.2269,
-        "imalat_yuzde": 41.10507246376811
+        "gerceklesen": 0.3122,
+        "imalat_yuzde": 56.55797101449275
       },
       "mek-kalorifer": {
         "pursantaj": 0.254,
-        "gerceklesen": 0.1835,
-        "imalat_yuzde": 72.24409448818896
+        "gerceklesen": 0.2,
+        "imalat_yuzde": 78.74015748031496
       },
       "elk-linye": {
         "pursantaj": 0.5324,
-        "gerceklesen": 0.2995,
-        "imalat_yuzde": 56.25469571750563
+        "gerceklesen": 0.3602,
+        "imalat_yuzde": 67.65589782118708
       },
       "elk-diyafon": {
         "pursantaj": 0.0424,
@@ -393,8 +393,8 @@
       },
       "elk-solar": {
         "pursantaj": 0.0399,
-        "gerceklesen": 0.0035,
-        "imalat_yuzde": 8.771929824561404
+        "gerceklesen": 0.0138,
+        "imalat_yuzde": 34.58646616541354
       },
       "elk-kolon": {
         "pursantaj": 0.0644,
@@ -403,13 +403,13 @@
       },
       "elk-pano": {
         "pursantaj": 0.0947,
-        "gerceklesen": 0.0423,
-        "imalat_yuzde": 44.66737064413938
+        "gerceklesen": 0.0791,
+        "imalat_yuzde": 83.52692713833157
       },
       "elk-asansor": {
         "pursantaj": 0.3207,
-        "gerceklesen": 0.1043,
-        "imalat_yuzde": 32.52260679763019
+        "gerceklesen": 0.1603,
+        "imalat_yuzde": 49.984409105082634
       }
     },
     "ADA-3": {
@@ -480,8 +480,8 @@
       },
       "mek-dogalgaz": {
         "pursantaj": 0.208,
-        "gerceklesen": 0.034,
-        "imalat_yuzde": 16.34615384615385
+        "gerceklesen": 0.1165,
+        "imalat_yuzde": 56.00961538461539
       },
       "mek-havalandirma": {
         "pursantaj": 0.0649,
@@ -490,13 +490,13 @@
       },
       "mek-sihhi": {
         "pursantaj": 0.6003,
-        "gerceklesen": 0.3052,
-        "imalat_yuzde": 50.84124604364485
+        "gerceklesen": 0.39,
+        "imalat_yuzde": 64.96751624187907
       },
       "mek-kalorifer": {
         "pursantaj": 0.2793,
-        "gerceklesen": 0.085,
-        "imalat_yuzde": 30.43322592194773
+        "gerceklesen": 0.16,
+        "imalat_yuzde": 57.28607232366632
       },
       "elk-linye": {
         "pursantaj": 0.5852,
@@ -525,8 +525,8 @@
       },
       "elk-solar": {
         "pursantaj": 0.0443,
-        "gerceklesen": 0.0061,
-        "imalat_yuzde": 13.769751693002258
+        "gerceklesen": 0.0154,
+        "imalat_yuzde": 34.76297968397291
       },
       "elk-kolon": {
         "pursantaj": 0.0717,
@@ -535,20 +535,20 @@
       },
       "elk-pano": {
         "pursantaj": 0.1047,
-        "gerceklesen": 0.0416,
-        "imalat_yuzde": 39.73256924546323
+        "gerceklesen": 0.0367,
+        "imalat_yuzde": 35.05253104106972
       },
       "elk-asansor": {
         "pursantaj": 0.3556,
-        "gerceklesen": 0.035,
-        "imalat_yuzde": 9.84251968503937
+        "gerceklesen": 0.0921,
+        "imalat_yuzde": 25.899887514060744
       }
     },
     "ADA-4": {
       "ins-kazi": {
         "pursantaj": 0.7957,
-        "gerceklesen": 0.6288,
-        "imalat_yuzde": 79.02475807465126
+        "gerceklesen": 0.672,
+        "imalat_yuzde": 84.45393992710821
       },
       "ins-betonarme": {
         "pursantaj": 7.0628,
@@ -557,38 +557,38 @@
       },
       "ins-doseme": {
         "pursantaj": 1.1719,
-        "gerceklesen": 0.4639,
-        "imalat_yuzde": 39.58528884717126
+        "gerceklesen": 0.7928,
+        "imalat_yuzde": 67.65082344909975
       },
       "ins-duvar": {
         "pursantaj": 2.4616,
-        "gerceklesen": 1.799,
-        "imalat_yuzde": 73.0825479363016
+        "gerceklesen": 2.334,
+        "imalat_yuzde": 94.81637959051025
       },
       "ins-tavan": {
         "pursantaj": 0.3595,
-        "gerceklesen": 0.1064,
-        "imalat_yuzde": 29.596662030598054
+        "gerceklesen": 0.2158,
+        "imalat_yuzde": 60.02781641168289
       },
       "ins-pencere": {
         "pursantaj": 0.5457,
-        "gerceklesen": 0.1984,
-        "imalat_yuzde": 36.35697269562031
+        "gerceklesen": 0.2718,
+        "imalat_yuzde": 49.80758658603629
       },
       "ins-kapi": {
         "pursantaj": 2.4497,
-        "gerceklesen": 0.1559,
-        "imalat_yuzde": 6.3640445768869665
+        "gerceklesen": 0.4911,
+        "imalat_yuzde": 20.047352737069847
       },
       "ins-dis-cephe": {
         "pursantaj": 1.5718,
-        "gerceklesen": 0.8706,
-        "imalat_yuzde": 55.38872630105611
+        "gerceklesen": 1.235,
+        "imalat_yuzde": 78.57233744751241
       },
       "ins-cati": {
         "pursantaj": 0.5657,
-        "gerceklesen": 0.3655,
-        "imalat_yuzde": 64.61021742973307
+        "gerceklesen": 0.4705,
+        "imalat_yuzde": 83.17129220434859
       },
       "ins-altyapi": {
         "pursantaj": 0.0546,
@@ -597,13 +597,13 @@
       },
       "ins-merdiven": {
         "pursantaj": 0.845,
-        "gerceklesen": 0.3481,
-        "imalat_yuzde": 41.19526627218935
+        "gerceklesen": 0.4767,
+        "imalat_yuzde": 56.414201183431956
       },
       "ins-cevre": {
         "pursantaj": 1.2303,
-        "gerceklesen": 0.2546,
-        "imalat_yuzde": 20.694139640738033
+        "gerceklesen": 0.3873,
+        "imalat_yuzde": 31.480126798341868
       },
       "ins-cocuk": {
         "pursantaj": 0.0769,
@@ -612,8 +612,8 @@
       },
       "mek-dogalgaz": {
         "pursantaj": 0.3158,
-        "gerceklesen": 0.0144,
-        "imalat_yuzde": 4.559848005066498
+        "gerceklesen": 0.1056,
+        "imalat_yuzde": 33.43888537048765
       },
       "mek-havalandirma": {
         "pursantaj": 0.1007,
@@ -622,18 +622,18 @@
       },
       "mek-sihhi": {
         "pursantaj": 0.908,
-        "gerceklesen": 0.3,
-        "imalat_yuzde": 33.03964757709251
+        "gerceklesen": 0.3598,
+        "imalat_yuzde": 39.62555066079295
       },
       "mek-kalorifer": {
         "pursantaj": 0.4195,
-        "gerceklesen": 0.063,
-        "imalat_yuzde": 15.01787842669845
+        "gerceklesen": 0.129,
+        "imalat_yuzde": 30.750893921334928
       },
       "elk-linye": {
         "pursantaj": 0.879,
-        "gerceklesen": 0.3998,
-        "imalat_yuzde": 45.4835039817975
+        "gerceklesen": 0.445,
+        "imalat_yuzde": 50.62571103526735
       },
       "elk-diyafon": {
         "pursantaj": 0.0701,
@@ -657,13 +657,13 @@
       },
       "elk-solar": {
         "pursantaj": 0.0686,
-        "gerceklesen": 0.006,
-        "imalat_yuzde": 8.746355685131196
+        "gerceklesen": 0.0238,
+        "imalat_yuzde": 34.693877551020414
       },
       "elk-kolon": {
         "pursantaj": 0.1084,
-        "gerceklesen": 0.0728,
-        "imalat_yuzde": 67.15867158671587
+        "gerceklesen": 0.0731,
+        "imalat_yuzde": 67.43542435424355
       },
       "elk-pano": {
         "pursantaj": 0.1588,
@@ -672,55 +672,55 @@
       },
       "elk-asansor": {
         "pursantaj": 0.5558,
-        "gerceklesen": 0.0554,
-        "imalat_yuzde": 9.96761424973012
+        "gerceklesen": 0.0975,
+        "imalat_yuzde": 17.54228139618568
       }
     },
     "ADA-5": {
       "ins-kazi": {
         "pursantaj": 0.7074,
-        "gerceklesen": 0.584,
-        "imalat_yuzde": 82.55583828102911
+        "gerceklesen": 0.6846,
+        "imalat_yuzde": 96.77692960135708
       },
       "ins-betonarme": {
         "pursantaj": 7.4121,
-        "gerceklesen": 7.3876,
-        "imalat_yuzde": 99.6694593974717
+        "gerceklesen": 7.3877,
+        "imalat_yuzde": 99.67080854278815
       },
       "ins-doseme": {
         "pursantaj": 1.2617,
-        "gerceklesen": 0.4783,
-        "imalat_yuzde": 37.909170167234684
+        "gerceklesen": 0.7372,
+        "imalat_yuzde": 58.42910359039391
       },
       "ins-duvar": {
         "pursantaj": 2.747,
-        "gerceklesen": 2.2524,
-        "imalat_yuzde": 81.99490353112488
+        "gerceklesen": 2.4992,
+        "imalat_yuzde": 90.97925009100838
       },
       "ins-tavan": {
         "pursantaj": 0.4085,
-        "gerceklesen": 0.1647,
-        "imalat_yuzde": 40.31823745410038
+        "gerceklesen": 0.2525,
+        "imalat_yuzde": 61.81150550795594
       },
       "ins-pencere": {
         "pursantaj": 0.6244,
-        "gerceklesen": 0.1677,
-        "imalat_yuzde": 26.857783472133246
+        "gerceklesen": 0.3035,
+        "imalat_yuzde": 48.60666239590007
       },
       "ins-kapi": {
         "pursantaj": 2.765,
-        "gerceklesen": 0.7028,
-        "imalat_yuzde": 25.417721518987342
+        "gerceklesen": 0.9221,
+        "imalat_yuzde": 33.34900542495479
       },
       "ins-dis-cephe": {
         "pursantaj": 1.7841,
-        "gerceklesen": 0.8556,
-        "imalat_yuzde": 47.95695308558937
+        "gerceklesen": 1.1561,
+        "imalat_yuzde": 64.80017936214337
       },
       "ins-cati": {
         "pursantaj": 0.6022,
-        "gerceklesen": 0.1323,
-        "imalat_yuzde": 21.969445366987713
+        "gerceklesen": 0.4151,
+        "imalat_yuzde": 68.93058784456993
       },
       "ins-altyapi": {
         "pursantaj": 0.0564,
@@ -729,13 +729,13 @@
       },
       "ins-merdiven": {
         "pursantaj": 0.8373,
-        "gerceklesen": 0.4848,
-        "imalat_yuzde": 57.9003941239699
+        "gerceklesen": 0.5981,
+        "imalat_yuzde": 71.43198375731518
       },
       "ins-cevre": {
         "pursantaj": 1.3315,
-        "gerceklesen": 0.5122,
-        "imalat_yuzde": 38.46789335336087
+        "gerceklesen": 0.6398,
+        "imalat_yuzde": 48.051070221554646
       },
       "ins-cocuk": {
         "pursantaj": 0.0667,
@@ -744,23 +744,23 @@
       },
       "mek-dogalgaz": {
         "pursantaj": 0.3482,
-        "gerceklesen": 0.035,
-        "imalat_yuzde": 10.051694428489375
+        "gerceklesen": 0.2275,
+        "imalat_yuzde": 65.33601378518094
       },
       "mek-havalandirma": {
         "pursantaj": 0.1079,
-        "gerceklesen": 0.045,
-        "imalat_yuzde": 41.705282669138086
+        "gerceklesen": 0.0725,
+        "imalat_yuzde": 67.19184430027804
       },
       "mek-sihhi": {
         "pursantaj": 1.0168,
-        "gerceklesen": 0.45,
-        "imalat_yuzde": 44.2564909520063
+        "gerceklesen": 0.525,
+        "imalat_yuzde": 51.63257277734068
       },
       "mek-kalorifer": {
         "pursantaj": 0.4718,
-        "gerceklesen": 0.052,
-        "imalat_yuzde": 11.02161933022467
+        "gerceklesen": 0.1236,
+        "imalat_yuzde": 26.19754133107249
       },
       "mek-yangin": {
         "pursantaj": 0.059,
@@ -769,8 +769,8 @@
       },
       "elk-linye": {
         "pursantaj": 1.0261,
-        "gerceklesen": 0.492,
-        "imalat_yuzde": 47.94854302699542
+        "gerceklesen": 0.5405,
+        "imalat_yuzde": 52.67517785790859
       },
       "elk-diyafon": {
         "pursantaj": 0.0795,
@@ -794,23 +794,23 @@
       },
       "elk-solar": {
         "pursantaj": 0.073,
-        "gerceklesen": 0,
-        "imalat_yuzde": 0
+        "gerceklesen": 0.0015,
+        "imalat_yuzde": 2.0547945205479454
       },
       "elk-kolon": {
         "pursantaj": 0.1187,
-        "gerceklesen": 0.0786,
-        "imalat_yuzde": 66.2173546756529
+        "gerceklesen": 0.0812,
+        "imalat_yuzde": 68.40775063184499
       },
       "elk-pano": {
         "pursantaj": 0.1677,
-        "gerceklesen": 0.0297,
-        "imalat_yuzde": 17.710196779964225
+        "gerceklesen": 0.0426,
+        "imalat_yuzde": 25.402504472271914
       },
       "elk-asansor": {
         "pursantaj": 0.5895,
-        "gerceklesen": 0.0076,
-        "imalat_yuzde": 1.289228159457167
+        "gerceklesen": 0.0977,
+        "imalat_yuzde": 16.57336726039016
       }
     },
     "ADA-6": {
@@ -826,38 +826,38 @@
       },
       "ins-doseme": {
         "pursantaj": 0.8029,
-        "gerceklesen": 0.6603,
-        "imalat_yuzde": 82.23938223938224
+        "gerceklesen": 0.7572,
+        "imalat_yuzde": 94.30813301781043
       },
       "ins-duvar": {
         "pursantaj": 1.748,
-        "gerceklesen": 1.6874,
-        "imalat_yuzde": 96.53318077803203
+        "gerceklesen": 1.7172,
+        "imalat_yuzde": 98.23798627002289
       },
       "ins-tavan": {
         "pursantaj": 0.26,
-        "gerceklesen": 0.2238,
-        "imalat_yuzde": 86.07692307692307
+        "gerceklesen": 0.2242,
+        "imalat_yuzde": 86.23076923076923
       },
       "ins-pencere": {
         "pursantaj": 0.3974,
-        "gerceklesen": 0.3063,
-        "imalat_yuzde": 77.07599396074485
+        "gerceklesen": 0.3558,
+        "imalat_yuzde": 89.5319577252139
       },
       "ins-kapi": {
         "pursantaj": 1.7595,
-        "gerceklesen": 0.6497,
-        "imalat_yuzde": 36.92526285876669
+        "gerceklesen": 0.8433,
+        "imalat_yuzde": 47.928388746803066
       },
       "ins-dis-cephe": {
         "pursantaj": 1.1353,
-        "gerceklesen": 0.9568,
-        "imalat_yuzde": 84.277283537391
+        "gerceklesen": 1.0888,
+        "imalat_yuzde": 95.90416629965648
       },
       "ins-cati": {
         "pursantaj": 0.3832,
-        "gerceklesen": 0.3032,
-        "imalat_yuzde": 79.1231732776618
+        "gerceklesen": 0.3472,
+        "imalat_yuzde": 90.60542797494782
       },
       "ins-altyapi": {
         "pursantaj": 0.0332,
@@ -866,13 +866,13 @@
       },
       "ins-merdiven": {
         "pursantaj": 0.5322,
-        "gerceklesen": 0.4177,
-        "imalat_yuzde": 78.48553175497933
+        "gerceklesen": 0.4707,
+        "imalat_yuzde": 88.44419391206313
       },
       "ins-cevre": {
         "pursantaj": 0.7342,
-        "gerceklesen": 0.5674,
-        "imalat_yuzde": 77.28139471533643
+        "gerceklesen": 0.5894,
+        "imalat_yuzde": 80.27785344592755
       },
       "ins-cocuk": {
         "pursantaj": 0.0626,
@@ -881,8 +881,8 @@
       },
       "mek-dogalgaz": {
         "pursantaj": 0.2198,
-        "gerceklesen": 0.0327,
-        "imalat_yuzde": 14.877161055505006
+        "gerceklesen": 0.1128,
+        "imalat_yuzde": 51.31938125568699
       },
       "mek-havalandirma": {
         "pursantaj": 0.0687,
@@ -891,13 +891,13 @@
       },
       "mek-sihhi": {
         "pursantaj": 0.6388,
-        "gerceklesen": 0.27,
-        "imalat_yuzde": 42.26675015654352
+        "gerceklesen": 0.37,
+        "imalat_yuzde": 57.92110206637445
       },
       "mek-kalorifer": {
         "pursantaj": 0.3003,
-        "gerceklesen": 0.103,
-        "imalat_yuzde": 34.2990342990343
+        "gerceklesen": 0.24,
+        "imalat_yuzde": 79.92007992007991
       },
       "elk-linye": {
         "pursantaj": 0.6744,
@@ -926,8 +926,8 @@
       },
       "elk-solar": {
         "pursantaj": 0.0465,
-        "gerceklesen": 0,
-        "imalat_yuzde": 0
+        "gerceklesen": 0.0146,
+        "imalat_yuzde": 31.397849462365592
       },
       "elk-kolon": {
         "pursantaj": 0.0756,
@@ -936,13 +936,13 @@
       },
       "elk-pano": {
         "pursantaj": 0.1067,
-        "gerceklesen": 0.0199,
-        "imalat_yuzde": 18.650421743205246
+        "gerceklesen": 0.0348,
+        "imalat_yuzde": 32.61480787253983
       },
       "elk-asansor": {
         "pursantaj": 0.3752,
-        "gerceklesen": 0.0428,
-        "imalat_yuzde": 11.40724946695096
+        "gerceklesen": 0.0543,
+        "imalat_yuzde": 14.47228144989339
       }
     }
   }
