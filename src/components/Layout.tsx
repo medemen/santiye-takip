@@ -1,16 +1,7 @@
 import { useNavigate, NavLink } from 'react-router-dom';
-import { getCurrentUser, cikisYap, isProjeMuduruSession } from '../stores/authStore';
+import { getCurrentUser, isProjeMuduruSession } from '../stores/authStore';
 import { useSiteConfig } from '../hooks/useSiteConfig';
 import { useIsDesktop } from '../hooks/useIsDesktop';
-import { useTema } from '../hooks/useTema';
-import { onayla } from '../utils/dialog';
-import type { TemaSecim } from '../stores/themeStore';
-
-const temaSecenekler: { deger: TemaSecim; ikon: string; etiket: string }[] = [
-  { deger: 'light', ikon: '☀️', etiket: 'Açık' },
-  { deger: 'dark', ikon: '🌙', etiket: 'Koyu' },
-  { deger: 'system', ikon: '🖥️', etiket: 'Sistem' },
-];
 
 const navItems = [
   { to: '/', label: 'Dashboard', icon: '📊' },
@@ -32,50 +23,6 @@ export default function Layout({ children }: Props) {
   const user = getCurrentUser();
   const config = useSiteConfig();
   const isDesktop = useIsDesktop();
-  const { secim: temaSecim, setSecim: setTemaSecim } = useTema();
-
-  const temaToggle = (
-    <div
-      style={{
-        display: 'flex',
-        alignItems: 'center',
-        gap: 2,
-        padding: 3,
-        borderRadius: 10,
-        backgroundColor: 'var(--bg-subtle)',
-        border: '1px solid var(--border)',
-      }}
-    >
-      {temaSecenekler.map((s) => (
-        <button
-          key={s.deger}
-          onClick={() => setTemaSecim(s.deger)}
-          title={`${s.etiket} tema`}
-          style={{
-            flex: 1,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            gap: 4,
-            background: temaSecim === s.deger ? 'var(--bg-card)' : 'transparent',
-            border: 'none',
-            borderRadius: 7,
-            padding: '5px 8px',
-            fontSize: 12,
-            color: temaSecim === s.deger ? 'var(--accent)' : 'var(--text-faint)',
-            fontWeight: temaSecim === s.deger ? 600 : 400,
-            cursor: 'pointer',
-            minHeight: 44,
-            minWidth: 44,
-            boxShadow: temaSecim === s.deger ? 'var(--shadow-card)' : 'none',
-          }}
-        >
-          <span style={{ fontSize: 13 }}>{s.ikon}</span>
-          <span>{s.etiket}</span>
-        </button>
-      ))}
-    </div>
-  );
 
   const gorunurNav = navItems.filter((item) => {
     if (item.desktopOnly) return isDesktop;
@@ -83,13 +30,6 @@ export default function Layout({ children }: Props) {
     if (item.to === '/ayarlar') return isProjeMuduruSession();
     return true;
   });
-
-  const handleLogout = async () => {
-    if (await onayla('Çıkış yapmak istediğinize emin misiniz?')) {
-      cikisYap();
-      navigate('/login');
-    }
-  };
 
   if (isDesktop) {
     return (
@@ -176,23 +116,6 @@ export default function Layout({ children }: Props) {
               {isProjeMuduruSession() && ' 👑 Proje Müdürü'}
               {user?.admin && !isProjeMuduruSession() && ' • Yönetici'}
             </div>
-            <div style={{ marginBottom: 8 }}>{temaToggle}</div>
-            <button
-              onClick={handleLogout}
-              style={{
-                width: '100%',
-                background: 'none',
-                border: '1px solid var(--border)',
-                borderRadius: 8,
-                padding: '8px 10px',
-                fontSize: 12,
-                color: 'var(--text-faint)',
-                cursor: 'pointer',
-                minHeight: 44,
-              }}
-            >
-              Çıkış
-            </button>
           </div>
         </aside>
 
@@ -232,24 +155,6 @@ export default function Layout({ children }: Props) {
             </span>
           )}
         </div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-          <div style={{ width: 'auto' }}>{temaToggle}</div>
-          <button
-            onClick={handleLogout}
-            style={{
-              background: 'none',
-              border: '1px solid var(--border)',
-              borderRadius: 8,
-              padding: '4px 10px',
-              fontSize: 11,
-              color: 'var(--text-faint)',
-              cursor: 'pointer',
-              minHeight: 44,
-            }}
-          >
-            Çıkış
-          </button>
-        </div>
       </div>
       <div style={{ padding: '16px 16px 80px 16px' }}>{children}</div>
       <nav
@@ -263,7 +168,6 @@ export default function Layout({ children }: Props) {
           backgroundColor: 'var(--bg-card)',
           borderTop: '1px solid var(--border)',
           display: 'flex',
-          justifyContent: 'space-around',
           alignItems: 'center',
           padding: '6px 0',
           paddingBottom: 'env(safe-area-inset-bottom, 6px)',
@@ -271,62 +175,85 @@ export default function Layout({ children }: Props) {
           boxShadow: '0 -1px 3px rgba(0,0,0,0.05)',
         }}
       >
-        {mobilNav.map((item) =>
-          item.fab ? (
-            <NavLink
-              key={item.to}
-              to={item.to}
-              style={{
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'center',
-                justifyContent: 'center',
-                textDecoration: 'none',
-                color: 'var(--text-faint)',
-                fontSize: 10,
-                gap: 2,
-                marginTop: -20,
-              }}
-            >
-              <div
+        {(() => {
+          const fabIx = mobilNav.findIndex((item) => item.fab);
+          const sol = mobilNav.slice(0, fabIx === -1 ? mobilNav.length : fabIx);
+          const sag = fabIx === -1 ? [] : mobilNav.slice(fabIx + 1);
+          const fab = fabIx === -1 ? null : mobilNav[fabIx];
+          const altNavItem = (item: (typeof navItems)[number]) =>
+            item.fab ? (
+              <NavLink
+                key={item.to}
+                to={item.to}
                 style={{
-                  width: 52,
-                  height: 52,
-                  borderRadius: '50%',
-                  backgroundColor: '#f59e0b',
+                  position: 'absolute',
+                  left: '50%',
+                  transform: 'translate(-50%, -20px)',
+                  bottom: 'env(safe-area-inset-bottom, 6px)',
                   display: 'flex',
+                  flexDirection: 'column',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  fontSize: 22,
-                  boxShadow: '0 2px 8px rgba(245,158,11,0.4)',
-                  color: '#fff',
+                  textDecoration: 'none',
+                  color: 'var(--text-faint)',
+                  fontSize: 10,
+                  gap: 2,
                 }}
               >
-                {item.icon}
-              </div>
-              <span style={{ fontWeight: 600, color: 'var(--text-muted)' }}>{item.label}</span>
-            </NavLink>
-          ) : (
-            <NavLink
-              key={item.to}
-              to={item.to}
-              style={({ isActive }) => ({
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'center',
-                textDecoration: 'none',
-                color: isActive ? '#f59e0b' : 'var(--text-subtle)',
-                fontSize: 10,
-                gap: 2,
-                padding: '4px 0',
-                fontWeight: isActive ? 600 : 400,
-              })}
-            >
-              <span style={{ fontSize: 20 }}>{item.icon}</span>
-              <span>{item.label}</span>
-            </NavLink>
-          )
-        )}
+                <div
+                  style={{
+                    width: 52,
+                    height: 52,
+                    borderRadius: '50%',
+                    backgroundColor: '#f59e0b',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    fontSize: 22,
+                    boxShadow: '0 2px 8px rgba(245,158,11,0.4)',
+                    color: '#fff',
+                  }}
+                >
+                  {item.icon}
+                </div>
+                <span style={{ fontWeight: 600, color: 'var(--text-muted)' }}>{item.label}</span>
+              </NavLink>
+            ) : (
+              <NavLink
+                key={item.to}
+                to={item.to}
+                style={({ isActive }) => ({
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                  textDecoration: 'none',
+                  color: isActive ? '#f59e0b' : 'var(--text-subtle)',
+                  fontSize: 10,
+                  gap: 2,
+                  padding: '4px 0',
+                  fontWeight: isActive ? 600 : 400,
+                })}
+              >
+                <span style={{ fontSize: 20 }}>{item.icon}</span>
+                <span>{item.label}</span>
+              </NavLink>
+            );
+          return (
+            <>
+              {sol.length > 0 && (
+                <div style={{ flex: 1, display: 'flex', justifyContent: 'space-around', alignItems: 'center' }}>
+                  {sol.map(altNavItem)}
+                </div>
+              )}
+              {fab && altNavItem(fab)}
+              {sag.length > 0 && (
+                <div style={{ flex: 1, display: 'flex', justifyContent: 'space-around', alignItems: 'center' }}>
+                  {sag.map(altNavItem)}
+                </div>
+              )}
+            </>
+          );
+        })()}
       </nav>
     </div>
   );

@@ -216,12 +216,16 @@ export default function ReportList() {
             onClick={() => setFilterOnay('')}
             style={{
               flex: 1,
-              padding: '8px 10px',
+              padding: '8px 4px',
               borderRadius: 8,
               border: 'none',
-              fontSize: 12,
+              fontSize: 11.5,
+              lineHeight: 1.1,
               fontWeight: 600,
               cursor: 'pointer',
+              whiteSpace: 'nowrap',
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
               minHeight: 44,
               backgroundColor: filterOnay === '' ? '#f59e0b' : 'var(--bg-subtle)',
               color: filterOnay === '' ? '#fff' : 'var(--text-muted)',
@@ -233,12 +237,16 @@ export default function ReportList() {
             onClick={() => setFilterOnay('beklemede')}
             style={{
               flex: 1,
-              padding: '8px 10px',
+              padding: '8px 4px',
               borderRadius: 8,
               border: 'none',
-              fontSize: 12,
+              fontSize: 11.5,
+              lineHeight: 1.1,
               fontWeight: 600,
               cursor: 'pointer',
+              whiteSpace: 'nowrap',
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
               minHeight: 44,
               backgroundColor: filterOnay === 'beklemede' ? '#d97706' : 'var(--bg-subtle)',
               color: filterOnay === 'beklemede' ? '#fff' : 'var(--text-muted)',
@@ -250,12 +258,16 @@ export default function ReportList() {
             onClick={() => setFilterOnay('reddedildi')}
             style={{
               flex: 1,
-              padding: '8px 10px',
+              padding: '8px 4px',
               borderRadius: 8,
               border: 'none',
-              fontSize: 12,
+              fontSize: 11.5,
+              lineHeight: 1.1,
               fontWeight: 600,
               cursor: 'pointer',
+              whiteSpace: 'nowrap',
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
               minHeight: 44,
               backgroundColor: filterOnay === 'reddedildi' ? '#dc2626' : 'var(--bg-subtle)',
               color: filterOnay === 'reddedildi' ? '#fff' : 'var(--text-muted)',
@@ -376,28 +388,22 @@ export default function ReportList() {
                   navigate(`/rapor-ekle?edit=${r.id}`);
                 }
               }}
-              style={{ cursor: editable ? 'pointer' : 'default', position: 'relative' }}
+              style={{ cursor: editable ? 'pointer' : 'default' }}
             >
               <ReportCard rapor={r} showActions />
               {isAdmin && (
-              <div
-                onClick={(e) => e.stopPropagation()}
-                style={{
-                  position: 'absolute',
-                  top: 8,
-                  right: 8,
-                  display: 'flex',
-                  gap: 4,
-                }}
-              >
+                <div
+                  onClick={(e) => e.stopPropagation()}
+                  style={{ display: 'flex', gap: 6, marginTop: 8 }}
+                >
                   {r.onay_durumu === 'beklemede' && (
                     <>
                       <button
                         onClick={(e) => { e.stopPropagation(); raporOnayla(r.id); toastGoster('Rapor onaylandı', 'success'); }}
-                        style={{ background: '#dcfce7', border: 'none', borderRadius: 6, padding: '6px 10px', fontSize: 13, lineHeight: 1, cursor: 'pointer', color: '#16a34a', minHeight: 44, minWidth: 44 }}
+                        style={{ flex: 1, minHeight: 44, borderRadius: 8, border: '1px solid transparent', fontSize: 12, fontWeight: 600, cursor: 'pointer', backgroundColor: '#16a34a', color: '#fff' }}
                         title="Onayla"
                       >
-                        ✓
+                        ✓ Onayla
                       </button>
                       <button
                         onClick={(e) => {
@@ -406,26 +412,24 @@ export default function ReportList() {
                           raporReddet(r.id, not ?? '');
                           toastGoster('Rapor reddedildi', 'success');
                         }}
-                        style={{ background: '#fee2e2', border: 'none', borderRadius: 6, padding: '6px 10px', fontSize: 13, lineHeight: 1, cursor: 'pointer', color: '#dc2626', minHeight: 44, minWidth: 44 }}
+                        style={{ flex: 1, minHeight: 44, borderRadius: 8, border: '1px solid transparent', fontSize: 12, fontWeight: 600, cursor: 'pointer', backgroundColor: '#dc2626', color: '#fff' }}
                         title="Reddet"
                       >
-                        ✗
+                        ✗ Reddet
                       </button>
                     </>
                   )}
                   <button
                     onClick={(e) => { e.stopPropagation(); setAcikFotoRapor(acikFotoRapor === r.id ? null : r.id); }}
                     style={{
+                      flex: 1,
+                      minHeight: 44,
+                      borderRadius: 8,
+                      fontSize: 13,
+                      cursor: 'pointer',
                       background: acikFotoRapor === r.id ? '#fef3c7' : 'none',
                       border: '1px solid var(--border)',
-                      borderRadius: 6,
-                      padding: '6px 10px',
-                      fontSize: 13,
-                      lineHeight: 1,
-                      cursor: 'pointer',
                       color: acikFotoRapor === r.id ? '#f59e0b' : 'var(--text-faint)',
-                      minHeight: 44,
-                      minWidth: 44,
                     }}
                     title="Fotoğraf Ekle"
                     aria-label={`${r.ada} raporuna fotoğraf ekle`}
@@ -435,23 +439,21 @@ export default function ReportList() {
                   <button
                     onClick={(e) => { e.stopPropagation(); handleDelete(r.id); }}
                     style={{
-                      background: 'var(--bg-danger)',
-                      border: 'none',
-                      borderRadius: 6,
-                      padding: '6px 10px',
-                      fontSize: 13,
-                      lineHeight: 1,
-                      cursor: 'pointer',
-                      color: '#ef4444',
+                      flex: 1,
                       minHeight: 44,
-                      minWidth: 44,
+                      borderRadius: 8,
+                      fontSize: 13,
+                      cursor: 'pointer',
+                      background: 'var(--bg-danger)',
+                      border: '1px solid transparent',
+                      color: '#ef4444',
                     }}
                     title="Sil"
                     aria-label={`${r.ada} ${r.blok_no === 0 ? 'ada geneli' : `blok ${r.blok_no}`} raporunu sil`}
                   >
                     🗑️
                   </button>
-              </div>
+                </div>
               )}
               {acikFotoRapor === r.id && (
                 <div

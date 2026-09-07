@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { getCurrentUser } from '../stores/authStore';
+import { getCurrentUser, cikisYap } from '../stores/authStore';
 import { useSiteConfig } from '../hooks/useSiteConfig';
 import { setSiteConfig, resetSiteConfig, persistConfigToDb } from '../config/site';
 import { CONFIG_VERSION } from '../config/defaultConfig';
@@ -13,6 +13,7 @@ import { onayla } from '../utils/dialog';
 import AdaBlokEditor from '../components/config/AdaBlokEditor';
 import KalemGrupEditor from '../components/config/KalemGrupEditor';
 import AuditLogKart from '../components/config/AuditLogKart';
+import TemaSecici from '../components/TemaSecici';
 
 export default function Settings() {
   const navigate = useNavigate();
@@ -118,6 +119,13 @@ export default function Settings() {
     navigate('/');
   };
 
+  const handleCikis = async () => {
+    if (await onayla('Çıkış yapmak istediğinize emin misiniz?')) {
+      cikisYap();
+      navigate('/login');
+    }
+  };
+
   const inputStyle: React.CSSProperties = {
     width: '100%',
     padding: '10px 12px',
@@ -169,6 +177,16 @@ export default function Settings() {
           <span>Konfigürasyon v{CONFIG_VERSION}</span>
           <span>{config.yapi.adalar.length} ada • {getAllKalemler(config).length} iş kalemi • {config.durumTespit.satirlar.length} durum tespit satırı</span>
         </div>
+      </div>
+
+      <div style={{ ...card, marginBottom: 16 }}>
+        <h3 style={{ fontSize: 14, fontWeight: 600, color: 'var(--text-secondary)', margin: 0, marginBottom: 12 }}>
+          Görünüm
+        </h3>
+        <p style={{ fontSize: 11, color: 'var(--text-subtle)', margin: 0, marginBottom: 10 }}>
+          Uygulama genelinde tema seçimi (açık / koyu / sistem).
+        </p>
+        <TemaSecici />
       </div>
 
       <div style={{ ...card, marginBottom: 16 }}>
@@ -389,6 +407,34 @@ export default function Settings() {
           }}
         >
           Varsayılana Döndür
+        </button>
+      </div>
+
+      <div style={{ ...card, marginTop: 16, display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 10 }}>
+        <div>
+          <h3 style={{ fontSize: 14, fontWeight: 600, color: 'var(--text-secondary)', margin: 0, marginBottom: 4 }}>
+            Oturum
+          </h3>
+          <p style={{ fontSize: 11, color: 'var(--text-subtle)', margin: 0 }}>
+            Bu cihazda oturum açan hesaptan çıkış yapın.
+          </p>
+        </div>
+        <button
+          onClick={handleCikis}
+          style={{
+            flexShrink: 0,
+            padding: '10px 16px',
+            backgroundColor: 'var(--bg-danger)',
+            border: 'none',
+            borderRadius: 10,
+            fontSize: 13,
+            fontWeight: 600,
+            color: '#ef4444',
+            cursor: 'pointer',
+            minHeight: 44,
+          }}
+        >
+          Çıkış Yap
         </button>
       </div>
     </div>
