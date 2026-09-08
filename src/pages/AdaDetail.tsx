@@ -10,7 +10,7 @@ import { useHedefler } from '../hooks/useHedefler';
 import { useRaporlar } from '../hooks/useRaporlar';
 import { getAda, getBloklar, getAllKalemler } from '../config/helpers';
 import { getSantiyeSefi, getBlokSorumlulari } from '../stores/kullanicilarStore';
-import { getAdaGenelIlerleme, getSonRapor } from '../stores/reportStore';
+import { getSonRapor, getSahaAdaIlerleme } from '../stores/reportStore';
 import { getHedefOzeti } from '../data/plan';
 
 export default function AdaDetail() {
@@ -37,7 +37,7 @@ export default function AdaDetail() {
   );
 
   const bloklar = getBloklar(config, ada!);
-  const ilerleme = getAdaGenelIlerleme(ada!, bloklar, getAllKalemler(config));
+  const ilerleme = getSahaAdaIlerleme(ada!, bloklar, getAllKalemler(config));
 
   const santiyeSefi = getSantiyeSefi(ada!);
   const sorumlular = getBlokSorumlulari(ada!);

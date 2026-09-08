@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { getIstatistikler, getAdaGenelIlerleme, getBlokProgress, getGrupAgirlikliAdaIlerleme, getProjeAgirlikliIlerleme, raporEtkinYuzde, getSonRaporHaritasi, getGenelIlerleme } from '../stores/reportStore';
+import { getIstatistikler, getBlokProgress, getGrupAgirlikliAdaIlerleme, getProjeAgirlikliIlerleme, raporEtkinYuzde, getSonRaporHaritasi, getGenelIlerleme, getSahaAdaIlerleme } from '../stores/reportStore';
 import { useHedefler } from '../hooks/useHedefler';
 import { useRaporlar } from '../hooks/useRaporlar';
 import { getHedefOzeti, hedefKalanGun } from '../data/plan';
@@ -105,12 +105,12 @@ export default function Dashboard() {
     void filtrelenmisRaporlar;
     return adalar.map((a) => ({
       name: a.ada,
-      value: getAdaGenelIlerleme(a.ada, a.bloklar, isKalemleri),
+      value: getSahaAdaIlerleme(a.ada, a.bloklar, isKalemleri),
       color: '#f59e0b',
     }));
   }, [filtrelenmisRaporlar, adalar, isKalemleri]);
 
-  const genelIlerleme = getGenelIlerleme(adalar, isKalemleri);
+  const genelIlerleme = Math.round(getProjeAgirlikliIlerleme(adalar) ?? getGenelIlerleme(adalar, isKalemleri));
 
   const adaDetay = useMemo(() => {
     const sayilar = adaDurumSayilari(filtrelenmisRaporlar);
@@ -119,7 +119,7 @@ export default function Dashboard() {
       return {
         ada: a.ada,
         ...s,
-        ilerleme: getAdaGenelIlerleme(a.ada, a.bloklar, isKalemleri),
+        ilerleme: getSahaAdaIlerleme(a.ada, a.bloklar, isKalemleri),
       };
     });
   }, [filtrelenmisRaporlar, adalar, isKalemleri]);
@@ -300,7 +300,7 @@ export default function Dashboard() {
         </div>
 
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))', gap: 12, marginBottom: 16 }}>
-          <KpiCard label="Genel İlerleme" value={`%${genelIlerleme}`} color={genelIlerleme === 100 ? '#22c55e' : '#f59e0b'} progress={genelIlerleme} aciklama="Ada ortalamalarının ortalaması (rapor bazlı)" />
+          <KpiCard label="Genel İlerleme" value={`%${genelIlerleme}`} color={genelIlerleme === 100 ? '#22c55e' : '#f59e0b'} progress={genelIlerleme} aciklama="Hakediş pursantajıyla ağırlıklı (rapor olmayan iş 0)" />
           <KpiCard label="Rapor Kapsamı" value={`%${blokVerisi.kapsam}`} color="#6366f1" progress={blokVerisi.kapsam} />
           <KpiCard label="Toplam Rapor" value={stats.toplamRapor} color="#6b7280" />
           <KpiCard label="Tamamlandı" value={stats.tamamlananIsler} color="#22c55e" />

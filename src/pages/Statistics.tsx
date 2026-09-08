@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { getIstatistikler, getAdaGenelIlerleme, getGenelIlerleme } from '../stores/reportStore';
+import { getIstatistikler, getGenelIlerleme, getProjeAgirlikliIlerleme, getSahaAdaIlerleme } from '../stores/reportStore';
 import { useRaporlar } from '../hooks/useRaporlar';
 import { getAllPersonel } from '../stores/kullanicilarStore';
 import { useSiteConfig } from '../hooks/useSiteConfig';
@@ -39,7 +39,7 @@ export default function Statistics() {
       return {
         ada: a.ada,
         ...s,
-        ilerleme: getAdaGenelIlerleme(a.ada, a.bloklar, isKalemleri),
+        ilerleme: getSahaAdaIlerleme(a.ada, a.bloklar, isKalemleri),
       };
     });
   }, [raporlar, adalar, isKalemleri]);
@@ -63,7 +63,7 @@ export default function Statistics() {
       .slice(0, 10);
   }, [raporlar]);
 
-  const genelIlerleme = getGenelIlerleme(adalar, isKalemleri);
+  const genelIlerleme = Math.round(getProjeAgirlikliIlerleme(adalar) ?? getGenelIlerleme(adalar, isKalemleri));
 
   return (
     <div>

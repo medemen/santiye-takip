@@ -28,12 +28,33 @@ if (hakedisKaynaklariVar) {
   const pursantaj = JSON.parse(readFileSync(join(dataDir, 'pursantaj.json'), 'utf8'));
   const hakedisJson = JSON.parse(readFileSync(join(dataDir, 'hakedis.json'), 'utf8'));
   const eslesme = JSON.parse(readFileSync(join(dataDir, 'kalem_grup_eslesme.json'), 'utf8'));
+
+  // Ada pursantajlari %100 olacak sekilde normalize edilir. Her adanin
+  // genel degeri kendi grup toplamina esitlenir, sonra tumu oransal
+  // olceklenerek genel toplam 100.0000'e cekilir (kucuk yuvarlama
+  // farklari hesaplari sistirmesin).
+  const adalar = { ...pursantaj.adalar };
+  let toplam = 0;
+  for (const [ada, v] of Object.entries(adalar)) {
+    const grupTop = Object.values(v.gruplar ?? {}).reduce((s, g) => s + g, 0);
+    v.genel = grupTop;
+    toplam += grupTop;
+  }
+  if (Math.abs(toplam - 100) > 1e-9 && toplam > 0) {
+    const faktor = 100 / toplam;
+    for (const v of Object.values(adalar)) {
+      v.genel *= faktor;
+      for (const g of Object.keys(v.gruplar)) v.gruplar[g] *= faktor;
+    }
+    console.log(`UYARI: pursantaj toplami %${toplam.toFixed(4)} -> %100.0000 olarak normalize edildi (x${faktor.toFixed(6)})`);
+  }
+
   hakedis = {
     hakedisNo: pursantaj.hakedisNo,
     kaynak: pursantaj.kaynak,
     gruplar: pursantaj.gruplar,
-    adalar: pursantaj.adalar,
-    toplam: pursantaj.toplam,
+    adalar,
+    toplam: 100,
     ilerlemeIcmal: hakedisJson.ilerlemeIcmal,
     grupIlerleme: hakedisJson.gruplar,
     kalemEslesme: eslesme.eslesme,

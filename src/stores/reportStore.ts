@@ -598,6 +598,8 @@ export function getKalemAdaIlerleme(
   return blokYuzdeleri.reduce((s, v) => s + v, 0) / blokYuzdeleri.length;
 }
 
+// Grup ilerlemesi hakedis imalat_yuzde hesabiyla ayni: gruptaki tum
+// kalemler paydas olur, raporu olmayan kalem 0 (is yapilmamis) sayilir.
 export function getGrupUygulamaIlerleme(
   ada: string,
   blokList: { blok_no: number }[],
@@ -606,15 +608,18 @@ export function getGrupUygulamaIlerleme(
   const hk = getSiteConfig().hakedis;
   if (!hk) return null;
   const kalemler = Object.keys(hk.kalemEslesme).filter((k) => hk.kalemEslesme[k] === grupId);
+  if (kalemler.length === 0) return null;
   const yuzdeler: number[] = [];
   for (const kalem of kalemler) {
     const v = getKalemAdaIlerleme(ada, blokList, kalem);
-    if (v !== null) yuzdeler.push(v);
+    yuzdeler.push(v === null ? 0 : v);
   }
-  if (yuzdeler.length === 0) return null;
   return yuzdeler.reduce((s, v) => s + v, 0) / yuzdeler.length;
 }
 
+// Ada ilerlemesi hakedisle ayni formul: tum gruplar paydada (tam
+// pursantaj), raporu olmayan grup imalat eksik oldugu icin 0 sayilir.
+// Boylece saha oranlari hakedis oranlariyla karsilastirilabilir olur.
 export function getGrupAgirlikliAdaIlerleme(
   ada: string,
   blokList: { blok_no: number }[]
@@ -626,8 +631,7 @@ export function getGrupAgirlikliAdaIlerleme(
   let pursantajToplam = 0;
   for (const [grupId, pur] of Object.entries(adaPur.gruplar)) {
     const uygulama = getGrupUygulamaIlerleme(ada, blokList, grupId);
-    if (uygulama === null) continue;
-    agirlikliToplam += pur * uygulama;
+    agirlikliToplam += pur * (uygulama ?? 0);
     pursantajToplam += pur;
   }
   if (pursantajToplam === 0) return null;
@@ -670,6 +674,18 @@ export function getAdaGenelIlerleme(
   isKalemleri: readonly string[]
 ): number {
   return Math.round(getAdaGenelIlerlemeHam(ada, blokList, isKalemleri));
+}
+
+// Ekranlarda gorunen "saha ilerleme" orani: hakedis pur yapisi varsa
+// hakedisle ayni agirlikli hesap, yoksa eski rapor ortalamasi.
+export function getSahaAdaIlerleme(
+  ada: string,
+  blokList: { blok_no: number }[],
+  isKalemleri: readonly string[]
+): number {
+  const pur = getGrupAgirlikliAdaIlerleme(ada, blokList);
+  if (pur !== null) return Math.round(pur);
+  return getAdaGenelIlerleme(ada, blokList, isKalemleri);
 }
 
 // Proje geneli: ada ortalamalarinin ortalamasi. Yuvarlama yalnizca

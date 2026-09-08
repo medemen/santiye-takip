@@ -133,6 +133,36 @@ if (dt) {
   }
 }
 
+// --- hakedis: ada pursantaj toplami %100 olmali ---
+const hk = cfg.hakedis;
+if (hk) {
+  const adaGeneller = Object.values(hk.adalar ?? {})
+    .map((a) => (a && typeof a === 'object' ? a.genel : undefined))
+    .filter(num);
+  if (adaGeneller.length === 0) {
+    hata('hakedis.adalar eksik veya genel degerleri sayi degil');
+  } else {
+    const genelToplam = adaGeneller.reduce((s, v) => s + v, 0);
+    if (Math.abs(genelToplam - 100) > 0.75) {
+      hata('hakedis: adalar genel pursantaj toplami %100 olmali (toplam: %' + genelToplam.toFixed(4) + ')');
+    } else if (Math.abs(genelToplam - 100) > 0.0001) {
+      uyari('hakedis: adalar genel pursantaj toplami %' + genelToplam.toFixed(4) + " (100'den sapma kucuk; build:config normalize eder)");
+    }
+    for (const [ada, v] of Object.entries(hk.adalar ?? {})) {
+      if (!adaIsimleri.has(ada)) hata('hakedis: ' + ada + ' yapi.adalar icinde yok');
+      const grupTop = Object.values(v?.gruplar ?? {})
+        .filter(num)
+        .reduce((s, g) => s + g, 0);
+      if (num(v?.genel) && Math.abs(grupTop - v.genel) > 0.01) {
+        hata('hakedis: ' + ada + ' grup pursantaj toplami genel ile uyusmuyor (gruplar %' + grupTop.toFixed(4) + ', genel %' + v.genel.toFixed(4) + ')');
+      }
+    }
+    for (const ada of adaIsimleri) {
+      if (!hk.adalar?.[ada]) hata('hakedis: ' + ada + ' pursantaj tanimli degil (hakedis.adalar)');
+    }
+  }
+}
+
 // --- ozet ---
 console.log('Config: ' + pathArg);
 console.log('  genel.santiyeAdi: ' + (cfg.genel?.santiyeAdi ?? '-' ));

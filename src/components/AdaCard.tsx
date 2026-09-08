@@ -1,7 +1,7 @@
 import { memo, useMemo } from 'react';
 import type { Blok } from '../types';
 import { getSantiyeSefi } from '../stores/kullanicilarStore';
-import { getAdaGenelIlerleme } from '../stores/reportStore';
+import { getSahaAdaIlerleme } from '../stores/reportStore';
 import { getAllKalemler } from '../config/helpers';
 import { useSiteConfig } from '../hooks/useSiteConfig';
 import { useRaporlar } from '../hooks/useRaporlar';
@@ -22,7 +22,7 @@ const AdaCard = memo(function AdaCard({ ada, blokSayisi, toplamDaire, toplamKat,
   const santiyeSefi = getSantiyeSefi(ada);
   const ilerleme = useMemo(() => {
     void raporlar;
-    return getAdaGenelIlerleme(ada, bloklar, getAllKalemler(config));
+    return getSahaAdaIlerleme(ada, bloklar, getAllKalemler(config));
   }, [ada, bloklar, config, raporlar]);
 
   return (
