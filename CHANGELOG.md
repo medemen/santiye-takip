@@ -1,5 +1,46 @@
 # Değişiklik Notları
 
+## [1.1.52] - 2026-09-08
+
+### İyileştirmeler
+
+- Saha ilerlemesi hakediş pursantaj ağırlıklarına bağlandı; her adanın pursantaj toplamı %100 doğrulanıp gerekirse normalize ediliyor (`scripts/build-config.mjs`, yeni `scripts/validate-config.mjs`).
+- Dashboard, ada kartı, ada detay ve istatistik ekranlarındaki ilerleme yüzdeleri bu hesaba göre güncellendi.
+
+## [1.1.51] - 2026-09-08
+
+### Yeni özellikler
+
+- **WhatsApp saha sohbetinden rapor üretimi**: yeni `scripts/chat-rapor.mjs`, sohbetlerdeki ada/blok/imalat/durum bilgisini saha raporlarına çevirir ve mevcut veriyle birleştirir.
+- `scripts/hakedis-oku.mjs`: hakedisNo/kaynak dosya adından türetiliyor; 10. hakediş `pursantaj.json` + `hakedis.json` olarak üretildi.
+
+### Veri
+
+- Güneyşehir 10. hakediş verisi config'e işlendi; `kalem_grup_eslesme` güncellendi.
+- `data/saha_raporlari.json` chat verisiyle güncellendi (1558 → 2947 rapor).
+
+## [1.1.48] - 2026-09-07
+
+### İyileştirmeler
+
+- Tema seçimi Ayarlar sayfasına taşındı, çıkış da Ayarlar'a alındı (`TemaSecici` bileşeni).
+- Alt navigasyon FAB'ı bar üzerinde ortalanmış "yüzen pill" olarak düzenlendi, çakışım giderildi.
+- Rapor listesi buton düzenlemeleri.
+
+## [1.1.42] - 2026-09-06
+
+### Yeni özellikler
+
+- Saha yazışmalarından üretilen gerçekçi rapor seti (`data/saha_raporlari.json`) ve aktarım script'leri (`scripts/saha-aktar.mjs`, `scripts/saha-dogrula.mjs`).
+
+### İyileştirmeler
+
+- `scripts/durum_aktar.mjs` açıklama metni tarih bağımsız hale getirildi.
+
+### Hata düzeltmeleri
+
+- Sunucudan silinen raporlar offline cihazda yeniden "diriliyordu"; tam senkronizasyonda bekleyen (yüklenecek) ve daha önce sunucuda görüp silinmiş raporlar artık ayrıştırılıyor, son başarılı senkronizasyondaki sunucu id özeti localStorage'da saklanıyor.
+
 ## [1.1.40] - 2026-09-06
 
 ### Yeni özellikler
