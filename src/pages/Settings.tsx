@@ -172,6 +172,34 @@ export default function Settings() {
         </div>
       </div>
 
+      <div style={{ ...card, marginBottom: 16, display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 10 }}>
+        <div>
+          <h3 style={{ fontSize: 14, fontWeight: 600, color: 'var(--text-secondary)', margin: 0, marginBottom: 4 }}>
+            Oturum
+          </h3>
+          <p style={{ fontSize: 11, color: 'var(--text-subtle)', margin: 0 }}>
+            Bu cihazda oturum açan hesaptan çıkış yapın.
+          </p>
+        </div>
+        <button
+          onClick={handleCikis}
+          style={{
+            flexShrink: 0,
+            padding: '10px 16px',
+            backgroundColor: 'var(--bg-danger)',
+            border: 'none',
+            borderRadius: 10,
+            fontSize: 13,
+            fontWeight: 600,
+            color: '#ef4444',
+            cursor: 'pointer',
+            minHeight: 44,
+          }}
+        >
+          Çıkış Yap
+        </button>
+      </div>
+
       <div style={{ ...card, padding: 14, marginBottom: 16, fontSize: 12, color: 'var(--text-faint)' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', gap: 8 }}>
           <span>Konfigürasyon v{CONFIG_VERSION}</span>
@@ -410,33 +438,6 @@ export default function Settings() {
         </button>
       </div>
 
-      <div style={{ ...card, marginTop: 16, display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 10 }}>
-        <div>
-          <h3 style={{ fontSize: 14, fontWeight: 600, color: 'var(--text-secondary)', margin: 0, marginBottom: 4 }}>
-            Oturum
-          </h3>
-          <p style={{ fontSize: 11, color: 'var(--text-subtle)', margin: 0 }}>
-            Bu cihazda oturum açan hesaptan çıkış yapın.
-          </p>
-        </div>
-        <button
-          onClick={handleCikis}
-          style={{
-            flexShrink: 0,
-            padding: '10px 16px',
-            backgroundColor: 'var(--bg-danger)',
-            border: 'none',
-            borderRadius: 10,
-            fontSize: 13,
-            fontWeight: 600,
-            color: '#ef4444',
-            cursor: 'pointer',
-            minHeight: 44,
-          }}
-        >
-          Çıkış Yap
-        </button>
-      </div>
     </div>
   );
 }

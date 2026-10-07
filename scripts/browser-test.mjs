@@ -160,7 +160,12 @@ async function girisYap(kullanici) {
 
 async function cikisYap() {
   page.once('dialog', (d) => d.accept());
-  await page.getByRole('button', { name: 'Çıkış' }).click();
+  // Çıkış butonu Profil sayfasında (Ayarlar'daki çıkış yalnızca PM'e açık).
+  await spaGez('/profil');
+  // Sayfa sonuna kaydır: sabit alt nav ve yüzen FAB butonun merkezini kapatir.
+  await page.evaluate(() => window.scrollTo(0, document.documentElement.scrollHeight));
+  await page.waitForTimeout(300);
+  await page.getByRole('button', { name: 'Çıkış Yap' }).click({ timeout: 15000 });
   await page.waitForURL(yolEsit('/login'), { timeout: 15000 });
 }
 

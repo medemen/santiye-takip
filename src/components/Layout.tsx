@@ -156,7 +156,7 @@ export default function Layout({ children }: Props) {
           )}
         </div>
       </div>
-      <div style={{ padding: '16px 16px 80px 16px' }}>{children}</div>
+      <div style={{ padding: '16px 16px calc(env(safe-area-inset-bottom, 0px) + 160px) 16px' }}>{children}</div>
       <nav
         style={{
           position: 'fixed',
