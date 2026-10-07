@@ -90,6 +90,12 @@ eklerken bu üçlüyü (cache + realtime + version-counter) tekrarlayın.
 - Sunucu tarafında aynı kurallar Supabase RLS politikalarıyla (`supabase/migrations/`)
   tekrar uygulanır — client tarafı kontrolleri sadece UX içindir, güvenlik sınırı DB'dedir.
 
+**Giriş (bkz. `src/stores/authStore.ts`, `src/pages/Login.tsx`):** şimdilik şifre
+sorulmaz; seçilen kişiyle ortak şifre (`VITE_DEFAULT_PASSWORD`) arka planda
+`signInWithPassword` ile sessiz kullanılır — oturum yine gerçek Supabase oturumudur,
+böylece RLS yazmaları çalışır. Supabase erişilemezse yerel oturuma düşülür. Geçici
+düzen ve geri alma notu: `TAKIP.md`.
+
 **Offline-first:** Supabase erişilemezse (`isSupabaseReady() === false`) uygulama
 `localStorage`'daki son bilinen veriyle ve bundle'daki `data/*.json` ile çalışmaya
 devam eder. Yeni bir özellik eklerken bu düşüşü (fallback) kırmamaya dikkat edin.

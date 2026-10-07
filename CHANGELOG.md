@@ -1,5 +1,17 @@
 # Değişiklik Notları
 
+## [1.1.53] - 2026-10-07
+
+### İyileştirmeler
+
+- Girişte **şifre alanı kaldırıldı**: seçilen hesapla ortak şifre arka planda sessiz oturum açar (geçici düzen — `VITE_DEFAULT_PASSWORD` pakete gömülür, bkz. `TAKIP.md`).
+- Ayarlar sayfasında "Oturum / Çıkış Yap" kartı en üste taşındı.
+- Alt navigasyon ve yüzen "Rapor" FAB'ının altında kalan içerik için alt boşluk artırıldı — sayfa sonundaki butonlar artık örtüşmüyor.
+
+### Testler
+
+- Browser smoke testi: çıkış adımı Profil sayfası üzerinden yürütülüyor (Ayarlar'daki çıkış yalnızca PM'e açık) — 17/17 adım geçiyor.
+
 ## [1.1.52] - 2026-09-08
 
 ### İyileştirmeler
