@@ -35,7 +35,7 @@ if (hakedisKaynaklariVar) {
   // farklari hesaplari sistirmesin).
   const adalar = { ...pursantaj.adalar };
   let toplam = 0;
-  for (const [ada, v] of Object.entries(adalar)) {
+  for (const v of Object.values(adalar)) {
     const grupTop = Object.values(v.gruplar ?? {}).reduce((s, g) => s + g, 0);
     v.genel = grupTop;
     toplam += grupTop;
