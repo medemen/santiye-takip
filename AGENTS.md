@@ -4,6 +4,14 @@ Bu dosya, projeyi ilk kez gören bir AI ajanının (Claude Code, opencode, vb.) 
 geliştiricinin hızla yön bulması için yazıldı. Dosya bazlı tam döküm için
 [`.agents/project-structure.md`](.agents/project-structure.md) dosyasına bakın.
 
+## Takip ve ajan geçişi
+
+Projenin güncel durumu, açık işleri ve değişiklik günlüğü [`TAKIP.md`](TAKIP.md)
+dosyasındadır. **Oturum başında bu dosyayı okuyun;** bir iş tamamlandığında günlüğe
+giriş ekleyip "Mevcut Durum" bölümünü güncelleyin. Böylece başka bir ajan
+uygulamasına geçtiğinde geliştirme kaldığı yerden sürer. Sürüm numarası
+değiştiyse `CHANGELOG.md` de aynı oturumda güncellenir.
+
 ## Projenin ne olduğu
 
 İnşaat şantiyelerinde ada/blok bazlı iş kalemi ilerlemesini takip eden bir React SPA.
@@ -41,6 +49,7 @@ Diğer script'ler (`seed:*`, `bootstrap:admin`, `new:santiye`, `cap:*`) için
 
 | Yol | İçerik |
 |---|---|
+| `TAKIP.md` | Canlı geliştirme takibi: mevcut durum, açık işler, değişiklik günlüğü, kararlar (bkz. "Takip ve ajan geçişi") |
 | `src/pages/` | Route başına bir sayfa bileşeni (aşağıdaki tabloya bakın) |
 | `src/components/` | Paylaşılan UI bileşenleri; `components/config/` şantiye config editör formları |
 | `src/stores/` | Modül seviyesi durum + Supabase CRUD/Realtime + localStorage önbellek (klasik store kütüphanesi yok) |
