@@ -72,47 +72,49 @@ function oturumuKaydet(oturum: Oturum): void {
   notifyAuthListeners();
 }
 
-export async function girisYap(ad_soyad: string, rol: string, sifre: string): Promise<Oturum> {
-  // Gerçek oturum: Supabase Auth ile signInWithPassword.
-  // Supabase yapılandırılmışsa şifre ZORUNLUDUR; hata durumunda sessiz statik
-  // oturuma düşmek kimlik doğrulamayı tamamen atlatılabilir kılar (güvenlik açığı).
+export async function girisYap(ad_soyad: string, rol: string): Promise<Oturum> {
+  // Şimdilik şifreli giriş kapalı: kullanıcı yalnızca isim seçer, ortak şifre
+  // paketteki VITE_DEFAULT_PASSWORD'ten sessiz kullanılır. Oturum yine gerçek
+  // Supabase oturumudur; RLS yazma politikaları auth.uid()'ye bağlı olduğu için
+  // statik oturuma düşmek yazımları sunucuya imkansız kılar. Ortak şifre bundle'a
+  // gömülür ve herkes okuyabilir — geçici çözüm, geri alınacak (bkz. TAKIP.md).
   if (isSupabaseReady()) {
-    if (!sifre) {
-      throw new Error('Şifre gerekli');
+    const ortakSifre = import.meta.env.VITE_DEFAULT_PASSWORD as string | undefined;
+    if (ortakSifre) {
+      const { data, error } = await getSupabase().auth.signInWithPassword({
+        email: epostaOlustur(ad_soyad),
+        password: ortakSifre,
+      });
+      if (!error && data.user) {
+        const { data: profil } = await getSupabase()
+          .from('kullanicilar')
+          .select('ad_soyad, rol, admin, yetkili_adalar, proje_muduru')
+          .eq('id', data.user.id)
+          .single();
+        const oturum: Oturum = {
+          user_id: data.user.id,
+          ad_soyad: profil?.ad_soyad ?? ad_soyad,
+          rol: profil?.rol ?? rol,
+          admin: profil?.admin ?? (isSantiyeSefi(ad_soyad) || isProjeMuduru(ad_soyad)),
+          proje_muduru: profil?.proje_muduru ?? isProjeMuduru(ad_soyad),
+          yetkili_adalar:
+            profil?.yetkili_adalar && profil.yetkili_adalar.length > 0
+              ? profil.yetkili_adalar
+              : statikOturum(ad_soyad, rol).yetkili_adalar,
+          giris_tarihi: new Date().toISOString(),
+        };
+        oturumuKaydet(oturum);
+        return oturum;
+      }
+      // Ağ yok / şifre uyuşmadı: offline-first yerel oturumla devam et (giriş
+      // kilitlenmesin); bu oturumda sunucu yazımları yapılamaz, bağlantı gelince
+      // gerçek oturum açılır.
+      console.warn('Supabase girişi yapılamadı, yerel oturuma düşülüyor.', error?.message);
+    } else {
+      console.warn('VITE_DEFAULT_PASSWORD tanımlı değil; yerel oturum açıldı.');
     }
-    const { data, error } = await getSupabase().auth.signInWithPassword({
-      email: epostaOlustur(ad_soyad),
-      password: sifre,
-    });
-    if (!error && data.user) {
-      const { data: profil } = await getSupabase()
-        .from('kullanicilar')
-        .select('ad_soyad, rol, admin, yetkili_adalar, proje_muduru')
-        .eq('id', data.user.id)
-        .single();
-      const oturum: Oturum = {
-        user_id: data.user.id,
-        ad_soyad: profil?.ad_soyad ?? ad_soyad,
-        rol: profil?.rol ?? rol,
-        admin: profil?.admin ?? (isSantiyeSefi(ad_soyad) || isProjeMuduru(ad_soyad)),
-        proje_muduru: profil?.proje_muduru ?? isProjeMuduru(ad_soyad),
-        yetkili_adalar:
-          profil?.yetkili_adalar && profil.yetkili_adalar.length > 0
-            ? profil.yetkili_adalar
-            : statikOturum(ad_soyad, rol).yetkili_adalar,
-        giris_tarihi: new Date().toISOString(),
-      };
-      oturumuKaydet(oturum);
-      return oturum;
-    }
-    // Kullanıcı var ama şifre yanlış / kullanıcı yok / ağ hatası ayrıştırılmaz:
-    // tek tip mesaj kullanıcı varlığını sızdırmasın.
-    console.warn('Supabase girişi başarısız.', error?.message);
-    throw new Error('Kullanıcı adı veya şifre hatalı');
   }
 
-  // Supabase hiç yapılandırılmamışsa (tam offline mod) yerel oturum açılır;
-  // bu modda sunucu verisi olmadığından yazma işlemleri zaten engellidir.
   const oturum = statikOturum(ad_soyad, rol);
   oturumuKaydet(oturum);
   return oturum;

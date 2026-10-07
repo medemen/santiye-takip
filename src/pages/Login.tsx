@@ -10,7 +10,6 @@ export default function Login() {
   const navigate = useNavigate();
   const config = useSiteConfig();
   const [selected, setSelected] = useState('');
-  const [sifre, setSifre] = useState('');
   const [hata, setHata] = useState('');
   const [yukleniyor, setYukleniyor] = useState(false);
   const supabaseAktif = isSupabaseReady();
@@ -35,7 +34,7 @@ export default function Login() {
     setYukleniyor(true);
     setHata('');
     try {
-      await girisYap(kisi.ad_soyad, kisi.rol, sifre);
+      await girisYap(kisi.ad_soyad, kisi.rol);
       navigate('/');
     } catch (err) {
       const mesaj = err instanceof Error ? err.message : 'Giriş yapılamadı';
@@ -108,26 +107,9 @@ export default function Login() {
         </select>
 
         {supabaseAktif && (
-          <>
-            <label htmlFor="login-sifre" style={{ display: 'block', fontSize: 13, fontWeight: 500, color: 'var(--text-muted)', marginBottom: 8 }}>
-              Şifre
-            </label>
-            <input
-              id="login-sifre"
-              type="password"
-              value={sifre}
-              onChange={(e) => setSifre(e.target.value)}
-              disabled={yukleniyor}
-              autoComplete="current-password"
-              placeholder="Şifrenizi girin"
-              style={{
-                width: '100%', padding: '12px 14px', borderRadius: 12,
-                border: '2px solid var(--border)', fontSize: 14, backgroundColor: 'var(--bg-card)',
-                boxSizing: 'border-box', marginBottom: 16,
-                color: 'var(--text-primary)',
-              }}
-            />
-          </>
+          <p style={{ fontSize: 12, color: 'var(--text-faint)', margin: '0 0 16px' }}>
+            Şifre gerekmez — seçtiğiniz hesapla oturum açılır.
+          </p>
         )}
 
         {!supabaseAktif && (
@@ -144,13 +126,13 @@ export default function Login() {
 
         <button
           type="submit"
-          disabled={!selected || yukleniyor || (supabaseAktif && !sifre)}
+          disabled={!selected || yukleniyor}
           style={{
             width: '100%', padding: '14px',
-            backgroundColor: selected && !yukleniyor && (!supabaseAktif || sifre) ? '#f59e0b' : 'var(--border)',
+            backgroundColor: selected && !yukleniyor ? '#f59e0b' : 'var(--border)',
             border: 'none', borderRadius: 12, fontSize: 15, fontWeight: 700,
-            color: selected && !yukleniyor && (!supabaseAktif || sifre) ? '#fff' : 'var(--text-subtle)',
-            cursor: selected && !yukleniyor && (!supabaseAktif || sifre) ? 'pointer' : 'not-allowed',
+            color: selected && !yukleniyor ? '#fff' : 'var(--text-subtle)',
+            cursor: selected && !yukleniyor ? 'pointer' : 'not-allowed',
           }}
         >
           {yukleniyor ? 'Giriş yapılıyor…' : 'Giriş Yap'}
