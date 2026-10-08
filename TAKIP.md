@@ -15,7 +15,7 @@ geliştirme kaldığı yerden devam eder. Kalıcı mimari kurallar ve dizin hari
 
 ## 1. Mevcut Durum
 
-- **Güncelleme:** 2026-10-07
+- **Güncelleme:** 2026-10-08
 - **Dal:** `master` (origin/master ile eşit, working tree temiz)
 - **Sürümler:** UI `package.json` → **1.1.53** · Android `version.properties` → **1.1.52** (versionCode 52; bir sonraki APK derlemesi bunu 1.1.53/53'e çıkarır ve hizalanır)
 - **Test:** birim 92/92 (vitest) · browser smoke **17/17** (`npm run test:browser -- --auto-start`)
@@ -24,13 +24,22 @@ geliştirme kaldığı yerden devam eder. Kalıcı mimari kurallar ve dizin hari
 
 ## 2. Açık İşler
 
-- **Şifreli giriş geri alınacak (geçici):** UI'da şifre alanı yok; ortak `VITE_DEFAULT_PASSWORD` bundle'a gömülü — paketi okuyan herkes girebilir. Normal güvenlik düzenine dönülecekse `Login.tsx` + `authStore.girisYap`'a şifre alanı geri getirilecek (yapı hazır, bkz. AGENTS.md "Giriş").
+- **Şifreli giriş geri alınacak (geçici):** UI'da şifre alanı yok (giriş + kullanıcı yönetimi dahil); ortak `VITE_DEFAULT_PASSWORD` bundle'a gömülü — paketi okuyan herkes girebilir. Normal güvenlik düzenine dönülecekse `Login.tsx` + `authStore.girisYap` + `kullaniciYonetimStore.santiyeKullaniciOlustur`'a şifre alanları geri getirilecek (bkz. AGENTS.md "Giriş").
+- **Android APK yeniden derlenmeli:** telefondaki eski APK'da giriş hâlâ şifreli; bir sonraki `cap:build:apk` ile 1.1.53 derlenip kurulmalı (`version.properties` 1.1.53/53'e hizalanır).
+- **Farklı şifreli hesaplar hizalanmalı:** eski "Geçici Şifre" ile açılmış hesaplar ortak şifreyle eşleşmeyebilir → sessiz giriş onlarda yerel oturuma düşer. `npm run seed:users` tüm hesapların şifresini ortak değere hizalar (dikkat: mevcut şifreleri değiştirir).
 - **Konsol 401'leri:** smoke testte 2-4 adet `401` konsol hatası görünüyor; görevleri etkilemiyor (giriş dahil her adım geçiyor), kaynağı araştırılacak.
 - Play Console'da yayınlanan sürüm kontrol edilmeli — depo notları 1.1.12 (code 14) diyor, sonraki yükleme kaydı yok (bkz. `play-console/yukleme-rehberi.md`).
 - Yeni hakediş periyodu geldiğinde: `scripts/hakedis-oku.mjs` → `npm run build:config` → `validate-config.mjs` akışını işle.
 - fikir/geri bildirim geldikçe buraya ekle; biten işi günlüğe taşıyıp buradan sil.
 
 ## 3. Değişiklik Günlüğü
+
+### 2026-10-08 — Kullanıcı yönetiminde şifre tamamen kaldırıldı
+
+- `KullaniciYonetim.tsx`: "Geçici Şifre" alanı ve "🔑 Şifre Sıfırla" butonu kaldırıldı; form artık şifre sormuyor, yerine bilgi notu konuldu.
+- `kullaniciYonetimStore.santiyeKullaniciOlustur`: `p_sifre` artık arka planda ortak `VITE_DEFAULT_PASSWORD`'ten geliyor (RPC en az 6 karakter istiyor, ortak şifre 11 karakter — doğrulandı). Eski düzenle farklı şifreyle açılan hesaplar sessiz girişte yerel oturuma düşüyordu — bu hata da kapandı.
+- Doğrulama: lint 0 · `tsc -b` 0 · birim 92/92 · browser smoke exit 0.
+- Canlı site de kontrol edildi: `medemen.github.io/santiye-takip/login` → şifre alanı 0 (üretimde şifresiz giriş yayında).
 
 ### 2026-10-07 — Şifresiz giriş + navigasyon düzeltmeleri
 

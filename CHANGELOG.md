@@ -5,6 +5,7 @@
 ### İyileştirmeler
 
 - Girişte **şifre alanı kaldırıldı**: seçilen hesapla ortak şifre arka planda sessiz oturum açar (geçici düzen — `VITE_DEFAULT_PASSWORD` pakete gömülür, bkz. `TAKIP.md`).
+- Kullanıcı oluşturmadaki **"Geçici Şifre" alanı ve "Şifre Sıfırla" kaldırıldı**: hesaplar ortak giriş şifresiyle otomatik açılır; farklı şifreyle açılan hesap sessiz girişte takılıyordu.
 - Ayarlar sayfasında "Oturum / Çıkış Yap" kartı en üste taşındı.
 - Alt navigasyon ve yüzen "Rapor" FAB'ının altında kalan içerik için alt boşluk artırıldı — sayfa sonundaki butonlar artık örtüşmüyor.
 
