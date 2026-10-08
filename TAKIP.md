@@ -34,6 +34,12 @@ geliştirme kaldığı yerden devam eder. Kalıcı mimari kurallar ve dizin hari
 
 ## 3. Değişiklik Günlüğü
 
+### 2026-10-08 (2) — Rapor düğmesi alt çubuğa alındı
+
+- `Layout.tsx` (mobil): yüzen FAB (`bottom: safe+86px`) kaldırıldı; "➕ Rapor" artık alt çubuğun tam ortasındaki sabit bir hap düğme. Diğer öğeler iki yana (`flex:1` + `space-around`) dağıtıldı — 5 öğede 2/3, PM'de (Ayarlar görünür) 3/3.
+- İçerik alt boşluğu `safe + 160px` → `safe + 96px` (çubuk yüksekliği 62px, 34px boşluk kalıyor).
+- Doğrulama: lint 0 · `tsc -b` · birim 92/92 · browser smoke exit 0 · canlı ölçümlerle örtüşme yok, pill merkezi ekran merkeziyle hizalı (350 vs 353px), `/rapor-ekle` navigasyonu çalışıyor.
+
 ### 2026-10-08 — Kullanıcı yönetiminde şifre tamamen kaldırıldı
 
 - `KullaniciYonetim.tsx`: "Geçici Şifre" alanı ve "🔑 Şifre Sıfırla" butonu kaldırıldı; form artık şifre sormuyor, yerine bilgi notu konuldu.
