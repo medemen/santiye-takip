@@ -5,14 +5,13 @@ import { getCurrentUser } from '../stores/authStore';
 import type { Kullanici } from '../stores/kullanicilarStore';
 import {
   santiyeKullaniciOlustur,
-  santiyeKullaniciSifreSifirla,
   santiyeKullaniciSil,
   santiyeKullaniciGuncelle,
   kullaniciEpostasi,
 } from '../stores/kullaniciYonetimStore';
 import { toastGoster } from '../stores/toastStore';
 import { card } from '../utils/styles';
-import { onayla, metinIste } from '../utils/dialog';
+import { onayla } from '../utils/dialog';
 
 export function YeniKullaniciForm({ onIptal, onKaydedildi }: { onIptal: () => void; onKaydedildi: () => void }) {
   const config = useSiteConfig();
@@ -21,7 +20,6 @@ export function YeniKullaniciForm({ onIptal, onKaydedildi }: { onIptal: () => vo
 
   const [adSoyad, setAdSoyad] = useState('');
   const [rol, setRol] = useState(sahaRolleri[0] ?? 'Personel');
-  const [sifre, setSifre] = useState('');
   const [admin, setAdmin] = useState(false);
   const [projeMuduru, setProjeMuduru] = useState(false);
   const [atananAda, setAtananAda] = useState('');
@@ -45,16 +43,11 @@ export function YeniKullaniciForm({ onIptal, onKaydedildi }: { onIptal: () => vo
       setHata('Ad soyad yazın.');
       return;
     }
-    if (sifre.length < 6) {
-      setHata('Şifre en az 6 karakter olmalı.');
-      return;
-    }
     setKaydediliyor(true);
     try {
       const sonuc = await santiyeKullaniciOlustur({
         ad_soyad: adSoyad.trim(),
         rol,
-        sifre,
         admin,
         proje_muduru: projeMuduru,
         yetkili_adalar: [...yetkiliAdalar],
@@ -119,14 +112,9 @@ export function YeniKullaniciForm({ onIptal, onKaydedildi }: { onIptal: () => vo
             </select>
           </div>
           <div>
-            <label style={labelStyle}>Geçici Şifre</label>
-            <input
-              type="password"
-              style={inputStyle}
-              value={sifre}
-              onChange={(e) => setSifre(e.target.value)}
-              placeholder="en az 6 karakter"
-            />
+            <p style={{ fontSize: 12, color: 'var(--text-faint)', margin: 0 }}>
+              Şifre gerekmez — hesap, uygulamanın ortak giriş şifresiyle otomatik açılır.
+            </p>
           </div>
           <div>
             <label style={labelStyle}>
@@ -181,7 +169,7 @@ export function YeniKullaniciForm({ onIptal, onKaydedildi }: { onIptal: () => vo
         )}
         {olusturulanEposta && (
           <div style={{ marginTop: 12, fontSize: 12, color: '#16a34a', backgroundColor: 'var(--bg-success)', padding: '8px 12px', borderRadius: 8 }}>
-            Kullanıcı oluşturuldu. Giriş: <b>{olusturulanEposta}</b>
+            Kullanıcı oluşturuldu: <b>{olusturulanEposta}</b>
           </div>
         )}
 
@@ -242,17 +230,6 @@ export function KullaniciYetkiKarti({ kullanici }: { kullanici: Kullanici }) {
       toastGoster(err instanceof Error ? err.message : 'Güncellenemedi', 'error');
     } finally {
       setKaydediliyor(false);
-    }
-  };
-
-  const sifreSifirla = async () => {
-    const yeniSifre = await metinIste(`${kullanici.ad_soyad} için yeni şifre (en az 6 karakter):`);
-    if (!yeniSifre) return;
-    try {
-      await santiyeKullaniciSifreSifirla(kullanici.id!, yeniSifre);
-      toastGoster('Şifre sıfırlandı', 'success');
-    } catch (err) {
-      toastGoster(err instanceof Error ? err.message : 'Şifre sıfırlanamadı', 'error');
     }
   };
 
@@ -367,17 +344,6 @@ export function KullaniciYetkiKarti({ kullanici }: { kullanici: Kullanici }) {
           }}
         >
           {kaydediliyor ? 'Kaydediliyor…' : 'Yetkileri Kaydet'}
-        </button>
-
-        <button
-          onClick={sifreSifirla}
-          style={{
-            width: '100%', padding: 11, backgroundColor: 'var(--bg-subtle)',
-            border: 'none', borderRadius: 10, fontSize: 13, fontWeight: 600,
-            color: 'var(--text-muted)', cursor: 'pointer',
-          }}
-        >
-          🔑 Şifre Sıfırla
         </button>
 
         {!kendim && (

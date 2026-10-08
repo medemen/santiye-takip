@@ -5,7 +5,6 @@ import { epostaOlustur } from './authStore';
 export interface YeniKullaniciInput {
   ad_soyad: string;
   rol: string;
-  sifre: string;
   admin?: boolean;
   proje_muduru?: boolean;
   yetkili_adalar?: string[];
@@ -20,10 +19,17 @@ export async function santiyeKullaniciOlustur(
   input: YeniKullaniciInput
 ): Promise<{ id: string; email: string }> {
   baslat('Sunucu bağlantısı yok');
+  // Şifresiz giriş düzeninde hesap, uygulamanın ortak giriş şifresiyle açılır
+  // (bkz. authStore.girisYap); farklı bir şifre verilirse sessiz giriş baştan
+  // başarısız olur ve kullanıcı yerel oturuma düşer.
+  const ortakSifre = import.meta.env.VITE_DEFAULT_PASSWORD as string | undefined;
+  if (!ortakSifre || ortakSifre.length < 6) {
+    throw new Error('VITE_DEFAULT_PASSWORD tanımlı değil veya 6 karakterden kısa; kullanıcı oluşturulamıyor.');
+  }
   const { data, error } = await getSupabase().rpc('santiye_kullanici_olustur', {
     p_ad_soyad: input.ad_soyad.trim(),
     p_rol: input.rol,
-    p_sifre: input.sifre,
+    p_sifre: ortakSifre,
     p_admin: input.admin ?? false,
     p_proje_muduru: input.proje_muduru ?? false,
     p_yetkili_adalar: input.yetkili_adalar ?? [],
@@ -32,15 +38,6 @@ export async function santiyeKullaniciOlustur(
   if (error) throw new Error(error.message);
   await supabaseKullanicilariYukle();
   return data as { id: string; email: string };
-}
-
-export async function santiyeKullaniciSifreSifirla(userId: string, yeniSifre: string): Promise<void> {
-  baslat('Sunucu bağlantısı yok');
-  const { error } = await getSupabase().rpc('santiye_kullanici_sifre_sifirla', {
-    p_user_id: userId,
-    p_yeni_sifre: yeniSifre,
-  });
-  if (error) throw new Error(error.message);
 }
 
 export async function santiyeKullaniciSil(userId: string): Promise<void> {
