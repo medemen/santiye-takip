@@ -26,14 +26,28 @@ geliştirme kaldığı yerden devam eder. Kalıcı mimari kurallar ve dizin hari
 ## 2. Açık İşler
 
 - **Şifreli giriş geri alınacak (geçici):** UI'da şifre alanı yok (giriş + kullanıcı yönetimi dahil); ortak `VITE_DEFAULT_PASSWORD` bundle'a gömülü — paketi okuyan herkes girebilir. Normal güvenlik düzenine dönülecekse `Login.tsx` + `authStore.girisYap` + `kullaniciYonetimStore.santiyeKullaniciOlustur`'a şifre alanları geri getirilecek (bkz. AGENTS.md "Giriş").
+- **Dashboard yatay taşma (951px) — tespit edildi, düzeltilecek:** `BlokMatrisi`'ndeki `width: 'max-content'` grid, kartın CSS grid track'ini şişiriyor (`min-width: auto`); hem masaüstünde hem mobilde tüm sayfa yatay kayıyor. Çözüm: matris sarmalayıcı kartına `minWidth: 0` (+ gerekirse `overflow: hidden`). Karar bekliyor.
+- **OfflineBanner 401 gürültüsü — kök neden bulundu:** `src/components/OfflineBanner.tsx:20` `GET ${SUPABASE_URL}/rest/v1/` çağrısı `apikey` header'ı olmadan yapılıyor → PostgREST 401 dönüyor (erişilebilir=true mantığı doğru çalışıyor, sadece 15 sn'de bir console.error). Çözüm: `apikey` anon key header'ı eklemek. Karar bekliyor.
+- **Raporlar tablosu büyüklüğü:** `raporlar` sorgusu ~4500+ kayda ulaştı, açılışta 5 sayfalık (offset 0→4000) ardışık çekim yapılıyor. Öneri: periyot filtresi / önbellek önceliği / sunucu tarafı toplulaştırma.
+- **Konsol 401'leri:** → yukarıdaki "OfflineBanner" maddesine taşındı (kök neden biliniyor).
 - **Telefon kurulumu bekliyor:** 1.1.54 release APK derlendi (`app-release.apk`, code 54) — cihaza USB/kurye ile kurulacak; şifresiz giriş + ortalanmış rapor düğmesi bu pakette. (Eski APK'da giriş hâlâ şifreli.)
 - **Farklı şifreli hesaplar hizalanmalı:** eski "Geçici Şifre" ile açılmış hesaplar ortak şifreyle eşleşmeyebilir → sessiz giriş onlarda yerel oturuma düşer. `npm run seed:users` tüm hesapların şifresini ortak değere hizalar (dikkat: mevcut şifreleri değiştirir).
-- **Konsol 401'leri:** smoke testte 2-4 adet `401` konsol hatası görünüyor; görevleri etkilemiyor (giriş dahil her adım geçiyor), kaynağı araştırılacak.
+- **Konsol 401'leri:** (kapatıldı — OfflineBanner kök nedeni yukarıda).
 - Play Console'da yayınlanan sürüm kontrol edilmeli — depo notları 1.1.12 (code 14) diyor, sonraki yükleme kaydı yok; **1.1.53/53 imzalı AAB hazır** (`play-console/yukleme-rehberi.md`'deki adımlarla yüklenebilir; sonraki derleme code 55 olur).
 - Yeni hakediş periyodu geldiğinde: `scripts/hakedis-oku.mjs` → `npm run build:config` → `validate-config.mjs` akışını işle.
 - fikir/geri bildirim geldikçe buraya ekle; biten işi günlüğe taşıyıp buradan sil.
 
 ## 3. Değişiklik Günlüğü
+
+### 2026-10-08 (5) — Uygulama test turu
+
+- Birim **92/92** · lint **0** · `tsc -b` 0 · smoke test **34/34** (şef + PM, iki tam tur, exit 0).
+- Sayfa turları (şef + PM): Dashboard, hedef-takvim, adalar, ada/blok detay, rapor-ekle, raporlar, istatistik, hakediş, personel, profil, ayarlar — gerçek hata metni yok, diğer sayfalarda yatay taşma 0.
+- Doğrulamalar: giriş 0 şifre alanı + "Şifre gerekmez" notu · Yeni Kullanıcı formu 0 şifre alanı, "Şifre Sıfırla" yok · Ayarlar'da Oturum kartı en üstte (PM) · `/ayarlar` şef için `/`'e yönlendiriyor · mobil alt çubukta Rapor düğmesi ortada, örtüşme yok.
+- **Bulgu 1:** Dashboard'da 951px yatay taşma — `BlokMatrisi` `width: max-content` (Açık İşler'de).
+- **Bulgu 2 (401'ler):** `OfflineBanner.tsx:20` apikey'siz `GET /rest/v1/` → 401, 15 sn'de bir console.error — kaynağı buydu (Açık İşler'de).
+- **Bulgu 3:** `raporlar` ~4500+ kayıt / 5 sayfalık açılış çekimi (Açık İşler'de).
+- Lighthouse (personel sayfası): Best Practices **100**, Accessibility **94** (düşük kontrast metin), SEO **60** (meta description + robots.txt yok — iç kullanım için öncelik düşük).
 
 ### 2026-10-08 (4) — Release APK (1.1.54 / code 54)
 
