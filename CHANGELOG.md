@@ -1,13 +1,22 @@
 # Değişiklik Notları
 
+## [1.1.54] - 2026-10-08
+
+### İyileştirmeler
+
+- Kullanıcı oluşturmadaki **"Geçici Şifre" alanı ve "Şifre Sıfırla" kaldırıldı**: hesaplar ortak giriş şifresiyle otomatik açılır; farklı şifreyle açılan hesap sessiz girişte takılıyordu.
+- Mobil alt çubuktaki **"Rapor" düğmesi yüzen FAB yerine çubuğun ortasına alındı** — artık kaydırırken yazının üstünü kapatmıyor; içerik alt boşluğu 160px → 96px'e düştü.
+
+### Android
+
+- Release paketleri imzalı olarak derlendi: **APK** `app-release.apk` (1.51 MB, versionCode 54) ve **AAB** `app-release.aab` (1.96 MB, versionCode 53).
+
 ## [1.1.53] - 2026-10-07
 
 ### İyileştirmeler
 
 - Girişte **şifre alanı kaldırıldı**: seçilen hesapla ortak şifre arka planda sessiz oturum açar (geçici düzen — `VITE_DEFAULT_PASSWORD` pakete gömülür, bkz. `TAKIP.md`).
-- Kullanıcı oluşturmadaki **"Geçici Şifre" alanı ve "Şifre Sıfırla" kaldırıldı**: hesaplar ortak giriş şifresiyle otomatik açılır; farklı şifreyle açılan hesap sessiz girişte takılıyordu.
 - Ayarlar sayfasında "Oturum / Çıkış Yap" kartı en üste taşındı.
-- Mobil alt çubuktaki **"Rapor" düğmesi yüzen FAB yerine çubuğun ortasına alındı** — artık kaydırırken yazının üstünü kapatmıyor; içerik alt boşluğu 160px → 96px'e düştü.
 - Alt navigasyon ve yüzen "Rapor" FAB'ının altında kalan içerik için alt boşluk artırıldı — sayfa sonundaki butonlar artık örtüşmüyor.
 
 ### Testler
