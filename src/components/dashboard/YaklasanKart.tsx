@@ -18,9 +18,9 @@ interface Props {
 export default function YaklasanKart({ hedefler, onNavigate }: Props) {
   return (
     <div style={{ ...card, marginBottom: 16 }}>
-      <h3 style={{ fontSize: 14, fontWeight: 600, color: 'var(--text-muted)', margin: 0, marginBottom: 10 }}>
+      <h2 style={{ fontSize: 14, fontWeight: 600, color: 'var(--text-muted)', margin: 0, marginBottom: 10 }}>
         ⏰ Yaklaşan Hedefler
-      </h3>
+      </h2>
       {hedefler.length === 0 ? (
         <p style={{ fontSize: 12, color: 'var(--text-subtle)', margin: 0 }}>Sonraki 14 gün içinde hedef yok. 🎉</p>
       ) : (

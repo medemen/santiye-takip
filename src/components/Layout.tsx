@@ -75,7 +75,7 @@ export default function Layout({ children }: Props) {
                     textDecoration: 'none',
                     fontSize: 14,
                     fontWeight: isActive ? 600 : 400,
-                    color: isActive ? '#f59e0b' : 'var(--text-muted)',
+                    color: isActive ? 'var(--accent-dark)' : 'var(--text-muted)',
                     backgroundColor: isActive ? 'var(--bg-accent)' : 'transparent',
                   })}
                 >
@@ -96,7 +96,7 @@ export default function Layout({ children }: Props) {
                   textDecoration: 'none',
                   fontSize: 14,
                   fontWeight: 600,
-                  color: '#fff',
+                  color: 'var(--on-accent)',
                   backgroundColor: '#f59e0b',
                   boxShadow: '0 2px 8px rgba(245,158,11,0.35)',
                 }}
@@ -140,7 +140,7 @@ export default function Layout({ children }: Props) {
         flexDirection: 'column',
         alignItems: 'center',
         textDecoration: 'none',
-        color: isActive ? '#f59e0b' : 'var(--text-subtle)',
+        color: isActive ? 'var(--accent-dark)' : 'var(--text-subtle)',
         fontSize: 10,
         gap: 2,
         padding: '4px 0',
@@ -173,17 +173,17 @@ export default function Layout({ children }: Props) {
               <span style={{ fontSize: 11, color: 'var(--text-subtle)' }}>
                 ({user.rol})
                 {isProjeMuduruSession() && (
-                  <span style={{ color: '#8b5cf6', fontWeight: 600 }}> 👑 Proje Müdürü</span>
+                  <span style={{ color: 'var(--text-brand)', fontWeight: 600 }}> 👑 Proje Müdürü</span>
                 )}
                 {user.admin && !isProjeMuduruSession() && (
-                  <span style={{ color: '#f59e0b', fontWeight: 600 }}> • Yönetici</span>
+                  <span style={{ color: 'var(--accent-dark)', fontWeight: 600 }}> • Yönetici</span>
                 )}
               </span>
             </span>
           )}
         </div>
       </div>
-      <div style={{ padding: '16px 16px calc(env(safe-area-inset-bottom, 0px) + 96px) 16px' }}>{children}</div>
+      <main style={{ padding: '16px 16px calc(env(safe-area-inset-bottom, 0px) + 96px) 16px' }}>{children}</main>
       <nav
         style={{
           position: 'fixed',
@@ -223,7 +223,7 @@ export default function Layout({ children }: Props) {
               boxShadow: '0 2px 8px rgba(245,158,11,0.4)',
               fontSize: 13,
               fontWeight: 600,
-              color: '#fff',
+              color: 'var(--on-accent)',
               whiteSpace: 'nowrap',
             })}
           >

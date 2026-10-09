@@ -12,9 +12,9 @@ interface Props {
 export default function PersonelAktiviteKart({ kisiler }: Props) {
   return (
     <div style={{ ...card, marginBottom: 16 }}>
-      <h3 style={{ fontSize: 14, fontWeight: 600, color: 'var(--text-muted)', margin: 0, marginBottom: 12 }}>
+      <h2 style={{ fontSize: 14, fontWeight: 600, color: 'var(--text-muted)', margin: 0, marginBottom: 12 }}>
         Son 7 Gün Personel Aktivitesi
-      </h3>
+      </h2>
       <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
         {kisiler.map((p, i) => (
           <div
@@ -32,7 +32,7 @@ export default function PersonelAktiviteKart({ kisiler }: Props) {
               {i === 0 && '🥇 '}{i === 1 && '🥈 '}{i === 2 && '🥉 '}
               {p.ad_soyad}
             </div>
-            <div style={{ fontSize: 13, fontWeight: 600, color: '#f59e0b' }}>{p.raporSayisi} rapor</div>
+            <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--accent-dark)' }}>{p.raporSayisi} rapor</div>
           </div>
         ))}
       </div>

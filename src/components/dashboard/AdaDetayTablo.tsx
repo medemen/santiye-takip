@@ -19,9 +19,9 @@ interface Props {
 export default function AdaDetayTablo({ satirlar, onNavigate }: Props) {
   return (
     <div style={{ ...card, marginBottom: 16 }}>
-      <h3 style={{ fontSize: 14, fontWeight: 600, color: 'var(--text-muted)', margin: 0, marginBottom: 10 }}>
+      <h2 style={{ fontSize: 14, fontWeight: 600, color: 'var(--text-muted)', margin: 0, marginBottom: 10 }}>
         Ada Detay
-      </h3>
+      </h2>
       <div style={{ display: 'flex', flexDirection: 'column' }}>
         <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 0.8fr 1fr 1fr 1fr 1.6fr', gap: 8, padding: '8px 12px', fontSize: 11, color: 'var(--text-subtle)', fontWeight: 600 }}>
           <span>Ada</span>
@@ -49,9 +49,9 @@ export default function AdaDetayTablo({ satirlar, onNavigate }: Props) {
           >
             <span style={{ fontWeight: 600, color: 'var(--text-primary)' }}>{a.ada}</span>
             <span style={{ color: 'var(--text-faint)' }}>{a.toplam}</span>
-            <span style={{ color: '#22c55e' }}>✅ {a.tamam}</span>
-            <span style={{ color: '#3b82f6' }}>🔵 {a.devam}</span>
-            <span style={{ color: '#ef4444' }}>⚠️ {a.gecikme}</span>
+            <span style={{ color: 'var(--text-success)' }}>✅ {a.tamam}</span>
+            <span style={{ color: 'var(--text-info)' }}>🔵 {a.devam}</span>
+            <span style={{ color: 'var(--text-danger)' }}>⚠️ {a.gecikme}</span>
             <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
               <div style={{ flex: 1 }}>
                 <ProgressBar value={a.ilerleme} height={8} />

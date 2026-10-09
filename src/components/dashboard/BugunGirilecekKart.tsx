@@ -11,13 +11,13 @@ export default function BugunGirilecekKart({ ogeler, onRaporEkle }: Props) {
   return (
     <div style={{ ...card, padding: 16, border: '1px solid var(--border-soft)' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
-        <h3 style={{ fontSize: 14, fontWeight: 600, color: 'var(--text-muted)', margin: 0 }}>
+        <h2 style={{ fontSize: 14, fontWeight: 600, color: 'var(--text-muted)', margin: 0 }}>
           ✅ Bugün Girilecek
-        </h3>
+        </h2>
         {ogeler.length > 0 && (
           <span
             style={{
-              fontSize: 11, fontWeight: 700, color: '#fff', backgroundColor: '#f59e0b',
+              fontSize: 11, fontWeight: 700, color: 'var(--on-accent)', backgroundColor: '#f59e0b',
               borderRadius: 999, padding: '2px 8px',
             }}
           >
@@ -64,7 +64,7 @@ export default function BugunGirilecekKart({ ogeler, onRaporEkle }: Props) {
                   borderRadius: 8,
                   fontSize: 12,
                   fontWeight: 600,
-                  color: '#fff',
+                  color: 'var(--on-accent)',
                   cursor: 'pointer',
                   minHeight: 44,
                 }}

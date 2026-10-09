@@ -9,7 +9,7 @@ export const card = {
 export const btnGhost = {
   background: 'none',
   border: 'none',
-  color: 'var(--accent)',
+  color: 'var(--accent-dark)',
   fontSize: 13,
   fontWeight: 600,
   cursor: 'pointer',

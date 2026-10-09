@@ -18,7 +18,7 @@ export default function HedefKart({ ozet, onNavigate, onHedefTakvim }: Props) {
             fontSize: 14, fontWeight: 600, color: 'var(--text-muted)',
           }}
         >
-          🎯 Hedef Takvimi <span style={{ fontSize: 11, color: '#f59e0b', fontWeight: 700 }}>→</span>
+          🎯 Hedef Takvimi <span style={{ fontSize: 11, color: 'var(--accent-dark)', fontWeight: 700 }}>→</span>
         </button>
         <span style={{ fontSize: 12, color: 'var(--text-subtle)' }}>{ozet.toplam} hedef</span>
       </div>

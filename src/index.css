@@ -21,11 +21,15 @@
   --text-primary: #1f2937;
   --text-secondary: #374151;
   --text-muted: #4b5563;
-  --text-faint: #6b7280;
-  --text-subtle: #9ca3af;
+  --text-faint: #5d6775;
+  --text-subtle: #647084;
   --accent: #f59e0b;
   --accent-dark: #92400e;
-  --on-accent: #ffffff;
+  --on-accent: #1f2937;
+  --text-danger: #b91c1c;
+  --text-info: #1d4ed8;
+  --text-success: #15803d;
+  --text-brand: #6d28d9;
   --shadow-card: 0 1px 3px rgba(0, 0, 0, 0.06);
   --shadow-nav: 0 2px 8px rgba(245, 158, 11, 0.35);
 }
@@ -44,12 +48,16 @@
   --border-soft: #29374d;
   --text-primary: #f1f5f9;
   --text-secondary: #cbd5e1;
-  --text-muted: #94a3b8;
-  --text-faint: #64748b;
+  --text-muted: #b3bdca;
+  --text-faint: #a2adbc;
   --text-subtle: #94a3b8;
   --accent: #f59e0b;
   --accent-dark: #fbbf24;
-  --on-accent: #ffffff;
+  --on-accent: #0f172a;
+  --text-danger: #f87171;
+  --text-info: #93c5fd;
+  --text-success: #4ade80;
+  --text-brand: #c4b5fd;
   --shadow-card: 0 1px 3px rgba(0, 0, 0, 0.4);
   --shadow-nav: 0 2px 8px rgba(245, 158, 11, 0.3);
 }
@@ -142,6 +150,76 @@ input[type='range']::-moz-range-thumb {
 ::-webkit-scrollbar-thumb {
   background: var(--border);
   border-radius: 3px;
+}
+
+@keyframes iskelet-parla {
+  0% {
+    opacity: 0.55;
+  }
+  50% {
+    opacity: 0.95;
+  }
+  100% {
+    opacity: 0.55;
+  }
+}
+
+.iskelet {
+  background: var(--bg-subtle);
+  border-radius: 8px;
+  animation: iskelet-parla 1.4s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .iskelet {
+    animation: none;
+  }
+}
+
+.login-secim {
+  background: transparent;
+}
+
+.login-secim:hover:not(:disabled) {
+  background: var(--bg-hover);
+}
+
+.login-secim--secili,
+.login-secim--secili:hover:not(:disabled) {
+  background: var(--bg-accent);
+}
+
+.grid-3-esnek {
+  display: grid;
+  grid-template-columns: 1.6fr 1fr 1fr;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.grid-2-esnek {
+  display: grid;
+  grid-template-columns: 1.2fr 1.8fr;
+  gap: 16px;
+  margin-bottom: 16px;
+  align-items: start;
+}
+
+@media (max-width: 1200px) {
+  .grid-3-esnek {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+@media (max-width: 1000px) {
+  .grid-2-esnek {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 900px) {
+  .grid-3-esnek {
+    grid-template-columns: 1fr;
+  }
 }
 
 ::selection {

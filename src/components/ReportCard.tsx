@@ -47,13 +47,13 @@ const ReportCard = memo(function ReportCard({ rapor, onClick, showActions }: Pro
         </div>
         <div style={{ display: 'flex', gap: 4, alignItems: 'center' }}>
           {rapor.onay_durumu === 'beklemede' && (
-            <span style={{ fontSize: 10, fontWeight: 600, color: '#f59e0b', backgroundColor: '#fef3c7', padding: '2px 6px', borderRadius: 6, whiteSpace: 'nowrap' }}>Onay Bekliyor</span>
+            <span style={{ fontSize: 10, fontWeight: 600, color: '#92400e', backgroundColor: '#fef3c7', padding: '2px 6px', borderRadius: 6, whiteSpace: 'nowrap' }}>Onay Bekliyor</span>
           )}
           {rapor.onay_durumu === 'onaylandi' && (
-            <span style={{ fontSize: 11, fontWeight: 700, color: '#22c55e' }}>✓</span>
+            <span style={{ fontSize: 11, fontWeight: 700, color: 'var(--text-success)' }}>✓</span>
           )}
           {rapor.onay_durumu === 'reddedildi' && (
-            <span style={{ fontSize: 10, fontWeight: 600, color: '#ef4444', backgroundColor: '#fee2e2', padding: '2px 6px', borderRadius: 6, whiteSpace: 'nowrap' }}>Reddedildi</span>
+            <span style={{ fontSize: 10, fontWeight: 600, color: '#b91c1c', backgroundColor: '#fee2e2', padding: '2px 6px', borderRadius: 6, whiteSpace: 'nowrap' }}>Reddedildi</span>
           )}
           {showActions && (
             <button
@@ -92,7 +92,7 @@ const ReportCard = memo(function ReportCard({ rapor, onClick, showActions }: Pro
         <div
           style={{
             fontSize: 12,
-            color: '#dc2626',
+            color: '#b91c1c',
             backgroundColor: '#fee2e2',
             padding: '6px 8px',
             borderRadius: 6,

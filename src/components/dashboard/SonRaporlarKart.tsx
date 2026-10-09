@@ -12,9 +12,9 @@ export default function SonRaporlarKart({ raporlar, grid, onTumu }: Props) {
   return (
     <div style={{ ...card }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
-        <h3 style={{ fontSize: 14, fontWeight: 600, color: 'var(--text-muted)', margin: 0 }}>
+        <h2 style={{ fontSize: 14, fontWeight: 600, color: 'var(--text-muted)', margin: 0 }}>
           Son Raporlar
-        </h3>
+        </h2>
         <button onClick={onTumu} style={btnGhost}>
           Tümü
         </button>

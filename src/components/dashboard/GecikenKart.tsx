@@ -18,7 +18,7 @@ export default function GecikenKart({ isler, onNavigate }: Props) {
     >
       <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
         <span style={{ fontSize: 18 }}>⚠️</span>
-        <span style={{ fontSize: 14, fontWeight: 600, color: '#ef4444' }}>
+        <span style={{ fontSize: 14, fontWeight: 600, color: 'var(--text-danger)' }}>
           {isler.length} Geciken İş Kalemi
         </span>
       </div>
@@ -36,7 +36,7 @@ export default function GecikenKart({ isler, onNavigate }: Props) {
             }}
           >
             <span style={{ fontWeight: 500 }}>{r.ada} - {r.blok_no === 0 ? 'Ada Geneli' : `Blok ${r.blok_no}`}</span>
-            <span style={{ color: '#ef4444' }}>{r.is_kalemi}</span>
+            <span style={{ color: 'var(--text-danger)' }}>{r.is_kalemi}</span>
           </button>
         ))}
       </div>

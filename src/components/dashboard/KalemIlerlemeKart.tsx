@@ -15,9 +15,9 @@ interface Props {
 export default function KalemIlerlemeKart({ kalemler, toplamKalem }: Props) {
   return (
     <div style={{ ...card }}>
-      <h3 style={{ fontSize: 14, fontWeight: 600, color: 'var(--text-muted)', margin: 0, marginBottom: 4 }}>
+      <h2 style={{ fontSize: 14, fontWeight: 600, color: 'var(--text-muted)', margin: 0, marginBottom: 4 }}>
         İş Kalemi Bazında İlerleme
-      </h3>
+      </h2>
       <div style={{ fontSize: 11, color: 'var(--text-subtle)', marginBottom: 10 }}>
         {toplamKalem} iş kalemi • proje geneli ortalama, en düşükten yükseğe
       </div>
