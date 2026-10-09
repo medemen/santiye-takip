@@ -26,6 +26,7 @@ import TrendKart from '../components/dashboard/TrendKart';
 import AdaDetayTablo from '../components/dashboard/AdaDetayTablo';
 import SonRaporlarKart from '../components/dashboard/SonRaporlarKart';
 import HakedisKarsilastirmaKart from '../components/dashboard/HakedisKarsilastirmaKart';
+import { SkeletonSayfa } from '../components/SkeletonKart';
 import BugunGirilecekKart from '../components/dashboard/BugunGirilecekKart';
 import { card, btnGhost } from '../utils/styles';
 
@@ -250,11 +251,7 @@ export default function Dashboard() {
   const altKartlar = [hedefKart, yaklasanKart, personelAktiviteKart].filter(Boolean);
 
   if (yukleniyor) {
-    return (
-      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '50vh', fontSize: 18, opacity: 0.6 }}>
-        Yükleniyor…
-      </div>
-    );
+    return <SkeletonSayfa kartSayisi={4} />;
   }
 
   if (isDesktop) {
@@ -285,7 +282,7 @@ export default function Dashboard() {
               onClick={() => navigate('/istatistik')}
               style={{
                 backgroundColor: '#f59e0b',
-                color: '#fff',
+                color: 'var(--on-accent)',
                 border: 'none',
                 borderRadius: 10,
                 padding: '8px 14px',
@@ -300,14 +297,14 @@ export default function Dashboard() {
         </div>
 
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))', gap: 12, marginBottom: 16 }}>
-          <KpiCard label="Genel İlerleme" value={`%${genelIlerleme}`} color={genelIlerleme === 100 ? '#22c55e' : '#f59e0b'} progress={genelIlerleme} aciklama="Hakediş pursantajıyla ağırlıklı (rapor olmayan iş 0)" />
+          <KpiCard label="Genel İlerleme" value={`%${genelIlerleme}`} color={genelIlerleme === 100 ? 'var(--text-success)' : 'var(--accent-dark)'} progress={genelIlerleme} aciklama="Hakediş pursantajıyla ağırlıklı (rapor olmayan iş 0)" />
           <KpiCard label="Rapor Kapsamı" value={`%${blokVerisi.kapsam}`} color="#6366f1" progress={blokVerisi.kapsam} />
           <KpiCard label="Toplam Rapor" value={stats.toplamRapor} color="#6b7280" />
-          <KpiCard label="Tamamlandı" value={stats.tamamlananIsler} color="#22c55e" />
-          <KpiCard label="Devam Ediyor" value={stats.devamEdenIsler} color="#3b82f6" />
-          <KpiCard label="Planlandı" value={stats.planlananIsler} color="#f59e0b" />
-          <KpiCard label="Gecikme" value={stats.gecikenIsler} color="#ef4444" />
-          {isAdminOrPM && <KpiCard label="Onay Bekleyen" value={onayBekleyenSayisi} color="#f59e0b" />}
+          <KpiCard label="Tamamlandı" value={stats.tamamlananIsler} color="var(--text-success)" />
+          <KpiCard label="Devam Ediyor" value={stats.devamEdenIsler} color="var(--text-info)" />
+          <KpiCard label="Planlandı" value={stats.planlananIsler} color="var(--accent-dark)" />
+          <KpiCard label="Gecikme" value={stats.gecikenIsler} color="var(--text-danger)" />
+          {isAdminOrPM && <KpiCard label="Onay Bekleyen" value={onayBekleyenSayisi} color="var(--accent-dark)" />}
         </div>
 
         {bugunGirilecek.length > 0 && (
@@ -333,28 +330,28 @@ export default function Dashboard() {
           </div>
         )}
 
-        <div style={{ display: 'grid', gridTemplateColumns: '1.6fr 1fr 1fr', gap: 16, marginBottom: 16 }}>
+        <div className="grid-3-esnek">
           <TrendKart veri={trendData} />
-          <div style={{ ...card }}>
-            <h3 style={{ fontSize: 14, fontWeight: 600, color: 'var(--text-muted)', margin: 0, marginBottom: 8 }}>
+          <div style={{ ...card, minWidth: 0 }}>
+            <h2 style={{ fontSize: 14, fontWeight: 600, color: 'var(--text-muted)', margin: 0, marginBottom: 8 }}>
               Rapor Dağılımı
-            </h3>
+            </h2>
             <DonutChart data={donutData} height={190} />
           </div>
-          <div style={{ ...card }}>
-            <h3 style={{ fontSize: 14, fontWeight: 600, color: 'var(--text-muted)', margin: 0, marginBottom: 8 }}>
+          <div style={{ ...card, minWidth: 0 }}>
+            <h2 style={{ fontSize: 14, fontWeight: 600, color: 'var(--text-muted)', margin: 0, marginBottom: 8 }}>
               Ada Bazında İlerleme
-            </h3>
+            </h2>
             <BarChart data={adaProgress} height={190} />
           </div>
         </div>
 
-        <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 1.8fr', gap: 16, marginBottom: 16, alignItems: 'start' }}>
+        <div className="grid-2-esnek">
           <KalemIlerlemeKart kalemler={blokVerisi.kalemIlerleme} toplamKalem={isKalemleri.length} />
-          <div style={{ ...card }}>
-            <h3 style={{ fontSize: 14, fontWeight: 600, color: 'var(--text-muted)', margin: 0, marginBottom: 8 }}>
+          <div style={{ ...card, minWidth: 0 }}>
+            <h2 style={{ fontSize: 14, fontWeight: 600, color: 'var(--text-muted)', margin: 0, marginBottom: 8 }}>
               Ada × Blok Matrisi
-            </h3>
+            </h2>
             <BlokMatrisi
               adalar={adalar.map((a) => ({ ada: a.ada, bloklar: a.bloklar.map((b) => b.blok_no) }))}
               ilerleme={blokVerisi.adaBlokMap}
@@ -387,16 +384,16 @@ export default function Dashboard() {
 
       {!isAdminOrPM && user && (
         <div style={{ ...card, padding: 16, marginBottom: 16, background: 'linear-gradient(135deg, #f0f9ff 0%, #eff6ff 100%)' }}>
-          <h3 style={{ fontSize: 13, fontWeight: 600, color: '#3b82f6', margin: 0, marginBottom: 10 }}>
+          <h2 style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-info)', margin: 0, marginBottom: 10 }}>
             Kişisel Rapor Özeti
-          </h3>
+          </h2>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 10 }}>
             <div style={{ textAlign: 'center' }}>
               <div style={{ fontSize: 22, fontWeight: 700, color: 'var(--text-primary)' }}>{filtrelenmisRaporlar.length}</div>
               <div style={{ fontSize: 11, color: 'var(--text-faint)' }}>Toplam Rapor</div>
             </div>
             <div style={{ textAlign: 'center' }}>
-              <div style={{ fontSize: 22, fontWeight: 700, color: '#f59e0b' }}>{filtrelenmisRaporlar.filter((r) => r.onay_durumu === 'beklemede').length}</div>
+              <div style={{ fontSize: 22, fontWeight: 700, color: 'var(--accent-dark)' }}>{filtrelenmisRaporlar.filter((r) => r.onay_durumu === 'beklemede').length}</div>
               <div style={{ fontSize: 11, color: 'var(--text-faint)' }}>Onay Bekleyen</div>
             </div>
             <div style={{ textAlign: 'center' }}>
@@ -434,7 +431,7 @@ export default function Dashboard() {
       <div style={{ ...card, padding: 18, marginBottom: 16 }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
           <span style={{ fontSize: 14, fontWeight: 600, color: 'var(--text-muted)' }}>Genel İlerleme</span>
-          <span style={{ fontSize: 24, fontWeight: 700, color: genelIlerleme === 100 ? '#22c55e' : '#f59e0b' }}>
+          <span style={{ fontSize: 24, fontWeight: 700, color: genelIlerleme === 100 ? 'var(--text-success)' : 'var(--accent-dark)' }}>
             %{genelIlerleme}
           </span>
         </div>
@@ -447,15 +444,15 @@ export default function Dashboard() {
       {isAdminOrPM && onayBekleyenSayisi > 0 && (
         <div style={{ ...card, padding: 14, marginBottom: 16, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <span style={{ fontSize: 14, fontWeight: 600, color: 'var(--text-muted)' }}>Onay Bekleyen</span>
-          <span style={{ fontSize: 20, fontWeight: 700, color: '#f59e0b' }}>{onayBekleyenSayisi}</span>
+          <span style={{ fontSize: 20, fontWeight: 700, color: 'var(--accent-dark)' }}>{onayBekleyenSayisi}</span>
         </div>
       )}
 
       <div style={{ ...card, marginBottom: 16 }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
-          <h3 style={{ fontSize: 14, fontWeight: 600, color: 'var(--text-muted)', margin: 0 }}>
+          <h2 style={{ fontSize: 14, fontWeight: 600, color: 'var(--text-muted)', margin: 0 }}>
             Rapor Dağılımı
-          </h3>
+          </h2>
           <button onClick={() => navigate('/istatistik')} style={btnGhost}>
             Detaylı İstatistik →
           </button>
@@ -464,9 +461,9 @@ export default function Dashboard() {
       </div>
 
       <div style={{ ...card, marginBottom: 16 }}>
-        <h3 style={{ fontSize: 14, fontWeight: 600, color: 'var(--text-muted)', margin: 0, marginBottom: 8 }}>
+        <h2 style={{ fontSize: 14, fontWeight: 600, color: 'var(--text-muted)', margin: 0, marginBottom: 8 }}>
           Ada Bazında İlerleme
-        </h3>
+        </h2>
         <BarChart data={adaProgress} />
       </div>
 

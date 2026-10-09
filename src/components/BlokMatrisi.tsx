@@ -46,7 +46,7 @@ const BlokMatrisi = memo(function BlokMatrisi({ adalar, ilerleme, onBlokClick }:
   }
 
   return (
-    <div style={{ overflowX: 'auto', maxHeight: 340, overflowY: 'auto' }}>
+    <div style={{ overflowX: 'auto', maxHeight: 340, overflowY: 'auto', maxWidth: '100%' }}>
       <div
         style={{
           display: 'grid',
@@ -95,7 +95,9 @@ const BlokMatrisi = memo(function BlokMatrisi({ adalar, ilerleme, onBlokClick }:
                   style={{
                     ...hucreStil,
                     backgroundColor: hucreRengi(v),
-                    color: v > 25 ? 'var(--text-primary)' : 'var(--text-faint)',
+                    // Renkli pastel kutulara koyu tema text-primary'i (açık renk) taşmaz:
+                    // sabit koyu metin her iki temada da 4.5:1'i geçer.
+                    color: v > 0 ? '#1f2937' : 'var(--text-faint)',
                     border: 'none',
                     cursor: 'pointer',
                   }}
