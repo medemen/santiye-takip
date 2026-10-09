@@ -18,6 +18,36 @@ const STORAGE_KEY = `${getSiteConfig().marka.localStoragePrefix}_raporlar`;
 // sunucudaki silme "dirilir"; bu ozet ayristirmayi saglar.
 const BILINEN_SUNUCU_KEY = `${STORAGE_KEY}_bilinen_sunucu_idleri`;
 
+// Her açılışta ~binlerce raporu yeniden indirmemek için: son tam senkronun
+// yerel zamanı + sunucuda görülen en büyük created_at (sunucu saati) saklanır.
+// Bu pencerenin dışında yalnızca created_at > son senkron olan satırlar çekilir
+// (delta). created_at sunucu tarafından atanır; çevrimdışı girilip sonradan
+// yüklenen raporlar da bu sayede yakalanır.
+const SON_SENKRON_ZAMAN_KEY = `${STORAGE_KEY}_son_senkron_zaman`;
+const SON_SENKRON_SUNUCU_KEY = `${STORAGE_KEY}_son_senkron_sunucu`;
+const TAM_SENKRON_ARALIGI_MS = 6 * 60 * 60 * 1000;
+const DELTA_GUVENLIK_PAYI_MS = 60 * 1000;
+
+const RAPOR_SELECT = 'id, tarih, raporlayan, ada, blok_no, is_kalemi, durum, ilerleme_yuzde, aciklama, olusturma_tarihi, user_id, onay_durumu, revizyon_notu, fotograflar, created_at';
+
+type SunucuRapor = Rapor & { created_at?: string };
+
+function yerelOku(anahtar: string): string {
+  try {
+    return localStorage.getItem(anahtar) ?? '';
+  } catch {
+    return '';
+  }
+}
+
+function yerelYaz(anahtar: string, deger: string): void {
+  try {
+    localStorage.setItem(anahtar, deger);
+  } catch {
+    /* localStorage dolu/engelli olabilir */
+  }
+}
+
 type Listener = () => void;
 const _raporListeners = new Set<Listener>();
 let _version = 0;
@@ -252,17 +282,64 @@ export async function supabaseRaporlariYukle(): Promise<void> {
   if (!isSupabaseReady()) return;
   try {
     await idbHydrasyonuBaslat();
-    const sunucu = await tumKayitlariGetir<Rapor>(async (bastan, kadar) =>
-      await getSupabase()
-        .from('raporlar')
-        .select('id, tarih, raporlayan, ada, blok_no, is_kalemi, durum, ilerleme_yuzde, aciklama, olusturma_tarihi, user_id, onay_durumu, revizyon_notu, fotograflar')
-        .order('olusturma_tarihi', { ascending: false })
-        .range(bastan, kadar)
-    );
     const yerel = getRaporlar();
-    const { birlestirilmis, bekleyen } = sunucuRaporlariniBirlestir(yerel, sunucu, bilinenSunucuIds());
+    const sonSenkronZaman = Number(yerelOku(SON_SENKRON_ZAMAN_KEY)) || 0;
+    const sonSenkronSunucu = yerelOku(SON_SENKRON_SUNUCU_KEY);
+    // Yerel önbellek boşsa, sunucu referansı yoksa veya penceresi geçtiyse
+    // tam senkron (silme/güncelleme uzlaştırması dahil) yapılır; aksi halde
+    // yalnızca yeni satırlar çekilir.
+    const tamSenkronGerekli =
+      yerel.length === 0 ||
+      !sonSenkronSunucu ||
+      (sonSenkronZaman > 0 && Date.now() - sonSenkronZaman > TAM_SENKRON_ARALIGI_MS);
+
+    let sunucu: SunucuRapor[];
+    if (tamSenkronGerekli) {
+      sunucu = await tumKayitlariGetir<SunucuRapor>(async (bastan, kadar) =>
+        await getSupabase()
+          .from('raporlar')
+          .select(RAPOR_SELECT)
+          .order('created_at', { ascending: false })
+          .range(bastan, kadar)
+      );
+    } else {
+      const deltaEsik = new Date(new Date(sonSenkronSunucu).getTime() - DELTA_GUVENLIK_PAYI_MS).toISOString();
+      sunucu = await tumKayitlariGetir<SunucuRapor>(async (bastan, kadar) =>
+        await getSupabase()
+          .from('raporlar')
+          .select(RAPOR_SELECT)
+          .gte('created_at', deltaEsik)
+          .order('created_at', { ascending: false })
+          .range(bastan, kadar)
+      );
+    }
+
+    let yeniSunucuReferans = sonSenkronSunucu;
+    for (const r of sunucu) {
+      if (r.created_at && (!yeniSunucuReferans || r.created_at > yeniSunucuReferans)) {
+        yeniSunucuReferans = r.created_at;
+      }
+    }
+
+    let birlestirilmis: Rapor[];
+    let bekleyen: Rapor[];
+    let yeniBilinen: Set<string>;
+    if (tamSenkronGerekli) {
+      const sonuc = sunucuRaporlariniBirlestir(yerel, sunucu, bilinenSunucuIds());
+      birlestirilmis = sonuc.birlestirilmis;
+      bekleyen = sonuc.bekleyen;
+      yeniBilinen = new Set(sunucu.map((r) => r.id));
+    } else {
+      // Delta modunda sunucu satırları id ile yereli ezer; silme tespiti
+      // yalnızca tam senkronda yapılır (Realtime DELETE canlı silmeyi yakalar).
+      const harita = new Map<string, Rapor>(yerel.map((r) => [r.id, r]));
+      for (const s of sunucu) harita.set(s.id, s);
+      birlestirilmis = [...harita.values()];
+      yeniBilinen = new Set(bilinenSunucuIds());
+      for (const s of sunucu) yeniBilinen.add(s.id);
+      bekleyen = yerel.filter((r) => !yeniBilinen.has(r.id));
+    }
     setRaporlar(birlestirilmis);
-    bilinenSunucuIdsniGuncelle(new Set(sunucu.map((r) => r.id)));
     // Tek tek upsert: tek bir yetkisiz/uyumsuz rapor kalan tum raporlarin
     // yuklenmesini bloke etmesin. RLS INSERT politikasinin client aynasi:
     // PM sinirsiz; sef ada-scope'lu (bos dizi = sinirsiz); sahip yalnizca
@@ -278,18 +355,23 @@ export async function supabaseRaporlariYukle(): Promise<void> {
     // rapor için tek tek istek atmak dakikalar sürebilir. Bir parça tamamen
     // başarısız olursa içindeki suçlu kaydı izole etmek için tek tek denenir.
     const basarisiz: Rapor[] = [];
+    const yuklenenIds = new Set<string>();
     const PARCA_BOYUTU = 50;
     for (let i = 0; i < adaylar.length; i += PARCA_BOYUTU) {
       const parca = adaylar.slice(i, i + PARCA_BOYUTU);
       const { error: parcaError } = await getSupabase()
         .from('raporlar')
         .upsert(parca.map((r) => raporToSupabase(r)), { onConflict: 'id' });
-      if (!parcaError) continue;
+      if (!parcaError) {
+        for (const r of parca) yuklenenIds.add(r.id);
+        continue;
+      }
       for (const r of parca) {
         const { error: upsertError } = await getSupabase()
           .from('raporlar')
           .upsert(raporToSupabase(r), { onConflict: 'id' });
         if (upsertError) basarisiz.push(r);
+        else yuklenenIds.add(r.id);
       }
     }
     if (basarisiz.length > 0) {
@@ -309,9 +391,23 @@ export async function supabaseRaporlariYukle(): Promise<void> {
     } else if (adaylar.length > 0) {
       _yuklemeHataBildirildi = false;
     }
+    for (const id of yuklenenIds) yeniBilinen.add(id);
+    bilinenSunucuIdsniGuncelle(yeniBilinen);
+    // Tam senkron penceresi yalnızca tam senkronda ilerler; delta senkronlar
+    // saati kaydırırsa aktif kullanıcıda 6 saatlik tam senkron hiç tetiklenmez,
+    // sunucudaki silinmeler ve eski satırlardaki güncellemeler uzlaştırılamazdı.
+    if (tamSenkronGerekli) yerelYaz(SON_SENKRON_ZAMAN_KEY, String(Date.now()));
+    if (yeniSunucuReferans) yerelYaz(SON_SENKRON_SUNUCU_KEY, yeniSunucuReferans);
   } catch {
     /* supabase offline, keep local data */
   }
+}
+
+// Kullanıcı tetiklemeli tam senkron: silinen/güncellenen kayıtları da uzlaştırır.
+export async function raporlariTamYenile(): Promise<void> {
+  yerelYaz(SON_SENKRON_ZAMAN_KEY, '0');
+  yerelYaz(SON_SENKRON_SUNUCU_KEY, '');
+  await supabaseRaporlariYukle();
 }
 
 export function saveRapor(rapor: Omit<Rapor, 'id' | 'olusturma_tarihi' | 'user_id' | 'onay_durumu' | 'revizyon_notu' | 'fotograflar'>): Rapor {
