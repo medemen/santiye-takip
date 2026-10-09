@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { getSupabaseAnonKey } from '../lib/supabase';
 
 const SUPABASE_URL = (import.meta.env.VITE_SUPABASE_URL as string | undefined) || '';
 
@@ -17,7 +18,15 @@ export function OfflineBanner() {
       try {
         const c = new AbortController();
         const zamanlayici = setTimeout(() => c.abort(), 6000);
-        await fetch(`${SUPABASE_URL}/rest/v1/`, { method: 'GET', signal: c.signal, cache: 'no-store' });
+        const apikey = getSupabaseAnonKey();
+        // /rest/v1/ koku anon anahtarla bile 401 dondurur; health ucu anon
+        // anahtarla 200 verir ve konsol gurultusu olusturmaz.
+        await fetch(`${SUPABASE_URL}/auth/v1/health`, {
+          method: 'GET',
+          headers: apikey ? { apikey } : undefined,
+          signal: c.signal,
+          cache: 'no-store',
+        });
         clearTimeout(zamanlayici);
         return true;
       } catch {
@@ -31,7 +40,12 @@ export function OfflineBanner() {
     };
 
     void kontrol();
-    aralik = window.setInterval(() => void kontrol(), 15000);
+    // Sekme gizliyken yoklamayi atla: arka planda gereksiz istek/pil tuketimi
+    // olmasin (Android WebView'da gercek baglanti zaten olaylarla yakalanir).
+    aralik = window.setInterval(() => {
+      if (document.visibilityState === 'hidden') return;
+      void kontrol();
+    }, 60000);
     const olay = () => void kontrol();
     window.addEventListener('online', olay);
     window.addEventListener('offline', olay);
@@ -57,7 +71,7 @@ export function OfflineBanner() {
         background: 'var(--color-warning, #f59e0b)',
         color: '#000',
         textAlign: 'center',
-        padding: '6px 12px',
+        padding: 'calc(6px + env(safe-area-inset-top)) 12px 6px',
         fontSize: 13,
         fontWeight: 600,
       }}

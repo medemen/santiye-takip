@@ -12,6 +12,12 @@ export function isSupabaseReady(): boolean {
   return _supabase !== null;
 }
 
+// Bazi ham istekler (or. baglanti yoklamasi) client'a girmeden anon anahtari
+// basligta tasimali; yoksa PostgREST 401 dondurur ve konsolu kirletir.
+export function getSupabaseAnonKey(): string {
+  return supabaseAnonKey;
+}
+
 export function getSupabase(): SupabaseClient {
   if (!_supabase) throw new Error('Supabase not configured');
   return _supabase;
