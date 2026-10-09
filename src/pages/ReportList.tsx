@@ -1,6 +1,6 @@
 import { useMemo, useState, useEffect, useCallback } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { deleteRapor, getRaporlar, raporOnayla, raporReddet } from '../stores/reportStore';
+import { deleteRapor, getRaporlar, raporOnayla, raporReddet, raporlariTamYenile } from '../stores/reportStore';
 import { useRaporlar } from '../hooks/useRaporlar';
 import { getCurrentUser, isSahaPersoneli } from '../stores/authStore';
 import { useSiteConfig } from '../hooks/useSiteConfig';
@@ -12,6 +12,7 @@ import { toastGoster } from '../stores/toastStore';
 import { raporlarXlsxExport } from '../utils/exportXlsx';
 import { onayla } from '../utils/dialog';
 import { getHedef } from '../stores/hedefStore';
+import { SkeletonSayfa } from '../components/SkeletonKart';
 
 const PAGE_SIZE = 20;
 
@@ -39,6 +40,7 @@ export default function ReportList() {
   const [searchTerm, setSearchTerm] = useState('');
   const [debouncedTerm, setDebouncedTerm] = useState('');
   const [sayfa, setSayfa] = useState(1);
+  const [yenileniyor, setYenileniyor] = useState(false);
   const [acikFotoRapor, setAcikFotoRapor] = useState<string | null>(null);
   const [raporFotograflari, setRaporFotograflari] = useState<Record<string, string[]>>({});
 
@@ -120,33 +122,54 @@ export default function ReportList() {
     }
   };
 
+  const handleYenile = async () => {
+    if (yenileniyor) return;
+    setYenileniyor(true);
+    try {
+      await raporlariTamYenile();
+      toastGoster('Raporlar sunucudan yenilendi', 'success');
+    } finally {
+      setYenileniyor(false);
+    }
+  };
+
   return (
     <div>
-      {yukleniyor && (
-        <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '50vh', fontSize: 18, opacity: 0.6 }}>
-          Yükleniyor…
-        </div>
-      )}
+      {yukleniyor && <SkeletonSayfa kartSayisi={3} />}
       {!yukleniyor && (<>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
         <h1 style={{ fontSize: 20, fontWeight: 700, color: 'var(--text-primary)', margin: 0 }}>Raporlar</h1>
-        <button
-          onClick={async () => {
-            try {
-              await raporlarXlsxExport(filtered, 'raporlar.xlsx', getHedef, { santiyeAdi: config.genel.santiyeAdi });
-              toastGoster(`${filtered.length} rapor Excel olarak indiriliyor`, 'success');
-            } catch {
-              toastGoster('Excel dosyası oluşturulamadı', 'error');
-            }
-          }}
-          style={{
-            background: 'none', border: '1px solid var(--border)', borderRadius: 8,
-              padding: '4px 10px', fontSize: 11, color: 'var(--text-faint)', cursor: 'pointer', minHeight: 44, minWidth: 44,
-          }}
-          title="Excel Aktar"
-        >
-          📥 Excel
-        </button>
+        <div style={{ display: 'flex', gap: 8 }}>
+          <button
+            onClick={() => void handleYenile()}
+            disabled={yenileniyor}
+            style={{
+              background: 'none', border: '1px solid var(--border)', borderRadius: 8,
+              padding: '4px 10px', fontSize: 11, color: 'var(--text-faint)', cursor: yenileniyor ? 'wait' : 'pointer',
+              minHeight: 44, minWidth: 44, opacity: yenileniyor ? 0.6 : 1,
+            }}
+            title="Sunucudan tam yenile (silinen/güncellenen kayıtları uzlaştırır)"
+          >
+            🔄 Yenile
+          </button>
+          <button
+            onClick={async () => {
+              try {
+                await raporlarXlsxExport(filtered, 'raporlar.xlsx', getHedef, { santiyeAdi: config.genel.santiyeAdi });
+                toastGoster(`${filtered.length} rapor Excel olarak indiriliyor`, 'success');
+              } catch {
+                toastGoster('Excel dosyası oluşturulamadı', 'error');
+              }
+            }}
+            style={{
+              background: 'none', border: '1px solid var(--border)', borderRadius: 8,
+                padding: '4px 10px', fontSize: 11, color: 'var(--text-faint)', cursor: 'pointer', minHeight: 44, minWidth: 44,
+            }}
+            title="Excel Aktar"
+          >
+            📥 Excel
+          </button>
+        </div>
       </div>
 
       <div

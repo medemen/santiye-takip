@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { getKullanicilar } from '../stores/kullanicilarStore';
 import { girisYap } from '../stores/authStore';
@@ -10,6 +10,7 @@ export default function Login() {
   const navigate = useNavigate();
   const config = useSiteConfig();
   const [selected, setSelected] = useState('');
+  const [arama, setArama] = useState('');
   const [hata, setHata] = useState('');
   const [yukleniyor, setYukleniyor] = useState(false);
   const supabaseAktif = isSupabaseReady();
@@ -17,15 +18,19 @@ export default function Login() {
   const tumKullanicilar = getKullanicilar().map((k) => ({
     ad_soyad: k.ad_soyad,
     rol: k.rol,
+    yonetici: k.admin || k.proje_muduru,
   }));
 
-  const yoneticiler = getKullanicilar()
-    .filter((k) => k.admin || k.proje_muduru)
-    .map((k) => ({ ad_soyad: k.ad_soyad, rol: k.rol }));
-
-  const standartKullanicilar = getKullanicilar()
-    .filter((k) => !k.admin && !k.proje_muduru)
-    .map((k) => ({ ad_soyad: k.ad_soyad, rol: k.rol }));
+  const gruplar = useMemo(() => {
+    const q = arama.trim().toLocaleLowerCase('tr');
+    const eslesen = q
+      ? tumKullanicilar.filter((k) => k.ad_soyad.toLocaleLowerCase('tr').includes(q))
+      : tumKullanicilar;
+    return [
+      { baslik: '👑 Yöneticiler', kisiler: eslesen.filter((k) => k.yonetici) },
+      { baslik: '👥 Standart Kullanıcılar', kisiler: eslesen.filter((k) => !k.yonetici) },
+    ].filter((g) => g.kisiler.length > 0);
+  }, [arama, tumKullanicilar]);
 
   const handleGiris = async () => {
     if (!selected || yukleniyor) return;
@@ -74,37 +79,70 @@ export default function Login() {
           border: '1px solid var(--border-soft)',
         }}
       >
-        <label htmlFor="login-kullanici" style={{ display: 'block', fontSize: 13, fontWeight: 500, color: 'var(--text-muted)', marginBottom: 8 }}>
+        <label htmlFor="login-arama" style={{ display: 'block', fontSize: 13, fontWeight: 500, color: 'var(--text-muted)', marginBottom: 8 }}>
           Kullanıcı Adı
         </label>
-        <select
-          id="login-kullanici"
-          value={selected}
-          onChange={(e) => setSelected(e.target.value)}
+        <input
+          id="login-arama"
+          type="text"
+          value={arama}
+          onChange={(e) => setArama(e.target.value)}
           disabled={yukleniyor}
           autoComplete="off"
+          placeholder="İsimle ara…"
           style={{
             width: '100%', padding: '12px 14px', borderRadius: 12,
             border: '2px solid var(--border)', fontSize: 14, backgroundColor: 'var(--bg-card)',
-            boxSizing: 'border-box', marginBottom: 16,
+            boxSizing: 'border-box', marginBottom: 8,
+          }}
+        />
+
+        <div
+          id="login-kullanici"
+          role="listbox"
+          aria-label="Kullanıcı seçimi"
+          style={{
+            maxHeight: 240, overflowY: 'auto', border: '1px solid var(--border)',
+            borderRadius: 12, padding: 4, marginBottom: 16, backgroundColor: 'var(--bg-card)',
           }}
         >
-          <option value="">Kişi seçin</option>
-          <optgroup label="👑 Yöneticiler">
-            {yoneticiler.map((k) => (
-              <option key={k.ad_soyad} value={k.ad_soyad}>
-                {k.ad_soyad} ({k.rol})
-              </option>
-            ))}
-          </optgroup>
-          <optgroup label="👥 Standart Kullanıcılar">
-            {standartKullanicilar.map((k) => (
-              <option key={k.ad_soyad} value={k.ad_soyad}>
-                {k.ad_soyad} ({k.rol})
-              </option>
-            ))}
-          </optgroup>
-        </select>
+          {gruplar.length === 0 && (
+            <div style={{ padding: '12px', fontSize: 13, color: 'var(--text-faint)', textAlign: 'center' }}>
+              Kişi bulunamadı
+            </div>
+          )}
+          {gruplar.map((grup) => (
+            <div key={grup.baslik}>
+              <div style={{ padding: '6px 10px 2px', fontSize: 11, fontWeight: 700, color: 'var(--text-faint)' }}>
+                {grup.baslik}
+              </div>
+              {grup.kisiler.map((k) => {
+                const secili = selected === k.ad_soyad;
+                return (
+                  <button
+                    key={k.ad_soyad}
+                    type="button"
+                    role="option"
+                    aria-selected={secili}
+                    disabled={yukleniyor}
+                    onClick={() => setSelected(k.ad_soyad)}
+                    className={`login-secim${secili ? ' login-secim--secili' : ''}`}
+                    style={{
+                      display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 8,
+                      width: '100%', textAlign: 'left', padding: '10px 12px', borderRadius: 8,
+                      border: 'none', cursor: 'pointer', fontSize: 14, fontFamily: 'inherit',
+                      color: 'var(--text-primary)',
+                      fontWeight: secili ? 700 : 500,
+                    }}
+                  >
+                    <span>{k.ad_soyad}{secili ? ' ✓' : ''}</span>
+                    <span style={{ fontSize: 11, color: 'var(--text-faint)' }}>{k.rol}</span>
+                  </button>
+                );
+              })}
+            </div>
+          ))}
+        </div>
 
         {supabaseAktif && (
           <p style={{ fontSize: 12, color: 'var(--text-faint)', margin: '0 0 16px' }}>

@@ -1,0 +1,4 @@
+User-agent: *
+Disallow: /
+
+# Şantiye Takip — yalnızca saha personeli için giriş gerektiren iç uygulama.

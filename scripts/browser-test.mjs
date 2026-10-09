@@ -129,11 +129,12 @@ async function gez(rota, beklenenler, adimAdi) {
 
 async function girisYap(kullanici) {
   await page.goto(BASE, { waitUntil: 'load', timeout: 30000 });
-  await page.locator('select').first().waitFor({ state: 'visible', timeout: 20000 });
-  const mevcutSecenekler = await page.locator('select option').allTextContents();
-  const secenek = mevcutSecenekler.find((s) => s.includes(kullanici));
-  if (!secenek) throw new Error(`Login listesinde "${kullanici}" bulunamadi. Secenekler: ${mevcutSecenekler.join(', ')}`);
-  await page.locator('select').first().selectOption({ label: secenek });
+  const aramaAlani = page.locator('#login-arama');
+  await aramaAlani.waitFor({ state: 'visible', timeout: 20000 });
+  await aramaAlani.fill(kullanici);
+  const secenek = page.getByRole('option').filter({ hasText: kullanici }).first();
+  await secenek.waitFor({ state: 'visible', timeout: 20000 });
+  await secenek.click();
   const sifreAlani = page.locator('input[type="password"]');
   if (await sifreAlani.count() > 0) {
     await sifreAlani.first().fill(SIFRE);
@@ -263,11 +264,12 @@ async function main() {
       const hatalar = [];
       dpage.on('pageerror', (e) => hatalar.push(String(e)));
       await dpage.goto(BASE, { waitUntil: 'load', timeout: 30000 });
-      await dpage.locator('select').first().waitFor({ state: 'visible', timeout: 20000 });
-      const secenekler = await dpage.locator('select option').allTextContents();
-      const secenek = secenekler.find((s) => s.includes(USER));
-      if (!secenek) throw new Error(`Desktop giris listesinde "${USER}" bulunamadi`);
-      await dpage.locator('select').first().selectOption({ label: secenek });
+      const darama = dpage.locator('#login-arama');
+      await darama.waitFor({ state: 'visible', timeout: 20000 });
+      await darama.fill(USER);
+      const dsecenek = dpage.getByRole('option').filter({ hasText: USER }).first();
+      await dsecenek.waitFor({ state: 'visible', timeout: 20000 });
+      await dsecenek.click();
       const dsifre = dpage.locator('input[type="password"]');
       if (await dsifre.count() > 0) {
         await dsifre.first().fill(SIFRE);
