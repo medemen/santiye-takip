@@ -1,5 +1,20 @@
 # Değişiklik Notları
 
+## [1.1.55] - Yayınlanmadı (geliştirme dalında)
+
+### İyileştirmeler
+
+- **Dashboard yatay taşma sıfırlandı**: grid track'lere `minWidth: 0`, `BlokMatrisi` dış sarmalayıcı `maxWidth: 100%` — masaüstü ve 480px mobil ölçümlerinde taşma 0.
+- **401 konsol gürültüsü bitti**: offline yoklaması `GET /rest/v1/` yerine `GET /auth/v1/health` + `apikey` kullanıyor; gizliyken 60 sn'de bir ölçer.
+- **Raporlar delta senkron**: açılışta yalnızca `created_at` üstü yeni kayıtlar çekilir (4500+ kayıtlık tek-çekim yükü kalktı); tam senkron 6 saatte bir ve "🔄 Yenile" düğmesiyle yapılır.
+- **Erişilebilirlik (Lighthouse a11y 1.0)**: kontrast token'ları (`--text-danger/info/success/brand`, koyu `--on-accent`), erişilebilir `StatusBadge` renkleri, `BlokMatrisi` hücre metinleri tema-bağımsız, Dashboard bölüm başlıkları `h3→h2`, mobil içerik `<main>` çatısına alındı. Açık + koyu temada 0 başarısız denetim.
+- **Login kişi listbox'ı**: arama kutulu, `role="option"` listbox; seçim ✓ işaretiyle gösterilir.
+- **İskelet yükleme + SEO**: `SkeletonKart` (Dashboard/ReportList), `public/robots.txt`, `index.html` meta description.
+
+### Testler
+
+- Birim 92/92 · lint 0 · `tsc -b` 0 · browser smoke **17/17** şef + **17/17** PM · Lighthouse a11y/best-practices/SEO **1.0**.
+
 ## [1.1.54] - 2026-10-08
 
 ### İyileştirmeler

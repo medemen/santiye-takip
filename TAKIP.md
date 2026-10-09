@@ -15,29 +15,36 @@ geliştirme kaldığı yerden devam eder. Kalıcı mimari kurallar ve dizin hari
 
 ## 1. Mevcut Durum
 
-- **Güncelleme:** 2026-10-08
-- **Dal:** `master` (origin/master ile eşit, working tree temiz)
+- **Güncelleme:** 2026-10-09
+- **Dal:** `master` — `fff9a41` + bu turun işi commit edilmeyi bekliyor, push yapılacak
 - **Sürümler:** UI `package.json` → **1.1.54** · Android `version.properties` → **1.1.54 (versionCode 54)** — hizalı
 - **Dağıtım:** `master` push → GitHub Pages otomatik deploy · **APK** `android/app/build/outputs/apk/release/app-release.apk` (1.51 MB, code 54) + **AAB** `android/app/build/outputs/bundle/release/app-release.aab` (1.96 MB, code 53) — ikisi de imzalı release, telefonda/Publish'de bekliyor
-- **Test:** birim 92/92 (vitest) · browser smoke **17/17** (`npm run test:browser -- --auto-start`)
+- **Test:** birim 92/92 (vitest) · browser smoke **17/17** şef + 17/17 PM (`npm run test:browser`) · Lighthouse a11y **1.0 / best-practices 1.0 / SEO 1.0** (açık + koyu tema, 0 hata)
 - **Lint:** oxlint temiz (0 uyarı) · `tsc -b` temiz
-- **Son iş:** Şifresiz giriş (sessiz ortak şifre), Ayarlar'da çıkış üste, kullanıcı yönetiminde şifre kalkması, rapor düğmesi alt çubuğun ortası, AAB 1.1.53 derlemesi.
+- **Son iş:** Test turu iyileştirmeleri — Dashboard taşması 0, OfflineBanner 401 gürültüsü bitti (`/auth/v1/health`), raporlar delta senkron (4500+ kayıt açılışta tek-çekim yükü kalktı), kontrast/başlık hiyerarşisi düzeltildi (Lighthouse a11y 1.0), Login kişi listbox'ı, robots.txt + meta description.
 
 ## 2. Açık İşler
 
 - **Şifreli giriş geri alınacak (geçici):** UI'da şifre alanı yok (giriş + kullanıcı yönetimi dahil); ortak `VITE_DEFAULT_PASSWORD` bundle'a gömülü — paketi okuyan herkes girebilir. Normal güvenlik düzenine dönülecekse `Login.tsx` + `authStore.girisYap` + `kullaniciYonetimStore.santiyeKullaniciOlustur`'a şifre alanları geri getirilecek (bkz. AGENTS.md "Giriş").
-- **Dashboard yatay taşma (951px) — tespit edildi, düzeltilecek:** `BlokMatrisi`'ndeki `width: 'max-content'` grid, kartın CSS grid track'ini şişiriyor (`min-width: auto`); hem masaüstünde hem mobilde tüm sayfa yatay kayıyor. Çözüm: matris sarmalayıcı kartına `minWidth: 0` (+ gerekirse `overflow: hidden`). Karar bekliyor.
-- **OfflineBanner 401 gürültüsü — kök neden bulundu:** `src/components/OfflineBanner.tsx:20` `GET ${SUPABASE_URL}/rest/v1/` çağrısı `apikey` header'ı olmadan yapılıyor → PostgREST 401 dönüyor (erişilebilir=true mantığı doğru çalışıyor, sadece 15 sn'de bir console.error). Çözüm: `apikey` anon key header'ı eklemek. Karar bekliyor.
-- **Raporlar tablosu büyüklüğü:** `raporlar` sorgusu ~4500+ kayda ulaştı, açılışta 5 sayfalık (offset 0→4000) ardışık çekim yapılıyor. Öneri: periyot filtresi / önbellek önceliği / sunucu tarafı toplulaştırma.
-- **Konsol 401'leri:** → yukarıdaki "OfflineBanner" maddesine taşındı (kök neden biliniyor).
+- **Native derleme kararı bekliyor (AAB/APK, code 55):** bir sonraki derleme `version.properties`'i 55'e çıkarır (şu an 1.1.54/code 54). Kullanıcı "sonra karar veririm" dedi — karar verilince `npm run cap:sync` → `gradlew assembleRelease` (+ gerekirse `bundleRelease`) akışı işlenecek.
+- **Raporlar delta senkron (kalan iyileştirme):** açılışta yalnızca `created_at` üstü delta çekilir; tam senkron 6 saatte bir + "Yenile" düğmesiyle yapılır. Silme tespiti yalnızca tam senkronda (Realtime DELETE canlı silmeyi yakalar) — bilinen takas, `reportStore.ts` yorumunda belgeli. İleride tam senkronu otomatik arka plana taşımak istenebilir.
 - **Telefon kurulumu bekliyor:** 1.1.54 release APK derlendi (`app-release.apk`, code 54) — cihaza USB/kurye ile kurulacak; şifresiz giriş + ortalanmış rapor düğmesi bu pakette. (Eski APK'da giriş hâlâ şifreli.)
 - **Farklı şifreli hesaplar hizalanmalı:** eski "Geçici Şifre" ile açılmış hesaplar ortak şifreyle eşleşmeyebilir → sessiz giriş onlarda yerel oturuma düşer. `npm run seed:users` tüm hesapların şifresini ortak değere hizalar (dikkat: mevcut şifreleri değiştirir).
-- **Konsol 401'leri:** (kapatıldı — OfflineBanner kök nedeni yukarıda).
 - Play Console'da yayınlanan sürüm kontrol edilmeli — depo notları 1.1.12 (code 14) diyor, sonraki yükleme kaydı yok; **1.1.53/53 imzalı AAB hazır** (`play-console/yukleme-rehberi.md`'deki adımlarla yüklenebilir; sonraki derleme code 55 olur).
 - Yeni hakediş periyodu geldiğinde: `scripts/hakedis-oku.mjs` → `npm run build:config` → `validate-config.mjs` akışını işle.
 - fikir/geri bildirim geldikçe buraya ekle; biten işi günlüğe taşıyıp buradan sil.
 
 ## 3. Değişiklik Günlüğü
+
+### 2026-10-09 (6) — Test turu iyileştirmeleri: taşma, 401, delta senkron, a11y 1.0
+
+- **Dashboard yatay taşma 0:** grid track'lere `minWidth: 0`, `BlokMatrisi` dış sarmalayıcıya `maxWidth: 100%`; masaüstü (994px) ve mobil (480px iframe) ölçümlerinde `scrollWidth − clientWidth = 0`, taşan kapsanmamış öğe 0.
+- **401 konsol gürültüsü bitti:** `OfflineBanner` bağlantı yoklaması `GET /rest/v1/` → `GET /auth/v1/health` + `apikey` (200 döner); gizliyken 60 sn'de bir yoklar, safe-area uyumlu. Smoke test çıkışında `[Sorun]` yok.
+- **Kontrast ve başlık hiyerarşisi (Lighthouse a11y 1.0, açık + koyu tema, 0 hata):** yeni token'lar (`--on-accent` koyu metin, `--text-danger/info/success/brand` tema-bağımlı), `StatusBadge` erişilebilir renk çiftleri, `BlokMatrisi` hücre metni tema-bağımsız koyu, `btnGhost`/aktif nav `--accent-dark`, beyaz-on-amber butonlar `--on-accent`, Dashboard bölüm başlıkları `h3→h2`; mobil Layout içeriği `<main>` çatısına alındı. 173 başarısız kontrast öğesi → 0.
+- **Raporlar delta senkron:** `reportStore` açılışta yalnızca `created_at ≥ son senkron − 60 sn` delta çeker (4500+ kayıt tek-çekim yükü kalktı); 6 saatlik tam senkron penceresi + sunucu referansı `SON_SENKRON_SUNUCU_KEY`; tam senkron penceresi **yalnızca tam senkronda ilerler** (delta senkronlar saati kaydırırsa silinen/eski satır güncellemeleri hiç uzlaştırılamazdı — düzeltildi). `ReportList`'te "🔄 Yenile" (tam senkron) düğmesi.
+- **Login kişi listbox'ı:** arama kutusu + `role="option"` listbox (seçim ✓, Giriş butonu etkinleşir); `scripts/browser-test.mjs` bu akışa göre güncellendi.
+- **İskelet + SEO:** `SkeletonKart` yükleme animasyonu (Dashboard/ReportList), `public/robots.txt` (Disallow: /), `index.html` meta description.
+- Doğrulama: birim **92/92** · lint **0** · `tsc -b` **0** · smoke **34/34** (şef + PM, exit 0) · Lighthouse a11y **1.0** / best-practices 1.0 / SEO 1.0 (iki tema).
 
 ### 2026-10-08 (5) — Uygulama test turu
 
